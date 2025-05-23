@@ -11,15 +11,15 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden min-h-[800px]">
-      <div className="absolute inset-0 z-0">
+    <section className="relative py-24 md:py-32 overflow-hidden">
+      <div className="absolute inset-0 z-0 flex items-center justify-center">
         {isClient && (
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover md:object-contain"
           >
             <source src="/videos/Roadmap.mp4" type="video/mp4" />
           </video>
