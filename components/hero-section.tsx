@@ -19,7 +19,7 @@ export default function HeroSection() {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover md:object-contain"
+            className="w-full h-full object-cover"
           >
             <source src="/videos/Roadmap.mp4" type="video/mp4" />
           </video>
