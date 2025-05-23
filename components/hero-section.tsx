@@ -11,7 +11,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden">
+    <section className="relative py-24 md:py-32 overflow-hidden min-h-[800px]">
       <div className="absolute inset-0 z-0">
         {isClient && (
           <video
@@ -19,7 +19,7 @@ export default function HeroSection() {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           >
             <source src="/videos/Roadmap.mp4" type="video/mp4" />
           </video>
