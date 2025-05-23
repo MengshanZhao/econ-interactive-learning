@@ -11,7 +11,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative py-64 md:py-72 overflow-hidden">
+    <section className="relative py-56 md:py-64 overflow-hidden">
       <div className="absolute inset-0 z-0 flex items-center justify-center">
         {isClient && (
           <video
