@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', 'Georgia', serif;
+  background: linear-gradient(120deg, #18181b 0%, #23242a 100%);
+  color: #e3e8f7;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 240 6% 12%; /* deep metallic dark */
+    --foreground: 220 15% 90%; /* bluish-silver */
+    --card: 240 6% 16%;
+    --card-foreground: 220 15% 90%;
+    --popover: 240 6% 16%;
+    --popover-foreground: 220 15% 90%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 240 6% 12%;
+    --secondary: 240 6% 22%;
+    --secondary-foreground: 220 15% 90%;
+    --muted: 240 6% 22%;
+    --muted-foreground: 220 15% 70%;
+    --accent: 220 10% 60%;
+    --accent-foreground: 220 15% 90%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 22%;
+    --input: 240 6% 22%;
+    --ring: 220 10% 60%;
+    --radius: 0.5rem;
+    --sidebar-background: 240 6% 10%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 240 6% 10%;
+    --sidebar-accent: 220 10% 60%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 6% 20%;
+    --sidebar-ring: 220 10% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Minimal card style */
+.card-minimal {
+  @apply bg-white border border-[color:hsl(var(--border))] rounded-xl shadow-none p-8;
+}
+
+/* Minimal outlined avatar */
+.avatar-outline {
+  @apply border border-[color:hsl(var(--border))] rounded-lg flex items-center justify-center bg-transparent;
+}
+
+/* Minimal link style */
+.link-minimal {
+  @apply underline text-[color:hsl(var(--foreground))] hover:text-black transition-colors;
+}
+
+/* Custom styles for a more relaxed look */
+.shining-button {
+  @apply bg-gradient-to-r from-gray-700 to-gray-600 text-white hover:from-gray-600 hover:to-gray-500 transition-all duration-300 ease-in-out;
+}
+
+.profile-border {
+  @apply border-4 border-gray-200 shadow-lg;
+}
+
+.field-photo {
+  @apply transition-transform duration-300 hover:scale-105;
+}
+
+/* Add subtle animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: -500px 0; }
+  100% { background-position: 500px 0; }
+}
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 2.5s linear infinite;
+}
+
+@layer components {
+  .metallic-gradient {
+    background: linear-gradient(120deg, #e6e7ee 0%, #bfc3c9 40%, #f8fafd 100%);
+    color: #18181b;
+    box-shadow: 0 2px 16px 0 rgba(255,255,255,0.08), 0 1.5px 0 0 #fff inset;
+  }
+  .button-metallic {
+    @apply px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-200;
+    background: linear-gradient(120deg, #f8fafd 0%, #bfc3c9 40%, #e6e7ee 100%);
+    color: #18181b;
+    border: 1px solid #bfc3c9;
+    text-shadow: 0 1px 8px #fff8, 0 1px 0 #fff;
+  }
+  .button-metallic:hover, .button-metallic:focus {
+    background: linear-gradient(120deg, #fff 0%, #dbe2ea 60%, #bfc3c9 100%);
+    box-shadow: 0 0 16px 2px #fff6, 0 1.5px 0 0 #fff inset;
+    color: #111;
+  }
+}
+
+.metallic-bg {
+  background: linear-gradient(120deg, #23242a 0%, #43464d 100%);
+}
+
+.spectrum-metallic-btn {
+  @apply px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-200 relative overflow-hidden border border-[color:hsl(var(--border))];
+  background: linear-gradient(90deg, #bfc3c9 0%, #7f8fa6 40%, #5e6b7a 70%, #bfc3c9 100%);
+  color: #e3e8f7;
+  text-shadow: 0 1px 8px #fff8, 0 1px 0 #fff;
+}
+.spectrum-metallic-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -75%; width: 50%; height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 100%);
+  transform: skewX(-20deg);
+  transition: left 0.5s;
+  z-index: 1;
+}
+.spectrum-metallic-btn:hover::before {
+  left: 120%;
+}
+.spectrum-metallic-btn:hover, .spectrum-metallic-btn:focus {
+  background: linear-gradient(90deg, #e3e8f7 0%, #bfc3c9 40%, #7f8fa6 70%, #e3e8f7 100%);
+  box-shadow: 0 0 24px 2px #bfc3c9cc, 0 1.5px 0 0 #fff inset;
+  color: #23242a;
+}
