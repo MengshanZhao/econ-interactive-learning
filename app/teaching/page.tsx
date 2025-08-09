@@ -1,4 +1,5 @@
 import { Book, Calendar, Star } from "lucide-react"
+import Link from "next/link"
 
 export default function TeachingPage() {
   return (
@@ -20,6 +21,65 @@ export default function TeachingPage() {
           <h2 className="text-3xl font-bold mb-12 text-foreground">Teaching Experience</h2>
 
           <div className="space-y-12">
+            {/* Fall 2025 Courses */}
+            <div className="card-minimal rounded-lg p-8">
+              <div className="flex items-start">
+                <div className="bg-gradient-to-br from-[#fff9e6] to-[#ffd700] p-3 rounded-lg text-[color:hsl(var(--foreground))] mr-6">
+                  <Book className="h-6 w-6" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold mb-2 text-foreground">Instructor</h3>
+                  <p className="text-foreground mb-4">Washington State University</p>
+                  <div className="flex items-center mb-4 text-foreground">
+                    <Calendar className="h-5 w-5 mr-2 text-[color:hsl(var(--primary))]" />
+                    <span>August 2025 - December 2025</span>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="bg-white p-6 rounded-lg shadow-sm">
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="text-xl font-semibold text-foreground">ECONS 335: Business Finance</h4>
+                      </div>
+                      <p className="text-foreground mb-2">Online course</p>
+                      <div className="space-y-2">
+                        <p className="text-foreground">
+                          Students will learn the basic tools of financial economics and how to apply them. The course equips students to analyze financial statements, understand and apply the time value of money, analyze the risk–return tradeoff, value assets such as stocks and bonds, and analyze firms’ major financial decisions. It also introduces major sources of financial data and emphasizes interpretation, quality, and credibility.
+                        </p>
+                        <p className="text-foreground">
+                          These analytical and information‑literacy skills are valuable for many careers and for personal financial decision‑making. The financial literacy students acquire will foster a lifelong appreciation for the role of financial economics in current events and their own lives.
+                        </p>
+                        <div className="pt-2">
+                          <Link
+                            href="/teaching/335"
+                            className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
+                          >
+                            View course details and interactive practice →
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-lg shadow-sm">
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="text-xl font-semibold text-foreground">ECONS 426: Transportation Economics & Supply Chain Analysis</h4>
+                      </div>
+                      <p className="text-foreground mb-2">Online course</p>
+                      <div className="space-y-2">
+                        <p className="text-foreground">By the end of the course, students should be able to:</p>
+                        <ul className="list-disc list-inside text-foreground space-y-1">
+                          <li>Understand important concepts on transportation and supply chain</li>
+                          <li>Apply fundamental microeconomic theory to analyze transportation issues</li>
+                          <li>Compare modes of transportation and their advantages/disadvantages in supply chains</li>
+                          <li>Conduct basic costing and pricing analysis related to transportation</li>
+                          <li>Perform empirical analysis related to transportation issues</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="card-minimal rounded-lg p-8">
               <div className="flex items-start">
                 <div className="bg-gradient-to-br from-[#fff9e6] to-[#ffd700] p-3 rounded-lg text-[color:hsl(var(--foreground))] mr-6">
