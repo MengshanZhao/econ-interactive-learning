@@ -13,18 +13,26 @@
     .profit-line.loss { background: linear-gradient(90deg, transparent, #ff4757, transparent); animation: moveLossLine 2s infinite linear; }
     @keyframes moveProfitLine { 0% { transform: translateX(-100%) translateY(0); } 100% { transform: translateX(100%) translateY(-20px); } }
     @keyframes moveLossLine { 0% { transform: translateX(-100%) translateY(0); } 100% { transform: translateX(100%) translateY(20px); } }
-    .balance-meter { width: 100%; max-width: 300px; margin: 0 auto 20px auto; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; border: 2px solid #4ecdc4; }
-    @media (max-width: 768px) {
-      .balance-meter { max-width: 250px; padding: 12px; }
-      .balance-label { font-size: 13px; }
-      .balance-text { font-size: 11px; }
-    }
+    
+    .balance-meter { position: fixed; top: 20px; left: 20px; width: 300px; z-index: 1000; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; border: 2px solid #4ecdc4; }
     .balance-label { font-size: 14px; margin-bottom: 8px; text-align: center; }
     .balance-bar { width: 100%; height: 20px; background: #333; border-radius: 10px; overflow: hidden; position: relative; }
     .balance-fill { height: 100%; background: linear-gradient(90deg, #ff4757 0%, #ffc048 50%, #4ecdc4 100%); transition: width 1s ease, background 0.5s ease; border-radius: 10px; }
     .balance-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
     
-    .container { background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); border-radius: 25px; padding: 40px; max-width: 900px; width: 92%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 10; position: relative; border: 2px solid rgba(78,205,196,0.3); }
+    .container { 
+      background: rgba(0,0,0,0.7); 
+      backdrop-filter: blur(20px); 
+      border-radius: 25px; 
+      padding: 40px; 
+      max-width: 900px; 
+      width: 92%; 
+      text-align: center; 
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5); 
+      z-index: 10; 
+      position: relative; 
+      border: 2px solid rgba(78,205,196,0.3);
+    }
     .timer { font-size: 4em; font-weight: bold; margin-bottom: 20px; text-shadow: 3px 3px 6px rgba(0,0,0,0.7); transition: all 0.3s ease; }
     .timer.warning { color: #ffa726; animation: timerPulse 0.5s infinite; }
     .timer.danger { color: #ff5252; animation: timerShake 0.3s infinite; text-shadow: 0 0 20px #ff5252; }
@@ -66,21 +74,19 @@
 </head>
 <body>
   <div class="profit-background" id="profit-background"></div>
+  <div class="balance-meter">
+    <div class="balance-label">Soul Balance 👻</div>
+    <div class="balance-bar">
+      <div class="balance-fill" id="balance-fill" style="width: 100%"></div>
+      <div class="balance-text" id="balance-text">100%</div>
+    </div>
+  </div>
   <button class="sound-toggle" id="sound-toggle" onclick="toggleSound()">🔊</button>
   
   <!-- Dramatic Flash Effect -->
   <div class="dramatic-flash" id="dramatic-flash"></div>
   
   <div class="container">
-    <!-- Soul Balance Meter -->
-    <div class="balance-meter">
-      <div class="balance-label">Soul Balance 👻</div>
-      <div class="balance-bar">
-        <div class="balance-fill" id="balance-fill" style="width: 100%"></div>
-        <div class="balance-text" id="balance-text">100%</div>
-      </div>
-    </div>
-    
     <div id="welcome-screen">
       <h1>👻 Haunted Finance Challenge</h1>
       <p style="margin: 20px 0; font-size: 1.2em;">The ghostly CFO is watching your every calculation... 😈</p>
