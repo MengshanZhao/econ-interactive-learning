@@ -49,9 +49,6 @@ export default function Navbar() {
                 <Link href="/teaching/335" className="block">
                   <DropdownMenuItem>ECONS 335: Business Finance</DropdownMenuItem>
                 </Link>
-                <Link href="/teaching/335/chapter-1" className="block">
-                  <DropdownMenuItem>335 Games: Chapter 1</DropdownMenuItem>
-                </Link>
               </DropdownMenuContent>
             </DropdownMenu>
             <Link href="/cv" className="text-gray-600 hover:text-gray-900 transition-colors">
@@ -88,9 +85,6 @@ export default function Navbar() {
                   </Link>
                   <Link href="/teaching/335" className="text-gray-900 hover:text-[color:hsl(var(--primary))] transition-colors" onClick={toggleMenu}>
                     ECONS 335: Business Finance
-                  </Link>
-                  <Link href="/teaching/335/chapter-1" className="text-gray-900 hover:text-[color:hsl(var(--primary))] transition-colors" onClick={toggleMenu}>
-                    335 Games: Chapter 1
                   </Link>
                 </nav>
               </details>
