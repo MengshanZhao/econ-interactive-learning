@@ -3,6 +3,313 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shareholder Tax Challenge</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Add large scary gif background overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: url('/images/financial_manager.gif') center/cover no-repeat;
+      opacity: 0.08;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Dynamic Profit/Loss Background */
+    .profit-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.15; transition: all 1s ease; }
+    .profit-line { position: absolute; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, #4ecdc4, transparent); animation: moveProfitLine 4s infinite linear; }
+    .profit-line.loss { background: linear-gradient(90deg, transparent, #ff4757, transparent); animation: moveLossLine 2s infinite linear; }
+    @keyframes moveProfitLine { 0% { transform: translateX(-100%) translateY(0); } 100% { transform: translateX(100%) translateY(-20px); } }
+    @keyframes moveLossLine { 0% { transform: translateX(-100%) translateY(0); } 100% { transform: translateX(100%) translateY(20px); } }
+
+    /* Balance Meter */
+    .balance-meter { position: fixed; top: 20px; left: 20px; width: 300px; z-index: 1000; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; border: 2px solid #4ecdc4; }
+    .balance-label { font-size: 14px; margin-bottom: 8px; text-align: center; }
+    .balance-bar { width: 100%; height: 20px; background: #333; border-radius: 10px; overflow: hidden; position: relative; }
+    .balance-fill { height: 100%; background: linear-gradient(90deg, #ff4757 0%, #ffc048 50%, #4ecdc4 100%); transition: width 1s ease, background 0.5s ease; border-radius: 10px; }
+    .balance-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+
+    /* CFO Character */
+    .cfo-character { position: fixed; bottom: 20px; right: 20px; z-index: 1000; transition: all 0.5s ease; }
+    .cfo-avatar { width: 160px; height: 160px; border-radius: 50%; position: relative; animation: scaryFloat 3s ease-in-out infinite; border: 4px solid rgba(255,0,0,0.6); box-shadow: 0 15px 35px rgba(139,0,0,0.7), 0 0 30px rgba(255,0,0,0.3); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
+    .cfo-avatar img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.2) brightness(0.9); }
+    @keyframes scaryFloat { 0%,100%{ transform: translateY(0) rotate(-1deg);} 50%{ transform: translateY(-12px) rotate(1deg);} }
+    @keyframes scarySuccess { 0%,100% { transform: scale(1); box-shadow: 0 15px 35px rgba(0,255,0,0.7), 0 0 40px rgba(0,255,0,0.5);} 25%{ transform: scale(1.1) rotate(5deg);} 75%{ transform: scale(1.1) rotate(-5deg);} }
+    @keyframes scaryFailure { 0%,100% { transform: scale(1); box-shadow: 0 15px 35px rgba(255,0,0,0.9), 0 0 50px rgba(255,0,0,0.8);} 25%{ transform: scale(0.9) translateX(-5px);} 75%{ transform: scale(0.9) translateX(5px);} }
+    .cfo-status { position: absolute; top: -15px; left: -15px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; border: 3px solid #fff; }
+    .cfo-status.profit { background: #4ecdc4; }
+    .cfo-status.loss { background: #ff4757; }
+    .cfo-status.neutral { background: #95a5a6; }
+
+    .container { background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); border-radius: 25px; padding: 40px; max-width: 900px; width: 92%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 10; position: relative; border: 2px solid rgba(78,205,196,0.3); }
+    .timer { font-size: 4em; font-weight: bold; margin-bottom: 20px; text-shadow: 3px 3px 6px rgba(0,0,0,0.7); }
+    .countdown-timer { font-size: 7em; font-weight: bold; color: #ff4757; text-shadow: 0 0 20px #ff4757; animation: countdownPulse 1s ease-in-out; }
+    @keyframes countdownPulse { 0%{ transform: scale(0.5); opacity: 0;} 50%{ transform: scale(1.2); opacity: 1;} 100%{ transform: scale(1); opacity: 1;} }
+    .timer.warning{ color:#ffa726; }
+    .timer.danger{ color:#ff5252; text-shadow: 0 0 20px #ff5252; }
+    .scenario-box { background: rgba(78,205,196,0.1); border: 2px solid #4ecdc4; border-radius: 15px; padding: 20px; margin: 20px 0; font-size: 1.2em; line-height: 1.6; }
+    .formula-box { background: rgba(255,193,7,0.1); border: 2px solid #ffc107; border-radius: 15px; padding: 18px; margin: 18px 0; font-family: 'Courier New', monospace; font-size: 1.05em; }
+    .question { font-size: 1.6em; margin-bottom: 30px; line-height: 1.6; background: rgba(255,255,255,0.1); padding: 24px; border-radius: 18px; border-left: 6px solid #4ecdc4; }
+    .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+    .answer-btn { padding: 22px 18px; font-size: 1.2em; border: none; border-radius: 14px; background: rgba(255,255,255,0.1); color: white; cursor: pointer; transition: all 0.25s ease; border: 3px solid transparent; position: relative; overflow: hidden; }
+    .answer-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); }
+    .answer-btn.correct { background: linear-gradient(135deg, #4ecdc4, #26d0ce); border-color: #26d0ce; }
+    .answer-btn.incorrect { background: linear-gradient(135deg, #ff4757, #ff3742); border-color: #ff3742; }
+    .start-btn, .ready-btn { padding: 18px 32px; font-size: 1.2em; background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); color: white; border: none; border-radius: 14px; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.3); text-transform: uppercase; font-weight: bold; }
+    .start-btn:hover, .ready-btn:hover { transform: translateY(-3px); }
+    .score { font-size: 1.4em; margin: 18px 0; background: rgba(0,0,0,0.5); padding: 12px 16px; border-radius: 18px; display: inline-block; border: 2px solid #4ecdc4; }
+    .hidden { display: none; }
+    .sound-toggle { position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.7); border: 2px solid #4ecdc4; color: white; padding: 10px; border-radius: 50%; cursor: pointer; font-size: 20px; z-index: 1001; transition: all 0.3s ease; }
+    .sound-toggle:hover { background: rgba(78,205,196,0.2); transform: scale(1.05); }
+    .dramatic-flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; opacity: 0; }
+    .dramatic-flash.success { background: radial-gradient(circle, rgba(78,205,196,0.3) 0%, transparent 70%); animation: successFlash 0.5s ease; }
+    .dramatic-flash.failure { background: radial-gradient(circle, rgba(255,71,87,0.3) 0%, transparent 70%); animation: failureFlash 0.5s ease; }
+    @keyframes successFlash { 0%{opacity:0} 50%{opacity:1} 100%{opacity:0} }
+    @keyframes failureFlash { 0%{opacity:0} 50%{opacity:1} 100%{opacity:0} }
+  </style>
+</head>
+<body>
+  <div class="profit-background" id="profit-background"></div>
+
+  <div class="balance-meter">
+    <div class="balance-label">Soul Balance 👻</div>
+    <div class="balance-bar">
+      <div class="balance-fill" id="balance-fill" style="width: 100%"></div>
+      <div class="balance-text" id="balance-text">100%</div>
+    </div>
+  </div>
+
+  <button class="sound-toggle" id="sound-toggle" onclick="toggleSound()">🔊</button>
+
+  <div class="cfo-character">
+    <div class="cfo-avatar">
+      <div class="cfo-status neutral" id="cfo-status">📊</div>
+    </div>
+  </div>
+
+  <div class="dramatic-flash" id="dramatic-flash"></div>
+
+  <div class="container">
+    <div id="welcome-screen">
+      <h1>👻 Haunted Finance Challenge</h1>
+      <p style="margin: 20px 0; font-size: 1.2em;">The ghostly CFO is watching your every calculation... 😈</p>
+      <button class="start-btn" onclick="startPractice()">Enter the Cursed Office 🏢</button>
+    </div>
+
+    <div id="practice-screen" class="hidden">
+      <h2>🔮 Learn the Dark Arts of Finance</h2>
+      <div class="scenario-box">
+        <strong>Cursed Scenario:</strong> You own shares in TechCorp. Each share earns <span style="color:#4ecdc4;">$12.00</span> before tax.
+        <br />Corporate tax rate: <span style="color:#ffc107;">25%</span>
+        <br />Your personal income tax rate: <span style="color:#ff6b6b;">30%</span>
+      </div>
+      <div class="formula-box">
+        <strong>After Corporate Tax:</strong> Earnings × (1 - Corporate Tax Rate)
+        <br />→ $12.00 × (1 - 0.25) = $9.00
+        <br /><br />
+        <strong>Your Personal Tax:</strong> After-Corporate-Tax × Personal Tax Rate
+        <br />→ $9.00 × 0.30 = $2.70
+        <br /><br />
+        <strong>Your Final Revenue:</strong> After-Corporate-Tax - Personal Tax
+        <br />→ $9.00 - $2.70 = $6.30
+        <br /><br />
+        <strong>Total Taxes Paid:</strong> Corporate Tax + Personal Tax
+        <br />→ $3.00 + $2.70 = $5.70
+      </div>
+      <div class="question">
+        <strong>Trial Question:</strong> What is your final revenue per share?
+      </div>
+      <div class="answers" id="practice-answers">
+        <button class="answer-btn" onclick="handlePracticeAnswer(0)">$5.40</button>
+        <button class="answer-btn" onclick="handlePracticeAnswer(1)">$6.30</button>
+        <button class="answer-btn" onclick="handlePracticeAnswer(2)">$7.20</button>
+        <button class="answer-btn" onclick="handlePracticeAnswer(3)">$8.10</button>
+      </div>
+      <button class="ready-btn hidden" id="ready-btn" onclick="getReady()">Start Challenge</button>
+    </div>
+
+    <div id="countdown-screen" class="hidden">
+      <h2>The Ghostly CFO is Preparing Your Doom... 👻</h2>
+      <div class="countdown-timer" id="countdown-display">3</div>
+    </div>
+
+    <div id="game-screen" class="hidden">
+      <div class="timer" id="timer">40</div>
+      <div class="score">Question <span id="current-q">1</span> of <span id="total-q">5</span></div>
+      <div class="scenario-box" id="scenario-box"></div>
+      <div class="question" id="question"></div>
+      <div class="answers" id="answers"></div>
+    </div>
+
+    <div id="results-screen" class="hidden">
+      <h2>🦇 Challenge Complete</h2>
+      <div style="font-size: 2em; margin: 20px 0; color: #4ecdc4;" id="final-score"></div>
+      <div style="font-size: 1.1em; margin: 12px 0;" id="performance-message"></div>
+      <button class="start-btn" onclick="resetGame()">Try Again</button>
+    </div>
+  </div>
+
+  <script>
+    let currentQuestionIndex = 0;
+    let correctAnswers = 0;
+    let totalQuestions = 5;
+    let timer;
+    let timeLeft = 20;
+    let soundEnabled = true;
+    let audioContext;
+    let balancePercentage = 100;
+
+    let currentScenario = {};
+    let gameQuestions = [];
+
+    function generateRandomScenario() {
+      const earnings = (Math.random() * 15 + 5).toFixed(2);
+      const corporateTax = Math.floor(Math.random() * 20 + 15);
+      const personalTax = Math.floor(Math.random() * 25 + 20);
+      const afterCorporateTax = earnings * (1 - corporateTax / 100);
+      const personalTaxAmount = afterCorporateTax * (personalTax / 100);
+      const finalRevenue = afterCorporateTax - personalTaxAmount;
+      const totalTaxes = (earnings * corporateTax / 100) + personalTaxAmount;
+      return {
+        earnings: parseFloat(earnings),
+        corporateTax,
+        personalTax,
+        afterCorporateTax: parseFloat(afterCorporateTax.toFixed(2)),
+        personalTaxAmount: parseFloat(personalTaxAmount.toFixed(2)),
+        finalRevenue: parseFloat(finalRevenue.toFixed(2)),
+        totalTaxes: parseFloat(totalTaxes.toFixed(2))
+      };
+    }
+
+    function generateQuestion(s) {
+      const type = Math.random() > 0.5 ? 'revenue' : 'taxes';
+      if (type === 'revenue') {
+        const correct = s.finalRevenue;
+        const wrong = [ (correct*0.8).toFixed(2), (correct*1.2).toFixed(2), (correct*0.9).toFixed(2) ].map(parseFloat);
+        return { type, question: 'What is your final revenue per share after all taxes?', correct, answers: shuffleArray([correct, ...wrong]).map(x => `$${x.toFixed(2)}`) };
+      } else {
+        const correct = s.totalTaxes;
+        const wrong = [ (correct*0.7).toFixed(2), (correct*1.3).toFixed(2), (correct*0.85).toFixed(2) ].map(parseFloat);
+        return { type, question: 'What is the total amount of taxes paid per share?', correct, answers: shuffleArray([correct, ...wrong]).map(x => `$${x.toFixed(2)}`) };
+      }
+    }
+
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function initAudio() {
+      if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playSound(freq, dur, type='sine', vol=0.1) {
+      if (!soundEnabled) return;
+      initAudio();
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      osc.connect(gain); gain.connect(audioContext.destination);
+      osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+      osc.type = type; gain.gain.setValueAtTime(vol, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + dur);
+      osc.start(audioContext.currentTime); osc.stop(audioContext.currentTime + dur);
+    }
+
+    function playScarySound(ok) {
+      if (!soundEnabled) return;
+      if (ok) { playSound(440, 0.3, 'triangle', 0.12); setTimeout(() => playSound(660, 0.2, 'sine', 0.08), 150); }
+      else { playSound(150, 0.6, 'sawtooth', 0.15); setTimeout(() => playSound(100, 0.3, 'square', 0.1), 150); }
+    }
+
+    function addProfitLine(good=true) {
+      const line = document.createElement('div');
+      line.className = `profit-line ${good ? '' : 'loss'}`;
+      line.style.top = (Math.random()*80 + 10) + '%';
+      line.style.animationDelay = (Math.random()*2) + 's';
+      document.getElementById('profit-background').appendChild(line);
+      setTimeout(()=> line.remove(), 4000);
+    }
+
+    function updateBalance(ok) {
+      balancePercentage = ok ? Math.min(100, balancePercentage + 5) : Math.max(0, balancePercentage - 20);
+      const fill = document.getElementById('balance-fill');
+      const txt = document.getElementById('balance-text');
+      fill.style.width = balancePercentage + '%';
+      txt.textContent = Math.round(balancePercentage) + '%';
+      if (balancePercentage > 70) fill.style.background = 'linear-gradient(90deg, #4ecdc4 0%, #26d0ce 100%)';
+      else if (balancePercentage > 30) fill.style.background = 'linear-gradient(90deg, #ffc048 0%, #ffb347 100%)';
+      else fill.style.background = 'linear-gradient(90deg, #ff4757 0%, #ff3742 100%)';
+    }
+
+    function updateCFOStatus(ok) {
+      const status = document.getElementById('cfo-status');
+      const avatar = document.querySelector('.cfo-avatar');
+      const flash = document.getElementById('dramatic-flash');
+      if (ok) { status.textContent='📈'; status.className='cfo-status profit'; avatar.style.animation='scarySuccess 1s ease'; flash.className='dramatic-flash success'; addProfitLine(true); }
+      else { status.textContent='📉'; status.className='cfo-status loss'; avatar.style.animation='scaryFailure 1s ease'; flash.className='dramatic-flash failure'; addProfitLine(false); }
+      playScarySound(ok);
+      setTimeout(()=>{ status.textContent='📊'; status.className='cfo-status neutral'; avatar.style.animation='scaryFloat 3s ease-in-out infinite'; flash.className='dramatic-flash'; }, 1200);
+    }
+
+    function toggleSound(){ soundEnabled = !soundEnabled; document.getElementById('sound-toggle').textContent = soundEnabled ? '🔊' : '🔇'; }
+    function startPractice(){ document.getElementById('welcome-screen').classList.add('hidden'); document.getElementById('practice-screen').classList.remove('hidden'); }
+
+    function handlePracticeAnswer(sel){ const btns = document.querySelectorAll('#practice-answers .answer-btn'); const correctIndex=1; btns.forEach((b,i)=>{ b.disabled=true; if(i===correctIndex) b.classList.add('correct'); else if (i===sel) b.classList.add('incorrect'); }); updateCFOStatus(sel===correctIndex); updateBalance(sel===correctIndex); setTimeout(()=> document.getElementById('ready-btn').classList.remove('hidden'), 900); }
+
+    function getReady(){ document.getElementById('practice-screen').classList.add('hidden'); document.getElementById('countdown-screen').classList.remove('hidden'); let c=3; const d=document.getElementById('countdown-display'); const iv=setInterval(()=>{ d.textContent=c; playSound(800,0.2,'square',0.2); c--; if(c<0){ clearInterval(iv); startGame(); } },1000); }
+
+    function startGame(){ document.getElementById('countdown-screen').classList.add('hidden'); document.getElementById('game-screen').classList.remove('hidden'); gameQuestions=[]; for(let i=0;i<totalQuestions;i++){ const s=generateRandomScenario(); const q=generateQuestion(s); gameQuestions.push({scenario:s, question:q}); } currentQuestionIndex=0; correctAnswers=0; balancePercentage=100; loadQuestion(); startTimer(); }
+
+    function loadQuestion(){ if(currentQuestionIndex>=gameQuestions.length){ endGame(); return; } const {scenario, question} = gameQuestions[currentQuestionIndex]; document.getElementById('current-q').textContent = currentQuestionIndex+1; document.getElementById('total-q').textContent = totalQuestions; document.getElementById('scenario-box').innerHTML = `<strong>Scenario:</strong><br />Earnings: <span style="color:#4ecdc4;">$${scenario.earnings.toFixed(2)}</span><br />Corporate tax: <span style="color:#ffc107;">${scenario.corporateTax}%</span><br />Personal tax: <span style=\"color:#ff6b6b;\">${scenario.personalTax}%</span>`; document.getElementById('question').textContent = question.question; const answersDiv=document.getElementById('answers'); answersDiv.innerHTML=''; const correctLabel = `$${question.correct.toFixed(2)}`; question.answers.forEach(answer=>{ const btn=document.createElement('button'); btn.className='answer-btn'; btn.textContent=answer; btn.onclick=(e)=>handleAnswer(answer===correctLabel, e.currentTarget); answersDiv.appendChild(btn); }); timeLeft=20; updateTimerDisplay(); }
+
+    function handleAnswer(isCorrect, clickedBtn){ const buttons=document.querySelectorAll('#answers .answer-btn'); buttons.forEach(b=>b.disabled=true); buttons.forEach(b=>{ if(b.textContent===`$${gameQuestions[currentQuestionIndex].question.correct.toFixed(2)}`) b.classList.add('correct'); }); if(!isCorrect && clickedBtn) clickedBtn.classList.add('incorrect'); updateCFOStatus(isCorrect); updateBalance(isCorrect); clearInterval(timer); setTimeout(()=>{ currentQuestionIndex++; loadQuestion(); if(currentQuestionIndex < gameQuestions.length) startTimer(); }, 900); }
+
+    function startTimer(){ timer = setInterval(()=>{ timeLeft--; updateTimerDisplay(); if(timeLeft<=5) playSound(1000, 0.08, 'square', 0.05); if(timeLeft<=0){ clearInterval(timer); updateCFOStatus(false); updateBalance(false); document.querySelectorAll('#answers .answer-btn').forEach(b=>b.disabled=true); setTimeout(()=>{ currentQuestionIndex++; loadQuestion(); if(currentQuestionIndex < gameQuestions.length) startTimer(); }, 800); } },1000); }
+
+    function updateTimerDisplay(){ const t=document.getElementById('timer'); t.textContent=timeLeft; t.className='timer'; if(timeLeft<=3) t.classList.add('danger'); else if(timeLeft<=7) t.classList.add('warning'); }
+
+    function endGame(){ clearInterval(timer); document.getElementById('game-screen').classList.add('hidden'); document.getElementById('results-screen').classList.remove('hidden'); const pct=(correctAnswers/totalQuestions)*100; const grade = balancePercentage>70?'Excellent': balancePercentage>40?'Good':'Needs Improvement'; document.getElementById('final-score').textContent = `${correctAnswers}/${totalQuestions} Correct (${pct.toFixed(0)}%)`; document.getElementById('performance-message').innerHTML = `Soul Balance: ${grade} (${balancePercentage.toFixed(0)}%)`; }
+
+    function resetGame(){ document.getElementById('results-screen').classList.add('hidden'); document.getElementById('welcome-screen').classList.remove('hidden'); currentQuestionIndex=0; correctAnswers=0; balancePercentage=100; updateBalance(true); document.getElementById('profit-background').innerHTML=''; }
+
+    // Replace bottom-right avatar with scary gif
+    window.addEventListener('DOMContentLoaded', ()=>{
+      const avatar = document.querySelector('.cfo-avatar');
+      if (avatar && !avatar.querySelector('img')) {
+        const img = document.createElement('img');
+        img.src = '/images/financial_manager.gif';
+        img.alt = 'Scary CFO';
+        avatar.prepend(img);
+      }
+    });
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ECONS 335 - Chapter 1: Tax of Corporation Earning</title>
   <style>
     /* Minimal reset for iframe context */
