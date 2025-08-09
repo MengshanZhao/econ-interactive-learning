@@ -18,17 +18,16 @@ export default function ECONS335Page() {
             <div className="md:col-span-2 space-y-6">
               <div className="card-minimal rounded-lg p-6">
                 <h2 className="text-2xl font-semibold mb-3 text-foreground">Course Overview</h2>
-                <p className="text-foreground mb-2">
-                  Students will learn the basic tools of financial economics and how to apply them. The course equips
-                  students to analyze financial statements, understand and apply the time value of money, analyze the
-                  risk–return tradeoff, value assets such as stocks and bonds, and analyze firms’ major financial
-                  decisions.
+                <p className="text-foreground mb-3">
+                  Core tools of financial economics with practical application to valuation and firm decisions.
                 </p>
-                <p className="text-foreground">
-                  The course also introduces major sources of financial data and emphasizes interpretation, quality,
-                  and credibility. These analytical and information‑literacy skills are valuable for many careers and
-                  for personal financial decision‑making.
-                </p>
+                <ul className="list-disc list-inside text-foreground space-y-1">
+                  <li>Analyze and interpret financial statements</li>
+                  <li>Apply time value of money and discounting</li>
+                  <li>Understand risk–return and portfolio intuition</li>
+                  <li>Value stocks and bonds; assess capital budgeting</li>
+                  <li>Use and evaluate financial data sources</li>
+                </ul>
               </div>
 
               <div className="card-minimal rounded-lg p-6">

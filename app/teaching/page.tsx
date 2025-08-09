@@ -41,13 +41,17 @@ export default function TeachingPage() {
                         <h4 className="text-xl font-semibold text-foreground">ECONS 335: Business Finance</h4>
                       </div>
                       <p className="text-foreground mb-2">Online course</p>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <p className="text-foreground">
-                          Students will learn the basic tools of financial economics and how to apply them. The course equips students to analyze financial statements, understand and apply the time value of money, analyze the risk–return tradeoff, value assets such as stocks and bonds, and analyze firms’ major financial decisions. It also introduces major sources of financial data and emphasizes interpretation, quality, and credibility.
+                          Core tools of financial economics with practical application to valuation and firm decisions.
                         </p>
-                        <p className="text-foreground">
-                          These analytical and information‑literacy skills are valuable for many careers and for personal financial decision‑making. The financial literacy students acquire will foster a lifelong appreciation for the role of financial economics in current events and their own lives.
-                        </p>
+                        <ul className="list-disc list-inside text-foreground space-y-1">
+                          <li>Analyze and interpret financial statements</li>
+                          <li>Apply time value of money and discounting</li>
+                          <li>Understand risk–return and portfolio intuition</li>
+                          <li>Value stocks and bonds; assess capital budgeting</li>
+                          <li>Use and evaluate financial data sources</li>
+                        </ul>
                         <div className="pt-2">
                           <Link
                             href="/teaching/335"
@@ -64,14 +68,16 @@ export default function TeachingPage() {
                         <h4 className="text-xl font-semibold text-foreground">ECONS 426: Transportation Economics & Supply Chain Analysis</h4>
                       </div>
                       <p className="text-foreground mb-2">Online course</p>
-                      <div className="space-y-2">
-                        <p className="text-foreground">By the end of the course, students should be able to:</p>
+                      <div className="space-y-3">
+                        <p className="text-foreground">
+                          Economic principles applied to freight, modes, pricing, and supply‑chain performance.
+                        </p>
                         <ul className="list-disc list-inside text-foreground space-y-1">
-                          <li>Understand important concepts on transportation and supply chain</li>
-                          <li>Apply fundamental microeconomic theory to analyze transportation issues</li>
-                          <li>Compare modes of transportation and their advantages/disadvantages in supply chains</li>
-                          <li>Conduct basic costing and pricing analysis related to transportation</li>
-                          <li>Perform empirical analysis related to transportation issues</li>
+                          <li>Explain transport and supply‑chain trade‑offs</li>
+                          <li>Compare modes and network design implications</li>
+                          <li>Conduct basic costing and pricing analyses</li>
+                          <li>Evaluate policy impacts using microeconomic tools</li>
+                          <li>Perform and interpret empirical analysis</li>
                         </ul>
                       </div>
                     </div>

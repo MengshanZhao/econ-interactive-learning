@@ -16,49 +16,7 @@ export default function ResearchPage() {
         </div>
       </section>
 
-      {/* Fieldwork Highlight */}
-      <section className="py-16 bg-card" id="maternal-health">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-foreground">Fieldwork Highlight: Maternal Health in Nigeria</h2>
-
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <Image
-                src="/images/fieldwork-nigeria.jpeg"
-                alt="Fieldwork in Nigeria"
-                width={600}
-                height={400}
-                className="field-photo rounded-lg object-cover w-full"
-              />
-            </div>
-            <div>
-              <h3 className="text-2xl font-bold mb-4 text-foreground">Problem Management Plus (PM+) Intervention</h3>
-              <p className="text-foreground mb-4">
-                As part of my research on maternal mental health and child undernutrition, I conducted fieldwork in
-                Gombe, Nigeria. This project examines the effects of Problem Management Plus (PM+) intervention on
-                maternal mental health and child nutrition outcomes.
-              </p>
-              <p className="text-foreground mb-4">
-                Working closely with local teams, I helped design experiments and questionnaires for a randomized
-                control trial involving 800 caregivers. I also created audio assistant survey tools for sensitive
-                questions and trained data collectors in the field.
-              </p>
-              <p className="text-foreground mb-6">
-                This research aims to provide evidence-based recommendations for improving maternal mental health
-                interventions in low-resource settings and understanding their impact on child development outcomes.
-              </p>
-              <div className="flex items-center text-foreground mb-4">
-                <Calendar className="h-5 w-5 mr-2 text-foreground" />
-                <span>January 2023 - Present</span>
-              </div>
-              <div className="flex items-center text-foreground">
-                <User className="h-5 w-5 mr-2 text-foreground" />
-                <span>Supervisor: Prof. Seollee Park</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Fieldwork Highlight moved below Working Papers */}
 
       {/* Working Papers */}
       <section className="py-16 bg-card" id="working-papers">
@@ -206,6 +164,50 @@ export default function ResearchPage() {
                 This paper investigates the potential influence of public sentiment and health policies on behavioral changes, specifically focusing on mobility during COVID-19. We employ daily counts of COVID-related tweets and sentiment trends derived using a natural language processing model to gauge public sentiment. Using Regression Discontinuity in Time Series (RDiT) method with county-level daily data from March to April 2020, we find that lockdown implementation leads to a significant 5.5% reduction in mobility, but this impact is only observed for ten days. Importantly, neutral-tone sentiment has the most pronounced negative impact on mobility compared to both negative and positive sentiments—substituting 3% of positive sentiment tweets with neutral-tone sentiment results in similar magnitude effects on mobility reduction as lockdown policies. This emphasizes the importance of considering public sentiment alongside policy measures to avoid overestimation issues.
               </p>
               <Button>Request Draft</Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Fieldwork Highlight: now placed after Working Papers */}
+      <section className="py-16 bg-card" id="maternal-health">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-8 text-foreground">Fieldwork Highlight: Maternal Health in Nigeria</h2>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <Image
+                src="/images/fieldwork-nigeria.jpeg"
+                alt="Fieldwork in Nigeria"
+                width={600}
+                height={400}
+                className="field-photo rounded-lg object-cover w-full"
+              />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold mb-4 text-foreground">Problem Management Plus (PM+) Intervention</h3>
+              <p className="text-foreground mb-4">
+                As part of my research on maternal mental health and child undernutrition, I conducted fieldwork in
+                Gombe, Nigeria. This project examines the effects of Problem Management Plus (PM+) intervention on
+                maternal mental health and child nutrition outcomes.
+              </p>
+              <p className="text-foreground mb-4">
+                Working closely with local teams, I helped design experiments and questionnaires for a randomized
+                control trial involving 800 caregivers. I also created audio assistant survey tools for sensitive
+                questions and trained data collectors in the field.
+              </p>
+              <p className="text-foreground mb-6">
+                This research aims to provide evidence-based recommendations for improving maternal mental health
+                interventions in low-resource settings and understanding their impact on child development outcomes.
+              </p>
+              <div className="flex items-center text-foreground mb-4">
+                <Calendar className="h-5 w-5 mr-2 text-foreground" />
+                <span>January 2023 - Present</span>
+              </div>
+              <div className="flex items-center text-foreground">
+                <User className="h-5 w-5 mr-2 text-foreground" />
+                <span>Supervisor: Prof. Seollee Park</span>
+              </div>
             </div>
           </div>
         </div>

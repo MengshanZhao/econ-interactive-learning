@@ -15,7 +15,7 @@ export default function Chapter1Page() {
               src="/games/chapter-1.html"
               title="Chapter 1 Game: Tax of Corporation Earning"
               className="w-full"
-              style={{ height: "80vh", border: 0 }}
+              style={{ height: "90vh", border: 0 }}
             />
           </div>
         </div>
