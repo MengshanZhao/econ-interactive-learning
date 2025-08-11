@@ -22,7 +22,7 @@ Timed questions on profitability, liquidity, and leverage; randomized each run.
 
 ---
 
-### Cashflow Sprint *(coming soon)*
+### Cashflow Sprint and a lot more! *(coming soon)*
 Drag-and-drop transactions into Operating / Investing / Financing sections. Updated weekly.
 
 ---
