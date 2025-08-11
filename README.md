@@ -9,8 +9,8 @@ I teach online. Some concepts (T-accounts, cash flows, ratios) stick better with
 ## Games
 - **Tax Quiz** — [Play here](https://www.mengshanzhao.com/teaching/335/chapter-1)  
   Timed questions on profitability, liquidity, leverage; randomized each run.
-- **Cashflow Sprint** *(coming soon)*  
-  Drag-and-drop transactions into Operating/Investing/Financing sections.
+- **Cashflow Sprint at a lot more** *(coming soon)*  
+  Drag-and-drop transactions into Operating/Investing/Financing sections. Update weekly.
 
 ## Tech
 Vanilla JS + HTML/CSS (fast, minimal bundle). Deployed via Vercel.  
