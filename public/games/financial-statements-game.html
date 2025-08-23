@@ -66,7 +66,7 @@
     .feedback-message.incorrect{background:#fdecea;color:#721c24;border:2px solid #f5c6cb;}
     .next-btn{background:linear-gradient(135deg,#17a2b8,#138496);color:#fff;border:none;padding:12px 25px;border-radius:25px;cursor:pointer;font-family:'Comic Sans MS','Chalkboard SE',fantasy;font-size:16px;font-weight:600;margin:18px auto;display:block;}
 
-    /* Step 2 - Improved layout with ratios on the right */
+    /* Step 2 - ratios on the right */
     .main-game{display:flex;gap:20px;margin-top:12px;align-items:flex-start;min-height:520px;}
     .statement-panel{flex:0 0 70%;background:#fdfdfd;border:3px solid #d4b896;border-radius:15px;padding:16px;box-shadow:0 10px 25px rgba(0,0,0,0.1);overflow-y:auto;max-height:540px;scroll-behavior:smooth;}
     .ratios-panel{flex:0 0 28%;background:#f0f8ff;border:3px solid #4169e1;border-radius:15px;padding:12px;box-shadow:0 10px 25px rgba(0,0,0,0.1);max-height:540px;overflow-y:auto;}
@@ -83,7 +83,7 @@
 
     .switch-statement-btn{width:100%;margin-top:12px;background:linear-gradient(135deg,#17a2b8,#138496);font-size:14px;padding:10px;position:sticky;bottom:0;}
 
-    /* Step 3 — improved right sidebar layout */
+    /* Step 3 — quiz layout */
     .quiz-section{max-width:1300px;margin:0 auto;}
     .quiz-question{font-size:1.6em;font-weight:bold;margin-bottom:10px;color:#8b7355;text-align:center;}
     .howto-quiz{margin:0 auto 10px; max-width:1100px; font-size:.95em; background:#fff8e1; border:1px solid #ffe08a; color:#6b4f00; padding:10px 12px; border-radius:10px;}
@@ -212,7 +212,7 @@
     <div class="step" id="step3">
       <div class="quiz-section">
         <div class="quiz-question" id="quizQuestionText"></div>
-        <p class="howto-quiz"><strong>Fill in the blanks:</strong> Simply click on items from the statements to fill the slots in order. The first item you click goes in the first slot, the second in the second slot, and so on. You can remove items by clicking the red "×" button. Submit when all slots are filled!</p>
+        <p class="howto-quiz"><strong>Fill in the blanks:</strong> Click items from the statements to fill the slots in order. Use the red “×” to clear a slot. Submit when all slots are filled.</p>
 
         <div class="quiz-grid">
           <!-- Left: statements -->
@@ -220,7 +220,7 @@
             <div class="dual-statements" id="dualStatements"></div>
           </div>
 
-          <!-- Right: ratio list + controls -->
+          <!-- Right: ratio info + controls -->
           <div class="quiz-right">
             <div class="ratio-ref" id="ratioRef"></div>
             <div class="quiz-controls">
@@ -238,29 +238,9 @@
       </div>
     </div>
 
-    <!-- Final -->
+    <!-- Final (Step 4) -->
     <div class="step" id="final">
-      <div style="text-align:center;padding:40px;max-width:800px;margin:0 auto;">
-        <h2 style="font-size:2.5em;color:#8b7355;margin-bottom:25px;font-weight:bold;">🎉 Congratulations!</h2>
-        
-        <div style="background:linear-gradient(135deg,#4CAF50,#45a049);color:white;padding:30px;border-radius:20px;margin:25px 0;font-size:1.3em;box-shadow:0 10px 30px rgba(76,175,80,0.3);">
-          <h3 style="margin-bottom:15px;">Final Score: <span id="finalScore">0</span>%</h3>
-          <p id="finalMessage" style="font-size:1.1em;"></p>
-        </div>
-        
-        <div style="margin:30px 0; padding:25px; background:#f8f9fa; border-radius:15px; border:2px solid #d4b896; max-height:400px; overflow-y:auto;">
-          <h3 style="color:#8b7355; margin-bottom:20px; font-size:1.4em;">📊 All Financial Ratios Covered:</h3>
-          <div id="allRatiosDisplay" style="text-align:left;"></div>
-        </div>
-        
-        <div style="margin-top:30px;">
-          <p style="font-size:1.2em; color:#6c757d; margin-bottom:25px;">Would you like to take the quiz again?</p>
-          <div style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap;">
-            <button class="btn" id="restartBtn" style="font-size:1.1em;padding:15px 30px; background:linear-gradient(135deg,#28a745,#20c997);">🔄 Yes, Take Quiz Again</button>
-            <button class="btn" id="goHomeBtn" style="font-size:1.1em;padding:15px 30px; background:linear-gradient(135deg,#6c757d,#495057);">🏠 No, Go Back to Course</button>
-          </div>
-        </div>
-      </div>
+      <!-- Filled by showFinal() -->
     </div>
   </div>
 </div>
@@ -278,7 +258,6 @@ let ratioInteractions = 0;
 
 // Quiz slot state
 let slotAssignments = {};   // e.g., {A:'Current Assets', B:'Current Liabilities'}
-let activeSlotKey = null;
 let currentQuestion = null;
 
 const sampleBalanceSheet = {
@@ -510,7 +489,7 @@ const quizPool = [
 
 let quizQuestions = [];
 
-// ---------- Audio (tiny feedback) ----------
+// ---------- Audio ----------
 function playTone(freq){
   try{
     const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -529,14 +508,9 @@ function ping(type){ if(type==='correct') playTone(800); else if(type==='incorre
 
 // ---------- Step 1 ----------
 function loadStep1Question(){
-  console.log('Loading step 1 question...');
   if(step1QuestionIndex >= recognitionQuestions.length){ showStep1Complete(); return; }
   const q = recognitionQuestions[step1QuestionIndex];
   const container = document.getElementById('questionContent');
-  if (!container) {
-    console.error('Question content container not found!');
-    return;
-  }
   container.innerHTML = `
     <div class="financial-statement">
       <div class="statement-title">Financial Statement</div>
@@ -548,11 +522,7 @@ function loadStep1Question(){
     </div>
     <div id="feedback" style="margin-top:8px;"></div>
   `;
-  const currentQuestionElement = document.getElementById('currentQuestion');
-  if (currentQuestionElement) {
-    currentQuestionElement.textContent = step1QuestionIndex + 1;
-  }
-  console.log('Step 1 question loaded successfully');
+  document.getElementById('currentQuestion').textContent = step1QuestionIndex + 1;
 }
 
 function answerRecognition(answer){
@@ -672,7 +642,6 @@ function selectRatio(btn, ratioName, cat){
 
 // ---------- Step 3 (quiz) ----------
 function buildStatementsHTML(){
-  // Always show BOTH statements
   const b = sampleBalanceSheet, i = sampleIncomeStatement;
   function buildOne(st, type){
     let html = `<div class="statement-card"><div class="statement-title">${st.title}</div>`;
@@ -713,11 +682,15 @@ function buildStatementsHTML(){
   return buildOne(b,'balance') + buildOne(i,'income');
 }
 
+// NEW: random 6 from ALL ratios (not fixed 3+3)
 function randomizeQuiz(){
-  const bal = quizPool.filter(q=>q.type==='balance');
-  const inc = quizPool.filter(q=>q.type==='income');
-  function pick3(arr){ return arr.slice().sort(()=>0.5-Math.random()).slice(0,3); }
-  quizQuestions = [...pick3(bal), ...pick3(inc)].sort(()=>0.5-Math.random());
+  const pool = quizPool.slice();
+  // Fisher-Yates shuffle
+  for(let i = pool.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  quizQuestions = pool.slice(0, 6); // pick any 6
   document.getElementById('totalQuestions').textContent = quizQuestions.length;
 }
 
@@ -742,7 +715,7 @@ function renderRatioReference(){
 function renderSlotsForQuestion(q){
   const row = document.getElementById('slotsRow');
   row.innerHTML = '';
-  slotAssignments = {}; activeSlotKey = null;
+  slotAssignments = {};
 
   function slot(key,label){
     const span = document.createElement('span');
@@ -755,7 +728,6 @@ function renderSlotsForQuestion(q){
   function addOp(ch){ const s=document.createElement('span'); s.className='op'; s.textContent=ch; row.appendChild(s); }
   function addText(t){ const s=document.createElement('span'); s.style.fontWeight='bold'; s.textContent=t; row.appendChild(s); }
 
-  // Auto layout based on template:
   if(q.template==='DIV'){
     slot('A','A'); addOp('÷'); slot('B','B');
   }else if(q.template==='ADD_DIV'){
@@ -763,6 +735,10 @@ function renderSlotsForQuestion(q){
   }else if(q.template==='ONE_MINUS_DIV'){
     addText('('); addText('1'); addOp('−'); slot('A','A'); addText(')'); addOp('÷'); slot('B','B');
   }
+
+  // Click lines to fill the NEXT empty slot
+  setupStatementClickHandlers();
+  updateSubmitButton();
 }
 
 function loadQuizQuestion(){
@@ -772,36 +748,25 @@ function loadQuizQuestion(){
   document.getElementById('dualStatements').innerHTML = buildStatementsHTML();
   renderSlotsForQuestion(currentQuestion);
   renderRatioReference();
-  
-  // Wait a moment for DOM to update, then setup handlers
-  setTimeout(() => {
-    setupStatementClickHandlers();
-    updateSubmitButton();
-  }, 100);
 }
 
 function setupStatementClickHandlers(){
   document.querySelectorAll('.clickable-quiz').forEach(line => {
     line.onclick = () => {
       const itemName = line.dataset.item;
-      
-      // Find the next empty slot
+
+      // find next empty slot
       const allSlots = Object.keys(currentQuestion.slots);
       let nextSlot = null;
-      
       for (let slotKey of allSlots) {
-        if (!slotAssignments[slotKey]) {
-          nextSlot = slotKey;
-          break;
-        }
+        if (!slotAssignments[slotKey]) { nextSlot = slotKey; break; }
       }
-      
       if (!nextSlot) {
-        alert('All slots are filled! Please remove an item first or submit your answer.');
+        alert('All slots are filled! Clear a slot or submit your answer.');
         return;
       }
-      
-      // Fill the slot with the selected item
+
+      // fill slot
       slotAssignments[nextSlot] = itemName;
       const slot = document.querySelector(`[data-slot="${nextSlot}"]`);
       slot.className = 'slot-pill';
@@ -822,193 +787,119 @@ function clearSlot(key){
 function updateSubmitButton(){
   const submitBtn = document.getElementById('submitQuizAnswer');
   const allSlots = Object.keys(currentQuestion.slots);
-  const filledSlots = Object.keys(slotAssignments);
-  submitBtn.disabled = filledSlots.length !== allSlots.length;
+  const filled = Object.keys(slotAssignments).length;
+  submitBtn.disabled = filled !== allSlots.length;
 }
 
 function submitQuizAnswer(){
   const allSlots = Object.keys(currentQuestion.slots);
-  const filledSlots = Object.keys(slotAssignments);
-  
-  if(filledSlots.length !== allSlots.length) {
+  if(Object.keys(slotAssignments).length !== allSlots.length) {
     alert('Please fill all slots before submitting!');
     return;
   }
-  
-  // Check if all assignments are correct
+
   let correct = true;
-  let incorrectSlots = [];
-  
   allSlots.forEach(key => {
     const assigned = slotAssignments[key];
     const allowed = currentQuestion.slots[key].allowed;
-    if(!allowed.includes(assigned)) {
-      correct = false;
-      incorrectSlots.push({slot: key, assigned: assigned, correct: allowed[0]});
-    }
+    if(!allowed.includes(assigned)) correct = false;
   });
-  
+
   if(correct){
     quizScore++; ping('correct');
-    
-    // Show success modal
-    const successModal = document.createElement('div');
-    successModal.innerHTML = `
-      <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                  background: linear-gradient(135deg, #d4edda, #c3e6cb); 
-                  border: 3px solid #28a745; border-radius: 15px; padding: 30px; 
-                  box-shadow: 0 20px 40px rgba(0,0,0,0.3); z-index: 1000; text-align: center;
-                  color: #155724; font-family: 'Comic Sans MS', fantasy;">
-          <h3 style="margin-bottom: 15px; font-size: 1.5em;">🎉 Excellent!</h3>
-          <p style="font-size: 1.2em; margin-bottom: 15px;">
-              <strong>${currentQuestion.name}</strong> formula is correct!
-          </p>
-          <p>Great job building the ratio formula!</p>
-          <button onclick="this.parentElement.parentElement.remove()" 
-                  style="margin-top: 15px; padding: 10px 20px; background: #28a745; 
-                         color: white; border: none; border-radius: 8px; cursor: pointer; 
-                         font-family: inherit;">Continue</button>
-      </div>
-      <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                  background: rgba(0,0,0,0.5); z-index: 999;"></div>
-    `;
-    document.body.appendChild(successModal);
+    showQuickModal('🎉 Excellent!', `${currentQuestion.name} formula is correct!`, 'success');
   }else{
     ping('incorrect');
-    
-    // Build student's answer formula
-    let studentFormula = '';
-    allSlots.forEach(key => {
-      const assigned = slotAssignments[key];
-      studentFormula += `${assigned}`;
-      if (key !== allSlots[allSlots.length - 1]) {
-        if (currentQuestion.template === 'DIV' && key === 'A') studentFormula += ' ÷ ';
-        else if (currentQuestion.template === 'ADD_DIV') {
-          if (key === 'A') studentFormula += ' + ';
-          else if (key === 'B') studentFormula += ' ) ÷ ';
-        }
-      }
-    });
-    
-    // Build correct answer formula
-    let correctFormula = '';
-    allSlots.forEach(key => {
-      const correctItem = currentQuestion.slots[key].allowed[0];
-      correctFormula += `${correctItem}`;
-      if (key !== allSlots[allSlots.length - 1]) {
-        if (currentQuestion.template === 'DIV' && key === 'A') correctFormula += ' ÷ ';
-        else if (currentQuestion.template === 'ADD_DIV') {
-          if (key === 'A') correctFormula += ' + ';
-          else if (key === 'B') correctFormula += ' ) ÷ ';
-        }
-      }
-    });
-    
-    // Show detailed error modal
-    const errorModal = document.createElement('div');
-    errorModal.innerHTML = `
-      <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                  background: linear-gradient(135deg, #f8d7da, #f1b0b7); 
-                  border: 3px solid #dc3545; border-radius: 15px; padding: 30px; 
-                  box-shadow: 0 20px 40px rgba(0,0,0,0.3); z-index: 1000; text-align: center;
-                  color: #721c24; font-family: 'Comic Sans MS', fantasy; max-width: 400px;">
-          <h3 style="margin-bottom: 15px; font-size: 1.5em;">❌ Not Quite Right!</h3>
-          <p style="font-size: 1.1em; margin-bottom: 10px;">
-              <strong>${currentQuestion.name}</strong> formula
-          </p>
-          <div style="background: rgba(255,255,255,0.7); padding: 15px; border-radius: 8px; margin: 15px 0;">
-              <p style="font-weight: bold; margin-bottom: 8px;">Correct Formula:</p>
-              <p style="font-size: 1.1em; color: #155724; font-family: monospace;">
-                  ${correctFormula}
-              </p>
-          </div>
-          <p style="font-size: 0.9em; margin-bottom: 15px;">
-              <strong>Your answer:</strong><br>
-              <span style="font-family: monospace; color: #dc3545;">${studentFormula}</span>
-          </p>
-          <button onclick="this.parentElement.parentElement.remove()" 
-                  style="margin-top: 10px; padding: 10px 20px; background: #dc3545; 
-                         color: white; border: none; border-radius: 8px; cursor: pointer; 
-                         font-family: inherit;">Continue</button>
+    const studentFormula = buildFormulaFromSlots(currentQuestion, slotAssignments);
+    const correctFormula = buildFormulaFromSlots(currentQuestion, pickCorrectAnswers(currentQuestion));
+    showQuickModal('❌ Not Quite Right!', `
+      <div style="background: rgba(255,255,255,0.7); padding: 12px; border-radius: 8px; margin: 10px 0;">
+        <div style="font-weight: bold; margin-bottom: 6px;">Correct Formula:</div>
+        <div style="font-family: monospace; color: #155724;">${correctFormula}</div>
       </div>
-      <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                  background: rgba(0,0,0,0.5); z-index: 999;" onclick="this.nextElementSibling.firstElementChild.querySelector('button').click();"></div>
-    `;
-    document.body.appendChild(errorModal);
+      <div style="margin-top:6px;font-size:.95em;">
+        <strong>Your answer:</strong><br>
+        <span style="font-family: monospace; color: #dc3545;">${studentFormula}</span>
+      </div>
+    `, 'error');
   }
-  
-  // Wait for modal to be dismissed before proceeding
+
+  // Move to next question after a short pause
   setTimeout(() => {
     currentQuestionIndex++;
     if (currentQuestionIndex >= quizQuestions.length) {
       showFinal();
     } else {
       loadQuizQuestion();
+      document.getElementById('quizScore').textContent = quizScore;
     }
-  }, 100); // Much faster transition after clicking OK
+  }, 200);
 }
 
-function showModal(title, message, type){
-  const modal = document.createElement('div');
-  modal.className = `modal ${type}`;
-  modal.innerHTML = `
-    <div class="title">${title}</div>
-    <div>${message}</div>
-    <button class="btn" onclick="this.parentElement.remove()">OK</button>
+function buildFormulaFromSlots(q, mapping){
+  const keys = Object.keys(q.slots);
+  const parts = [];
+  if(q.template==='DIV'){
+    parts.push(mapping.A, ' ÷ ', mapping.B);
+  }else if(q.template==='ADD_DIV'){
+    parts.push('(', mapping.A, ' + ', mapping.B, ') ÷ ', mapping.C);
+  }else if(q.template==='ONE_MINUS_DIV'){
+    parts.push('(', '1', ' − ', mapping.A, ') ÷ ', mapping.B);
+  }
+  return parts.join('');
+}
+function pickCorrectAnswers(q){
+  const obj = {};
+  Object.keys(q.slots).forEach(k => { obj[k] = q.slots[k].allowed[0]; });
+  return obj;
+}
+
+function showQuickModal(title, htmlMessage, type){
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = `
+    <div class="modal ${type}">
+      <div class="title">${title}</div>
+      <div>${htmlMessage}</div>
+      <button class="btn" onclick="this.closest('.modal').remove()">OK</button>
+    </div>
+    <div class="modal-backdrop" onclick="this.previousElementSibling.remove(); this.remove();"></div>
   `;
-  document.body.appendChild(modal);
+  document.body.appendChild(wrapper);
 }
 
+// ---------- Final ----------
 function showFinal(){
-  const finalScore = Math.round(((step1Score + quizScore) / (recognitionQuestions.length + quizQuestions.length)) * 100);
-  
-  // Go to step 4 (final step) first
-  goToStep(4);
-  
-  // Then replace the content in the final step
+  // Ensure we activate the correct step (fix for final screen not showing)
+  goToStep('final');
+
+  const totalAnswered = recognitionQuestions.length + quizQuestions.length;
+  const totalScore = step1Score + quizScore;
+  const finalScore = Math.round((totalScore / totalAnswered) * 100);
+
   const finalContainer = document.getElementById('final');
   finalContainer.innerHTML = `
     <div style="text-align:center;padding:40px;max-width:800px;margin:0 auto;">
       <h2 style="font-size:2.5em;color:#8b7355;margin-bottom:25px;font-weight:bold;">🎉 Congratulations!</h2>
-      
       <div style="background:linear-gradient(135deg,#4CAF50,#45a049);color:white;padding:30px;border-radius:20px;margin:25px 0;font-size:1.3em;box-shadow:0 10px 30px rgba(76,175,80,0.3);">
         <h3 style="margin-bottom:15px;">Final Score: ${finalScore}%</h3>
-        <p style="font-size:1.1em;">
+        <p style="font-size:1.05em;">
           ${finalScore >= 90 ? 'Outstanding! You have mastered financial statement analysis.' : 
-            finalScore >= 80 ? 'Excellent work! You have a strong understanding of financial statements.' :
-            finalScore >= 70 ? 'Good job! You have a solid foundation in financial analysis.' :
+            finalScore >= 80 ? 'Excellent work! You have a strong understanding.' :
+            finalScore >= 70 ? 'Good job! You have a solid foundation.' :
             'Keep practicing! Review the concepts and try again.'}
         </p>
+        <p style="margin-top:8px;">(You scored ${totalScore} out of ${totalAnswered} total points.)</p>
       </div>
-      
-      <button class="btn" onclick="restartGame()" style="font-size:1.2em;padding:15px 30px;background:linear-gradient(135deg,#28a745,#20c997);margin-top:30px;">
-        🔄 Take Quiz Again
-      </button>
+      <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn" onclick="restartGame()" style="font-size:1.1em;padding:14px 28px; background:linear-gradient(135deg,#28a745,#20c997);">🔄 Retake Quiz</button>
+        <button class="btn" onclick="goToStep(1)" style="font-size:1.1em;padding:14px 28px; background:linear-gradient(135deg,#6c757d,#495057);">🏠 Back to Start</button>
+      </div>
     </div>
   `;
 }
 
-function displayAllRatios(){
-  const container = document.getElementById('allRatiosDisplay');
-  let html = '';
-  
-  // Use the actual category names from ratioCategories
-  Object.entries(ratioCategories).forEach(([category, ratios]) => {
-    html += `<div style="margin-bottom:15px;">`;
-    html += `<div style="font-weight:bold; color:#8b7355; margin-bottom:5px; font-size:1.1em;">${category}</div>`;
-    Object.entries(ratios).forEach(([ratioName, ratioData]) => {
-      html += `<div style="margin-left:15px; margin-bottom:3px; font-size:0.95em;">`;
-      html += `<span style="font-weight:500;">${ratioName}:</span> <span style="font-family:monospace; color:#0d47a1;">${ratioData.formula}</span>`;
-      html += `</div>`;
-    });
-    html += `</div>`;
-  });
-  
-  container.innerHTML = html;
-}
-
+// ---------- Restart ----------
 function restartGame(){
-  // Reset all game state
   currentStep = 1;
   step1Score = 0;
   step1QuestionIndex = 0;
@@ -1017,33 +908,39 @@ function restartGame(){
   selectedRatio = null;
   ratioInteractions = 0;
   slotAssignments = {};
-  activeSlotKey = null;
   currentQuestion = null;
   quizQuestions = [];
-  
-  // Go back to step 1
+
   goToStep(1);
   loadStep1Question();
 }
 
-
-
-// ---------- Navigation ----------
+// ---------- Navigation (FIXED to handle 'final') ----------
 function goToStep(step){
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-  document.getElementById(`step${step}`).classList.add('active');
-  currentStep = step;
-  
-  // Update progress bar
-  const progress = (step / 4) * 100;
+
+  if (step === 'final' || step === 4) {
+    document.getElementById('final').classList.add('active');
+    currentStep = 4;
+  } else {
+    document.getElementById(`step${step}`).classList.add('active');
+    currentStep = step;
+  }
+
+  // progress bar
+  const totalSteps = 4;
+  const progress = Math.min((currentStep / totalSteps) * 100, 100);
   document.getElementById('progressBar').style.width = progress + '%';
-  
+
   if(step === 2){
     displayStatement('balance');
     loadRatioButtons();
     document.getElementById('startQuizBtn').onclick = () => goToStep(3);
   }else if(step === 3){
-    randomizeQuiz();
+    quizScore = 0;
+    currentQuestionIndex = 0;
+    randomizeQuiz(); // pick 6 fresh questions every time user enters Step 3
+    document.getElementById('quizScore').textContent = quizScore;
     loadQuizQuestion();
     document.getElementById('clearAllBtn').onclick = () => {
       slotAssignments = {};
@@ -1051,43 +948,14 @@ function goToStep(step){
       updateSubmitButton();
     };
     document.getElementById('submitQuizAnswer').onclick = submitQuizAnswer;
-  }else if(step === 4){
-    document.getElementById('restartBtn').onclick = () => {
-      currentStep = 1; step1Score = 0; step1QuestionIndex = 0; quizScore = 0; currentQuestionIndex = 0;
-      goToStep(1); loadStep1Question();
-    };
-    document.getElementById('goHomeBtn').onclick = () => {
-      // Close the game and return to the course page
-      if (window.opener) {
-        window.close();
-      } else {
-        window.location.href = '/teaching/335/chapter-2';
-      }
-    };
   }
 }
 
 // ---------- Initialize ----------
 document.addEventListener('DOMContentLoaded', () => {
-  try {
-    console.log('Game initializing...');
-    loadStep1Question();
-    console.log('Game initialized successfully');
-  } catch (error) {
-    console.error('Error initializing game:', error);
-    // Show a fallback message if there's an error
-    const container = document.getElementById('questionContent');
-    if (container) {
-      container.innerHTML = `
-        <div style="text-align:center;padding:20px;">
-          <h3 style="color:#8b7355;">Game Loading...</h3>
-          <p>If the game doesn't load, please refresh the page.</p>
-          <button class="btn" onclick="location.reload()">Refresh Page</button>
-        </div>
-      `;
-    }
-  }
+  loadStep1Question();
 });
 </script>
 </body>
 </html>
+
