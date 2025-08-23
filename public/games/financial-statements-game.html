@@ -962,10 +962,13 @@ function showModal(title, message, type){
 function showFinal(){
   const finalScore = Math.round(((step1Score + quizScore) / (recognitionQuestions.length + quizQuestions.length)) * 100);
   
-  // Simple final page with just score and retake button
-  const container = document.getElementById('questionContent');
-  container.innerHTML = `
-    <div style="text-align:center;padding:40px;">
+  // Go to step 4 (final step) first
+  goToStep(4);
+  
+  // Then replace the content in the final step
+  const finalContainer = document.getElementById('final');
+  finalContainer.innerHTML = `
+    <div style="text-align:center;padding:40px;max-width:800px;margin:0 auto;">
       <h2 style="font-size:2.5em;color:#8b7355;margin-bottom:25px;font-weight:bold;">🎉 Congratulations!</h2>
       
       <div style="background:linear-gradient(135deg,#4CAF50,#45a049);color:white;padding:30px;border-radius:20px;margin:25px 0;font-size:1.3em;box-shadow:0 10px 30px rgba(76,175,80,0.3);">
