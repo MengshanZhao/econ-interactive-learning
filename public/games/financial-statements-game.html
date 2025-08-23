@@ -682,15 +682,14 @@ function buildStatementsHTML(){
   return buildOne(b,'balance') + buildOne(i,'income');
 }
 
-// NEW: random 6 from ALL ratios (not fixed 3+3)
+// Random 6 from ALL ratios
 function randomizeQuiz(){
   const pool = quizPool.slice();
-  // Fisher-Yates shuffle
   for(let i = pool.length - 1; i > 0; i--){
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
-  quizQuestions = pool.slice(0, 6); // pick any 6
+  quizQuestions = pool.slice(0, 6);
   document.getElementById('totalQuestions').textContent = quizQuestions.length;
 }
 
@@ -736,7 +735,6 @@ function renderSlotsForQuestion(q){
     addText('('); addText('1'); addOp('−'); slot('A','A'); addText(')'); addOp('÷'); slot('B','B');
   }
 
-  // Click lines to fill the NEXT empty slot
   setupStatementClickHandlers();
   updateSubmitButton();
 }
@@ -754,8 +752,6 @@ function setupStatementClickHandlers(){
   document.querySelectorAll('.clickable-quiz').forEach(line => {
     line.onclick = () => {
       const itemName = line.dataset.item;
-
-      // find next empty slot
       const allSlots = Object.keys(currentQuestion.slots);
       let nextSlot = null;
       for (let slotKey of allSlots) {
@@ -765,8 +761,6 @@ function setupStatementClickHandlers(){
         alert('All slots are filled! Clear a slot or submit your answer.');
         return;
       }
-
-      // fill slot
       slotAssignments[nextSlot] = itemName;
       const slot = document.querySelector(`[data-slot="${nextSlot}"]`);
       slot.className = 'slot-pill';
@@ -807,7 +801,8 @@ function submitQuizAnswer(){
 
   if(correct){
     quizScore++; ping('correct');
-    showQuickModal('🎉 Excellent!', `${currentQuestion.name} formula is correct!`, 'success');
+    document.getElementById('quizScore').textContent = quizScore;
+    showQuickModal('🎉 Excellent!', `${currentQuestion.name} formula is correct!`, 'success', nextQuestion);
   }else{
     ping('incorrect');
     const studentFormula = buildFormulaFromSlots(currentQuestion, slotAssignments);
@@ -821,23 +816,20 @@ function submitQuizAnswer(){
         <strong>Your answer:</strong><br>
         <span style="font-family: monospace; color: #dc3545;">${studentFormula}</span>
       </div>
-    `, 'error');
+    `, 'error', nextQuestion);
   }
+}
 
-  // Move to next question after a short pause
-  setTimeout(() => {
-    currentQuestionIndex++;
-    if (currentQuestionIndex >= quizQuestions.length) {
-      showFinal();
-    } else {
-      loadQuizQuestion();
-      document.getElementById('quizScore').textContent = quizScore;
-    }
-  }, 200);
+function nextQuestion(){
+  currentQuestionIndex++;
+  if (currentQuestionIndex >= quizQuestions.length) {
+    showFinal();
+  } else {
+    loadQuizQuestion();
+  }
 }
 
 function buildFormulaFromSlots(q, mapping){
-  const keys = Object.keys(q.slots);
   const parts = [];
   if(q.template==='DIV'){
     parts.push(mapping.A, ' ÷ ', mapping.B);
@@ -854,24 +846,31 @@ function pickCorrectAnswers(q){
   return obj;
 }
 
-function showQuickModal(title, htmlMessage, type){
+function showQuickModal(title, htmlMessage, type, onClose){
   const wrapper = document.createElement('div');
+  const closeAndAdvance = () => {
+    const m = wrapper.querySelector('.modal');
+    const b = wrapper.querySelector('.modal-backdrop');
+    if (m) m.remove();
+    if (b) b.remove();
+    if (typeof onClose === 'function') onClose();
+  };
   wrapper.innerHTML = `
     <div class="modal ${type}">
       <div class="title">${title}</div>
       <div>${htmlMessage}</div>
-      <button class="btn" onclick="this.closest('.modal').remove()">OK</button>
+      <button class="btn" id="modalOkBtn">OK</button>
     </div>
-    <div class="modal-backdrop" onclick="this.previousElementSibling.remove(); this.remove();"></div>
+    <div class="modal-backdrop"></div>
   `;
   document.body.appendChild(wrapper);
+  wrapper.querySelector('#modalOkBtn').onclick = closeAndAdvance;
+  wrapper.querySelector('.modal-backdrop').onclick = closeAndAdvance;
 }
 
 // ---------- Final ----------
 function showFinal(){
-  // Ensure we activate the correct step (fix for final screen not showing)
   goToStep('final');
-
   const totalAnswered = recognitionQuestions.length + quizQuestions.length;
   const totalScore = step1Score + quizScore;
   const finalScore = Math.round((totalScore / totalAnswered) * 100);
@@ -915,7 +914,7 @@ function restartGame(){
   loadStep1Question();
 }
 
-// ---------- Navigation (FIXED to handle 'final') ----------
+// ---------- Navigation (handles 'final') ----------
 function goToStep(step){
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
 
@@ -927,7 +926,6 @@ function goToStep(step){
     currentStep = step;
   }
 
-  // progress bar
   const totalSteps = 4;
   const progress = Math.min((currentStep / totalSteps) * 100, 100);
   document.getElementById('progressBar').style.width = progress + '%';
@@ -939,7 +937,7 @@ function goToStep(step){
   }else if(step === 3){
     quizScore = 0;
     currentQuestionIndex = 0;
-    randomizeQuiz(); // pick 6 fresh questions every time user enters Step 3
+    randomizeQuiz(); // fresh 6 each time
     document.getElementById('quizScore').textContent = quizScore;
     loadQuizQuestion();
     document.getElementById('clearAllBtn').onclick = () => {
@@ -958,4 +956,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
