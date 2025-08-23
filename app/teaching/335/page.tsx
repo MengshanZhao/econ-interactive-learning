@@ -39,6 +39,9 @@ export default function ECONS335Page() {
                   <Link href="/teaching/335/chapter-1" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
                     Chapter 1: Tax of Corporation Earning
                   </Link>
+                  <Link href="/teaching/335/chapter-2" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 2: Financial Statement Analysis
+                  </Link>
                 </div>
               </div>
             </div>
@@ -60,7 +63,11 @@ export default function ECONS335Page() {
                       Chapter 1: Tax of Corporation Earning
                     </Link>
                   </li>
-                  <li className="text-muted-foreground">Chapter 2: Coming soon</li>
+                  <li>
+                    <Link href="/teaching/335/chapter-2" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 2: Financial Statement Analysis
+                    </Link>
+                  </li>
                 </ol>
               </div>
             </aside>
