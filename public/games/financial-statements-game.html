@@ -832,11 +832,15 @@ function submitQuizAnswer(){
   }else{
     ping('incorrect');
     
-    // Build detailed feedback message
-    let feedbackMessage = 'Your answer is incorrect.\n\n';
+    // Build detailed feedback message with HTML formatting
+    let feedbackMessage = '<div style="text-align:center; line-height:1.6;">';
+    
+    // Header
+    feedbackMessage += '<div style="font-size:1.2em; font-weight:bold; color:#721c24; margin-bottom:15px;">Your answer is incorrect</div>';
     
     // Show student's answer
-    feedbackMessage += 'Your answer: ';
+    feedbackMessage += '<div style="margin-bottom:10px;"><span style="font-weight:bold; color:#6c757d;">Your answer:</span><br>';
+    feedbackMessage += '<span style="font-size:1.1em; color:#dc3545; font-family:monospace;">';
     allSlots.forEach(key => {
       const assigned = slotAssignments[key];
       feedbackMessage += `${assigned}`;
@@ -848,8 +852,11 @@ function submitQuizAnswer(){
         }
       }
     });
+    feedbackMessage += '</span></div>';
     
-    feedbackMessage += '\n\nCorrect answer: ';
+    // Show correct answer
+    feedbackMessage += '<div><span style="font-weight:bold; color:#6c757d;">Correct answer:</span><br>';
+    feedbackMessage += '<span style="font-size:1.1em; color:#28a745; font-family:monospace;">';
     allSlots.forEach(key => {
       const correctItem = currentQuestion.slots[key].allowed[0];
       feedbackMessage += `${correctItem}`;
@@ -861,6 +868,7 @@ function submitQuizAnswer(){
         }
       }
     });
+    feedbackMessage += '</span></div></div>';
     
     showModal('Incorrect', feedbackMessage, 'error');
   }
