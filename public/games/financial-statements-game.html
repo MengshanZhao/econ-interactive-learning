@@ -240,9 +240,9 @@
 
     <!-- Final -->
     <div class="step" id="final">
-      <div class="final-screen" style="text-align:center;padding:30px;max-width:800px;margin:0 auto;">
-        <h2 style="font-size:2.2em;color:#8b7355;margin-bottom:15px;font-weight:bold;">Congratulations!</h2>
-        <div class="final-score">
+      <div class="final-screen" style="text-align:center;padding:40px;max-width:600px;margin:0 auto;">
+        <h2 style="font-size:2.5em;color:#8b7355;margin-bottom:25px;font-weight:bold;">Congratulations!</h2>
+        <div class="final-score" style="background:linear-gradient(135deg,#4CAF50,#45a049);color:white;padding:25px;border-radius:20px;margin:25px 0;font-size:1.3em;box-shadow:0 10px 30px rgba(76,175,80,0.3);">
           <h3>Final Score: <span id="finalScore">0</span>%</h3>
           <p id="finalMessage"></p>
         </div>
@@ -849,55 +849,98 @@ function submitQuizAnswer(){
   
   if(correct){
     quizScore++; ping('correct');
-    showModal('Correct!', 'Great job building the formula correctly!', 'success');
+    
+    // Show success modal
+    const successModal = document.createElement('div');
+    successModal.innerHTML = `
+      <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                  background: linear-gradient(135deg, #d4edda, #c3e6cb); 
+                  border: 3px solid #28a745; border-radius: 15px; padding: 30px; 
+                  box-shadow: 0 20px 40px rgba(0,0,0,0.3); z-index: 1000; text-align: center;
+                  color: #155724; font-family: 'Comic Sans MS', fantasy;">
+          <h3 style="margin-bottom: 15px; font-size: 1.5em;">🎉 Excellent!</h3>
+          <p style="font-size: 1.2em; margin-bottom: 15px;">
+              <strong>${currentQuestion.name}</strong> formula is correct!
+          </p>
+          <p>Great job building the ratio formula!</p>
+          <button onclick="this.parentElement.parentElement.remove()" 
+                  style="margin-top: 15px; padding: 10px 20px; background: #28a745; 
+                         color: white; border: none; border-radius: 8px; cursor: pointer; 
+                         font-family: inherit;">Continue</button>
+      </div>
+      <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                  background: rgba(0,0,0,0.5); z-index: 999;"></div>
+    `;
+    document.body.appendChild(successModal);
   }else{
     ping('incorrect');
     
-    // Build detailed feedback message with HTML formatting
-    let feedbackMessage = '<div style="text-align:center; line-height:1.6;">';
-    
-    // Header
-    feedbackMessage += '<div style="font-size:1.2em; font-weight:bold; color:#721c24; margin-bottom:15px;">Your answer is incorrect</div>';
-    
-    // Show student's answer
-    feedbackMessage += '<div style="margin-bottom:10px;"><span style="font-weight:bold; color:#6c757d;">Your answer:</span><br>';
-    feedbackMessage += '<span style="font-size:1.1em; color:#dc3545; font-family:monospace;">';
+    // Build student's answer formula
+    let studentFormula = '';
     allSlots.forEach(key => {
       const assigned = slotAssignments[key];
-      feedbackMessage += `${assigned}`;
+      studentFormula += `${assigned}`;
       if (key !== allSlots[allSlots.length - 1]) {
-        if (currentQuestion.template === 'DIV' && key === 'A') feedbackMessage += ' ÷ ';
+        if (currentQuestion.template === 'DIV' && key === 'A') studentFormula += ' ÷ ';
         else if (currentQuestion.template === 'ADD_DIV') {
-          if (key === 'A') feedbackMessage += ' + ';
-          else if (key === 'B') feedbackMessage += ' ) ÷ ';
+          if (key === 'A') studentFormula += ' + ';
+          else if (key === 'B') studentFormula += ' ) ÷ ';
         }
       }
     });
-    feedbackMessage += '</span></div>';
     
-    // Show correct answer
-    feedbackMessage += '<div><span style="font-weight:bold; color:#6c757d;">Correct answer:</span><br>';
-    feedbackMessage += '<span style="font-size:1.1em; color:#28a745; font-family:monospace;">';
+    // Build correct answer formula
+    let correctFormula = '';
     allSlots.forEach(key => {
       const correctItem = currentQuestion.slots[key].allowed[0];
-      feedbackMessage += `${correctItem}`;
+      correctFormula += `${correctItem}`;
       if (key !== allSlots[allSlots.length - 1]) {
-        if (currentQuestion.template === 'DIV' && key === 'A') feedbackMessage += ' ÷ ';
+        if (currentQuestion.template === 'DIV' && key === 'A') correctFormula += ' ÷ ';
         else if (currentQuestion.template === 'ADD_DIV') {
-          if (key === 'A') feedbackMessage += ' + ';
-          else if (key === 'B') feedbackMessage += ' ) ÷ ';
+          if (key === 'A') correctFormula += ' + ';
+          else if (key === 'B') correctFormula += ' ) ÷ ';
         }
       }
     });
-    feedbackMessage += '</span></div></div>';
     
-    showModal('Incorrect', feedbackMessage, 'error');
+    // Show detailed error modal
+    const errorModal = document.createElement('div');
+    errorModal.innerHTML = `
+      <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                  background: linear-gradient(135deg, #f8d7da, #f1b0b7); 
+                  border: 3px solid #dc3545; border-radius: 15px; padding: 30px; 
+                  box-shadow: 0 20px 40px rgba(0,0,0,0.3); z-index: 1000; text-align: center;
+                  color: #721c24; font-family: 'Comic Sans MS', fantasy; max-width: 400px;">
+          <h3 style="margin-bottom: 15px; font-size: 1.5em;">❌ Not Quite Right!</h3>
+          <p style="font-size: 1.1em; margin-bottom: 10px;">
+              <strong>${currentQuestion.name}</strong> formula
+          </p>
+          <div style="background: rgba(255,255,255,0.7); padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <p style="font-weight: bold; margin-bottom: 8px;">Correct Formula:</p>
+              <p style="font-size: 1.1em; color: #155724; font-family: monospace;">
+                  ${correctFormula}
+              </p>
+          </div>
+          <p style="font-size: 0.9em; margin-bottom: 15px;">
+              <strong>Your answer:</strong><br>
+              <span style="font-family: monospace; color: #dc3545;">${studentFormula}</span>
+          </p>
+          <button onclick="this.parentElement.parentElement.remove()" 
+                  style="margin-top: 10px; padding: 10px 20px; background: #dc3545; 
+                         color: white; border: none; border-radius: 8px; cursor: pointer; 
+                         font-family: inherit;">Continue</button>
+      </div>
+      <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                  background: rgba(0,0,0,0.5); z-index: 999;" onclick="this.nextElementSibling.firstElementChild.querySelector('button').click();"></div>
+    `;
+    document.body.appendChild(errorModal);
   }
   
+  // Wait for modal to be dismissed before proceeding
   setTimeout(() => {
     currentQuestionIndex++;
     loadQuizQuestion();
-  }, 3000); // Give more time to read the feedback
+  }, 100); // Much faster transition after clicking OK
 }
 
 function showModal(title, message, type){
