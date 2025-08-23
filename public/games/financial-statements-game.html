@@ -81,7 +81,7 @@
     .ratio-button.selected{background:linear-gradient(135deg,#8b7355,#a0906b);color:#fff;border-color:#8b7355;transform:translateX(3px);}
     .highlight{background:linear-gradient(135deg,#fff3cd,#ffeaa7)!important;border:2px solid #f39c12!important;}
 
-    .switch-statement-btn{width:100%;margin-top:12px;background:linear-gradient(135deg,#17a2b8,#138496);font-size:14px;padding:10px;}
+    .switch-statement-btn{width:100%;margin-top:12px;background:linear-gradient(135deg,#17a2b8,#138496);font-size:14px;padding:10px;position:sticky;bottom:0;}
 
     /* Step 3 — improved right sidebar layout */
     .quiz-section{max-width:1300px;margin:0 auto;}
@@ -208,7 +208,7 @@
     <div class="step" id="step3">
       <div class="quiz-section">
         <div class="quiz-question" id="quizQuestionText"></div>
-        <p class="howto-quiz"><strong>Build the formula:</strong> The math symbols are already shown. Click a <em>slot</em> to activate it, then click an item from the statements to fill it. Use the red "×" on a slot to clear it. Submit when all slots are filled.</p>
+        <p class="howto-quiz"><strong>Fill in the blanks:</strong> Click on any empty slot to select it, then click on an item from the statements to fill it. You can remove items by clicking the red "×" button. Submit your answer when all slots are filled!</p>
 
         <div class="quiz-grid">
           <!-- Left: statements -->
@@ -704,13 +704,13 @@ function templateShort(q){
 
 function renderRatioReference(){
   const ref = document.getElementById('ratioRef');
-  ref.innerHTML = '<h4>Ratios in This Quiz</h4>';
-  quizQuestions.forEach((q, idx)=>{
+  ref.innerHTML = '<h4>Current Question</h4>';
+  if (currentQuestion) {
     const div = document.createElement('div');
-    div.className = 'item' + (idx===currentQuestionIndex ? ' active' : '');
-    div.innerHTML = `<span>${q.name}</span> <span class="tpl">${templateShort(q)}</span>`;
+    div.className = 'item active';
+    div.innerHTML = `<span>${currentQuestion.name}</span> <span class="tpl">${templateShort(currentQuestion)}</span>`;
     ref.appendChild(div);
-  });
+  }
 }
 
 function renderSlotsForQuestion(q){
@@ -751,21 +751,31 @@ function loadQuizQuestion(){
   document.getElementById('dualStatements').innerHTML = buildStatementsHTML();
   renderSlotsForQuestion(currentQuestion);
   renderRatioReference();
-  setupStatementClickHandlers();
-  updateSubmitButton();
+  
+  // Wait a moment for DOM to update, then setup handlers
+  setTimeout(() => {
+    setupStatementClickHandlers();
+    updateSubmitButton();
+  }, 100);
 }
 
 function setupStatementClickHandlers(){
   document.querySelectorAll('.clickable-quiz').forEach(line => {
     line.onclick = () => {
-      if(!activeSlotKey) return;
+      if(!activeSlotKey) {
+        alert('Please click on a slot first to select it!');
+        return;
+      }
       const itemName = line.dataset.item;
       const slot = document.querySelector(`[data-slot="${activeSlotKey}"]`);
       if(!slot) return;
       
       // Check if this item is allowed for this slot
       const allowed = currentQuestion.slots[activeSlotKey].allowed;
-      if(!allowed.includes(itemName)) return;
+      if(!allowed.includes(itemName)) {
+        alert('This item is not valid for the selected slot. Try a different item.');
+        return;
+      }
       
       slotAssignments[activeSlotKey] = itemName;
       slot.className = 'slot-pill';
