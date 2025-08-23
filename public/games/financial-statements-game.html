@@ -208,7 +208,7 @@
     <div class="step" id="step3">
       <div class="quiz-section">
         <div class="quiz-question" id="quizQuestionText"></div>
-        <p class="howto-quiz"><strong>Fill in the blanks:</strong> Click on any empty slot to select it, then click on an item from the statements to fill it. You can remove items by clicking the red "×" button. Submit your answer when all slots are filled!</p>
+        <p class="howto-quiz"><strong>Fill in the blanks:</strong> Simply click on items from the statements to fill the slots in order. The first item you click goes in the first slot, the second in the second slot, and so on. You can remove items by clicking the red "×" button. Submit when all slots are filled!</p>
 
         <div class="quiz-grid">
           <!-- Left: statements -->
@@ -724,11 +724,6 @@ function renderSlotsForQuestion(q){
     span.dataset.slot = key;
     span.title = label || key;
     span.innerHTML = `<em>Slot ${label || key}</em>`;
-    span.onclick = (e)=>{
-      activeSlotKey = key;
-      document.querySelectorAll('.slot-pill').forEach(p=>p.classList.remove('active'));
-      span.classList.add('active');
-    };
     row.appendChild(span);
   }
   function addOp(ch){ const s=document.createElement('span'); s.className='op'; s.textContent=ch; row.appendChild(s); }
@@ -762,26 +757,29 @@ function loadQuizQuestion(){
 function setupStatementClickHandlers(){
   document.querySelectorAll('.clickable-quiz').forEach(line => {
     line.onclick = () => {
-      if(!activeSlotKey) {
-        alert('Please click on a slot first to select it!');
-        return;
-      }
       const itemName = line.dataset.item;
-      const slot = document.querySelector(`[data-slot="${activeSlotKey}"]`);
-      if(!slot) return;
       
-      // Check if this item is allowed for this slot
-      const allowed = currentQuestion.slots[activeSlotKey].allowed;
-      if(!allowed.includes(itemName)) {
-        alert('This item is not valid for the selected slot. Try a different item.');
+      // Find the next empty slot
+      const allSlots = Object.keys(currentQuestion.slots);
+      let nextSlot = null;
+      
+      for (let slotKey of allSlots) {
+        if (!slotAssignments[slotKey]) {
+          nextSlot = slotKey;
+          break;
+        }
+      }
+      
+      if (!nextSlot) {
+        alert('All slots are filled! Please remove an item first or submit your answer.');
         return;
       }
       
-      slotAssignments[activeSlotKey] = itemName;
+      // Fill the slot with the selected item
+      slotAssignments[nextSlot] = itemName;
+      const slot = document.querySelector(`[data-slot="${nextSlot}"]`);
       slot.className = 'slot-pill';
-      slot.innerHTML = `${itemName} <button class="slot-remove" onclick="clearSlot('${activeSlotKey}')">×</button>`;
-      activeSlotKey = null;
-      slot.classList.remove('active');
+      slot.innerHTML = `${itemName} <button class="slot-remove" onclick="clearSlot('${nextSlot}')">×</button>`;
       updateSubmitButton();
     };
   });
@@ -806,14 +804,22 @@ function submitQuizAnswer(){
   const allSlots = Object.keys(currentQuestion.slots);
   const filledSlots = Object.keys(slotAssignments);
   
-  if(filledSlots.length !== allSlots.length) return;
+  if(filledSlots.length !== allSlots.length) {
+    alert('Please fill all slots before submitting!');
+    return;
+  }
   
   // Check if all assignments are correct
   let correct = true;
+  let incorrectSlots = [];
+  
   allSlots.forEach(key => {
     const assigned = slotAssignments[key];
     const allowed = currentQuestion.slots[key].allowed;
-    if(!allowed.includes(assigned)) correct = false;
+    if(!allowed.includes(assigned)) {
+      correct = false;
+      incorrectSlots.push({slot: key, assigned: assigned, correct: allowed[0]});
+    }
   });
   
   if(correct){
@@ -821,13 +827,34 @@ function submitQuizAnswer(){
     showModal('Correct!', 'Great job building the formula correctly!', 'success');
   }else{
     ping('incorrect');
-    showModal('Incorrect', 'Check your formula components and try again.', 'error');
+    
+    // Build detailed feedback message
+    let feedbackMessage = 'Your answer is incorrect. Here are the corrections:\n\n';
+    incorrectSlots.forEach(item => {
+      feedbackMessage += `• Slot ${item.slot}: You chose "${item.assigned}" but it should be "${item.correct}"\n`;
+    });
+    
+    // Show correct formula
+    feedbackMessage += '\nThe correct formula is:\n';
+    allSlots.forEach(key => {
+      const correctItem = currentQuestion.slots[key].allowed[0];
+      feedbackMessage += `${correctItem}`;
+      if (key !== allSlots[allSlots.length - 1]) {
+        if (currentQuestion.template === 'DIV' && key === 'A') feedbackMessage += ' ÷ ';
+        else if (currentQuestion.template === 'ADD_DIV') {
+          if (key === 'A') feedbackMessage += ' + ';
+          else if (key === 'B') feedbackMessage += ' ) ÷ ';
+        }
+      }
+    });
+    
+    showModal('Incorrect', feedbackMessage, 'error');
   }
   
   setTimeout(() => {
     currentQuestionIndex++;
     loadQuizQuestion();
-  }, 1500);
+  }, 3000); // Give more time to read the feedback
 }
 
 function showModal(title, message, type){
