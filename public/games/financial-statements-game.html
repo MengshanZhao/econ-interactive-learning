@@ -924,25 +924,14 @@ function displayAllRatios(){
   const container = document.getElementById('allRatiosDisplay');
   let html = '';
   
-  // Group ratios by category
-  const categories = {
-    'Liquidity Ratios': ['Current Ratio', 'Quick Ratio', 'Cash Ratio'],
-    'Leverage Ratios': ['Debt-Equity Ratio (book)', 'Equity Multiplier (book)'],
-    'Profitability Ratios': ['Gross Margin', 'Operating Margin', 'Net Profit Margin'],
-    'Interest Coverage': ['EBIT/Interest Coverage', 'EBITDA/Interest Coverage'],
-    'Operating Returns': ['Asset Turnover', 'Return on Assets (ROA)']
-  };
-  
-  Object.entries(categories).forEach(([category, ratios]) => {
+  // Use the actual category names from ratioCategories
+  Object.entries(ratioCategories).forEach(([category, ratios]) => {
     html += `<div style="margin-bottom:15px;">`;
     html += `<div style="font-weight:bold; color:#8b7355; margin-bottom:5px; font-size:1.1em;">${category}</div>`;
-    ratios.forEach(ratio => {
-      const ratioData = findRatioData(ratio);
-      if (ratioData) {
-        html += `<div style="margin-left:15px; margin-bottom:3px; font-size:0.95em;">`;
-        html += `<span style="font-weight:500;">${ratio}:</span> <span style="font-family:monospace; color:#0d47a1;">${ratioData.formula}</span>`;
-        html += `</div>`;
-      }
+    Object.entries(ratios).forEach(([ratioName, ratioData]) => {
+      html += `<div style="margin-left:15px; margin-bottom:3px; font-size:0.95em;">`;
+      html += `<span style="font-weight:500;">${ratioName}:</span> <span style="font-family:monospace; color:#0d47a1;">${ratioData.formula}</span>`;
+      html += `</div>`;
     });
     html += `</div>`;
   });
@@ -950,14 +939,7 @@ function displayAllRatios(){
   container.innerHTML = html;
 }
 
-function findRatioData(ratioName) {
-  for (let category in ratioCategories) {
-    if (ratioCategories[category][ratioName]) {
-      return ratioCategories[category][ratioName];
-    }
-  }
-  return null;
-}
+
 
 // ---------- Navigation ----------
 function goToStep(step){
