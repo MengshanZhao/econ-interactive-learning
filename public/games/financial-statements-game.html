@@ -240,23 +240,24 @@
 
     <!-- Final -->
     <div class="step" id="final">
-      <div class="final-screen" style="text-align:center;padding:40px;max-width:600px;margin:0 auto;">
-        <h2 style="font-size:2.5em;color:#8b7355;margin-bottom:25px;font-weight:bold;">Congratulations!</h2>
-        <div class="final-score" style="background:linear-gradient(135deg,#4CAF50,#45a049);color:white;padding:25px;border-radius:20px;margin:25px 0;font-size:1.3em;box-shadow:0 10px 30px rgba(76,175,80,0.3);">
-          <h3>Final Score: <span id="finalScore">0</span>%</h3>
-          <p id="finalMessage"></p>
+      <div style="text-align:center;padding:40px;max-width:800px;margin:0 auto;">
+        <h2 style="font-size:2.5em;color:#8b7355;margin-bottom:25px;font-weight:bold;">🎉 Congratulations!</h2>
+        
+        <div style="background:linear-gradient(135deg,#4CAF50,#45a049);color:white;padding:30px;border-radius:20px;margin:25px 0;font-size:1.3em;box-shadow:0 10px 30px rgba(76,175,80,0.3);">
+          <h3 style="margin-bottom:15px;">Final Score: <span id="finalScore">0</span>%</h3>
+          <p id="finalMessage" style="font-size:1.1em;"></p>
         </div>
         
-        <div style="margin:30px 0; padding:20px; background:#f8f9fa; border-radius:15px; border:2px solid #d4b896;">
-          <h3 style="color:#8b7355; margin-bottom:15px;">All Financial Ratios Covered:</h3>
-          <div id="allRatiosDisplay" style="text-align:left; max-height:300px; overflow-y:auto;"></div>
+        <div style="margin:30px 0; padding:25px; background:#f8f9fa; border-radius:15px; border:2px solid #d4b896; max-height:400px; overflow-y:auto;">
+          <h3 style="color:#8b7355; margin-bottom:20px; font-size:1.4em;">📊 All Financial Ratios Covered:</h3>
+          <div id="allRatiosDisplay" style="text-align:left;"></div>
         </div>
         
-        <div style="margin-top:25px;">
-          <p style="font-size:1.1em; color:#6c757d; margin-bottom:20px;">Would you like to take the quiz again?</p>
-          <div style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;">
-            <button class="btn" id="restartBtn" style="font-size:1.05em;padding:12px 26px; background:linear-gradient(135deg,#28a745,#20c997);">Yes, Take Quiz Again</button>
-            <button class="btn" id="goHomeBtn" style="font-size:1.05em;padding:12px 26px; background:linear-gradient(135deg,#6c757d,#495057);">No, Go Back to Course</button>
+        <div style="margin-top:30px;">
+          <p style="font-size:1.2em; color:#6c757d; margin-bottom:25px;">Would you like to take the quiz again?</p>
+          <div style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap;">
+            <button class="btn" id="restartBtn" style="font-size:1.1em;padding:15px 30px; background:linear-gradient(135deg,#28a745,#20c997);">🔄 Yes, Take Quiz Again</button>
+            <button class="btn" id="goHomeBtn" style="font-size:1.1em;padding:15px 30px; background:linear-gradient(135deg,#6c757d,#495057);">🏠 No, Go Back to Course</button>
           </div>
         </div>
       </div>
@@ -939,7 +940,11 @@ function submitQuizAnswer(){
   // Wait for modal to be dismissed before proceeding
   setTimeout(() => {
     currentQuestionIndex++;
-    loadQuizQuestion();
+    if (currentQuestionIndex >= quizQuestions.length) {
+      showFinal();
+    } else {
+      loadQuizQuestion();
+    }
   }, 100); // Much faster transition after clicking OK
 }
 
