@@ -961,20 +961,28 @@ function showModal(title, message, type){
 
 function showFinal(){
   const finalScore = Math.round(((step1Score + quizScore) / (recognitionQuestions.length + quizQuestions.length)) * 100);
-  document.getElementById('finalScore').textContent = finalScore;
   
-  let message = '';
-  if(finalScore >= 90) message = 'Outstanding! You have mastered financial statement analysis.';
-  else if(finalScore >= 80) message = 'Excellent work! You have a strong understanding of financial statements.';
-  else if(finalScore >= 70) message = 'Good job! You have a solid foundation in financial analysis.';
-  else message = 'Keep practicing! Review the concepts and try again.';
-  
-  document.getElementById('finalMessage').textContent = message;
-  
-  // Display all ratios covered
-  displayAllRatios();
-  
-  goToStep(4);
+  // Simple final page with just score and retake button
+  const container = document.getElementById('questionContent');
+  container.innerHTML = `
+    <div style="text-align:center;padding:40px;">
+      <h2 style="font-size:2.5em;color:#8b7355;margin-bottom:25px;font-weight:bold;">🎉 Congratulations!</h2>
+      
+      <div style="background:linear-gradient(135deg,#4CAF50,#45a049);color:white;padding:30px;border-radius:20px;margin:25px 0;font-size:1.3em;box-shadow:0 10px 30px rgba(76,175,80,0.3);">
+        <h3 style="margin-bottom:15px;">Final Score: ${finalScore}%</h3>
+        <p style="font-size:1.1em;">
+          ${finalScore >= 90 ? 'Outstanding! You have mastered financial statement analysis.' : 
+            finalScore >= 80 ? 'Excellent work! You have a strong understanding of financial statements.' :
+            finalScore >= 70 ? 'Good job! You have a solid foundation in financial analysis.' :
+            'Keep practicing! Review the concepts and try again.'}
+        </p>
+      </div>
+      
+      <button class="btn" onclick="restartGame()" style="font-size:1.2em;padding:15px 30px;background:linear-gradient(135deg,#28a745,#20c997);margin-top:30px;">
+        🔄 Take Quiz Again
+      </button>
+    </div>
+  `;
 }
 
 function displayAllRatios(){
@@ -994,6 +1002,25 @@ function displayAllRatios(){
   });
   
   container.innerHTML = html;
+}
+
+function restartGame(){
+  // Reset all game state
+  currentStep = 1;
+  step1Score = 0;
+  step1QuestionIndex = 0;
+  quizScore = 0;
+  currentQuestionIndex = 0;
+  selectedRatio = null;
+  ratioInteractions = 0;
+  slotAssignments = {};
+  activeSlotKey = null;
+  currentQuestion = null;
+  quizQuestions = [];
+  
+  // Go back to step 1
+  goToStep(1);
+  loadStep1Question();
 }
 
 
