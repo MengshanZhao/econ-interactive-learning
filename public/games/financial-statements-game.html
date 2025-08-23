@@ -528,9 +528,14 @@ function ping(type){ if(type==='correct') playTone(800); else if(type==='incorre
 
 // ---------- Step 1 ----------
 function loadStep1Question(){
+  console.log('Loading step 1 question...');
   if(step1QuestionIndex >= recognitionQuestions.length){ showStep1Complete(); return; }
   const q = recognitionQuestions[step1QuestionIndex];
   const container = document.getElementById('questionContent');
+  if (!container) {
+    console.error('Question content container not found!');
+    return;
+  }
   container.innerHTML = `
     <div class="financial-statement">
       <div class="statement-title">Financial Statement</div>
@@ -542,7 +547,11 @@ function loadStep1Question(){
     </div>
     <div id="feedback" style="margin-top:8px;"></div>
   `;
-  document.getElementById('currentQuestion').textContent = step1QuestionIndex + 1;
+  const currentQuestionElement = document.getElementById('currentQuestion');
+  if (currentQuestionElement) {
+    currentQuestionElement.textContent = step1QuestionIndex + 1;
+  }
+  console.log('Step 1 question loaded successfully');
 }
 
 function answerRecognition(answer){
@@ -982,7 +991,24 @@ function goToStep(step){
 
 // ---------- Initialize ----------
 document.addEventListener('DOMContentLoaded', () => {
-  loadStep1Question();
+  try {
+    console.log('Game initializing...');
+    loadStep1Question();
+    console.log('Game initialized successfully');
+  } catch (error) {
+    console.error('Error initializing game:', error);
+    // Show a fallback message if there's an error
+    const container = document.getElementById('questionContent');
+    if (container) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:20px;">
+          <h3 style="color:#8b7355;">Game Loading...</h3>
+          <p>If the game doesn't load, please refresh the page.</p>
+          <button class="btn" onclick="location.reload()">Refresh Page</button>
+        </div>
+      `;
+    }
+  }
 });
 </script>
 </body>
