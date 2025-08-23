@@ -199,7 +199,11 @@
         <div class="ratios-panel">
           <h3>Financial Ratios</h3>
           <div id="ratioCategories"></div>
-          <button class="btn" id="startQuizBtn" style="display:none; margin-top:10px;">Start Quiz Challenge</button>
+          <div style="margin-top:15px; padding:10px; background:#fff8e1; border:1px solid #ffe08a; border-radius:8px; font-size:0.9em; color:#6b4f00;">
+            <strong>Ready for the quiz?</strong><br>
+            Explore at least 3 different ratios to unlock the quiz challenge!
+          </div>
+          <button class="btn" id="startQuizBtn" style="display:none; margin-top:10px; position:sticky; bottom:10px;">Start Quiz Challenge</button>
         </div>
       </div>
     </div>
@@ -829,13 +833,23 @@ function submitQuizAnswer(){
     ping('incorrect');
     
     // Build detailed feedback message
-    let feedbackMessage = 'Your answer is incorrect. Here are the corrections:\n\n';
-    incorrectSlots.forEach(item => {
-      feedbackMessage += `• Slot ${item.slot}: You chose "${item.assigned}" but it should be "${item.correct}"\n`;
+    let feedbackMessage = 'Your answer is incorrect.\n\n';
+    
+    // Show student's answer
+    feedbackMessage += 'Your answer: ';
+    allSlots.forEach(key => {
+      const assigned = slotAssignments[key];
+      feedbackMessage += `${assigned}`;
+      if (key !== allSlots[allSlots.length - 1]) {
+        if (currentQuestion.template === 'DIV' && key === 'A') feedbackMessage += ' ÷ ';
+        else if (currentQuestion.template === 'ADD_DIV') {
+          if (key === 'A') feedbackMessage += ' + ';
+          else if (key === 'B') feedbackMessage += ' ) ÷ ';
+        }
+      }
     });
     
-    // Show correct formula
-    feedbackMessage += '\nThe correct formula is:\n';
+    feedbackMessage += '\n\nCorrect answer: ';
     allSlots.forEach(key => {
       const correctItem = currentQuestion.slots[key].allowed[0];
       feedbackMessage += `${correctItem}`;
