@@ -66,7 +66,7 @@ function generateQuestion() {
   }
 
   const opts = new Set([JSON.stringify(correct)]);
-  while (opts.size < 4) {
+  while (opts.size < 2) {
     let noise;
     if (unknown === "r") noise = roundTo(correct * (1 + (Math.random() * 0.4 - 0.2)) + (Math.random() - 0.5) * 0.01, 4);
     else if (unknown === "n") noise = roundTo(Math.max(0.25, correct + (Math.random() - 0.5) * 2), 2);
@@ -231,9 +231,9 @@ function Playfield({ pos, question, onChoose, hud, lastExplain, fx, theme, idle 
             <>
               <div className="text-sm opacity-90 mb-2">Find the missing variable: <span className="font-semibold">{question.unknown}</span></div>
               <div className="text-lg font-semibold leading-snug mb-3">{question.prompt}</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+              <div className="grid grid-cols-1 gap-4 mb-3">
                 {question.options.map((opt, i) => (
-                  <button key={i} onClick={() => onChoose(opt)} className="rounded-lg bg-white/10 hover:bg-white/20 px-4 py-3 text-left font-medium transition-colors">
+                  <button key={i} onClick={() => onChoose(opt)} className="rounded-lg bg-white/10 hover:bg-white/20 px-6 py-4 text-left font-medium transition-colors text-lg">
                     {question.formatter(opt)}
                   </button>
                 ))}
