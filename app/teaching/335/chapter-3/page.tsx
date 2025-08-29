@@ -203,7 +203,7 @@ export default function TVMRocketGame() {
 // ------- Playfield (shared rectangle) -------
 function Playfield({ pos, question, onChoose, hud, lastExplain, fx, theme, idle = false }) {
   return (
-    <div className={`relative w-full max-w-2xl mx-auto rounded-2xl border border-white/10 overflow-hidden shadow-xl ${themeClass(theme)} ${fx?.type === 'wrong' ? 'shake' : ''}`} style={{ aspectRatio: '14/10', height: 'auto' }}>
+    <div className={`relative w-full max-w-2xl mx-auto rounded-2xl border border-white/10 overflow-hidden shadow-xl ${themeClass(theme)} ${fx?.type === 'wrong' ? 'shake' : ''}`} style={{ aspectRatio: '9/14', height: 'auto' }}>
       {/* rocket — free movement, always above panel */}
       <div className={`absolute transition-all duration-500 ease-out z-10 ${fx?.type === 'wrong' ? 'wobble' : ''}`} style={{ left: `${pos.x}%`, bottom: `${pos.y}%`, transform: "translate(-50%, 0)" }}>
         <Rocket boost={fx?.type === 'correct'} fail={fx?.type === 'wrong'} />
