@@ -14,9 +14,9 @@ I teach online. Some concepts (T-accounts, cash flows, ratios) stick better with
 
 ### Tax — [Play here](https://www.mengshanzhao.com/teaching/335/chapter-1)
 Timed questions on profitability, liquidity, and leverage; randomized each run.
-### Financial and Income Statement — [Play here]([https://www.mengshanzhao.com/teaching/335/chapter-1](https://www.mengshanzhao.com/games/financial-statements-game.html))
+### Financial and Income Statement — [Play here](https://www.mengshanzhao.com/games/financial-statements-game.html)
 What is finance/income statement and how do you calculate 10+ different ratios calculation in easy step, instead of 100 slides.
-### Present and Future Ratios — [Play here]([https://www.mengshanzhao.com/teaching/335/chapter-1](https://www.mengshanzhao.com/teaching/335/chapter-3))
+### Present and Future Ratios — [Play here](https://www.mengshanzhao.com/teaching/335/chapter-1](https://www.mengshanzhao.com/teaching/335/chapter-3)
 How to calculate the present or future value with a rocket.
 
 **Preview:**
