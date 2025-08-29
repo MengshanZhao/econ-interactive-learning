@@ -150,7 +150,7 @@ export default function TVMRocketGame() {
 
   return (
     <div className="min-h-screen w-full bg-[#0b1020] text-white overflow-hidden font-pixel">
-      <div className="relative mx-auto max-w-3xl px-4 py-6">
+      <div className="relative mx-auto max-w-3xl px-4 py-6" style={{ minHeight: '100vh' }}>
         <header className="flex items-center justify-between mb-4">
           <h1 className="text-2xl md:text-3xl font-black tracking-tight">TVM Rocket</h1>
           <div className="flex items-center gap-2">
@@ -203,7 +203,7 @@ export default function TVMRocketGame() {
 // ------- Playfield (shared rectangle) -------
 function Playfield({ pos, question, onChoose, hud, lastExplain, fx, theme, idle = false }) {
   return (
-    <div className={`relative h-[520px] rounded-2xl border border-white/10 overflow-hidden shadow-xl ${themeClass(theme)} ${fx?.type === 'wrong' ? 'shake' : ''}`}>
+    <div className={`relative h-[600px] rounded-2xl border border-white/10 overflow-hidden shadow-xl ${themeClass(theme)} ${fx?.type === 'wrong' ? 'shake' : ''}`}>
       {/* rocket — free movement, always above panel */}
       <div className={`absolute transition-all duration-500 ease-out z-10 ${fx?.type === 'wrong' ? 'wobble' : ''}`} style={{ left: `${pos.x}%`, bottom: `${pos.y}%`, transform: "translate(-50%, 0)" }}>
         <Rocket boost={fx?.type === 'correct'} fail={fx?.type === 'wrong'} />
