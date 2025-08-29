@@ -13,7 +13,7 @@ import React, { useState, useEffect } from "react";
 const ROCKET_IMG = "/images/rocket.png"; // local rocket image
 
 // UI constants
-const PANEL_PCT = 26; // height % of bottom question panel
+const PANEL_PCT = 35; // height % of bottom question panel - increased for better visibility
 const TOP_MARGIN_PCT = 4; // keep headroom at the top
 
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
@@ -224,22 +224,22 @@ function Playfield({ pos, question, onChoose, hud, lastExplain, fx, theme, idle 
 
       {/* bottom question panel – fixed position */}
       <div className="absolute left-3 right-3 bottom-3" style={{ height: `${PANEL_PCT}%` }}>
-        <div className="h-full rounded-xl bg-black/45 backdrop-blur-sm border border-white/10 p-3 overflow-auto">
+        <div className="h-full rounded-xl bg-black/45 backdrop-blur-sm border border-white/10 p-4 overflow-y-auto">
           {!question ? (
             <div className="text-center text-base opacity-90">Lesson demo — quiz starts when you click Start.</div>
           ) : (
             <>
-              <div className="text-sm opacity-90 mb-1">Find the missing variable: <span className="font-semibold">{question.unknown}</span></div>
-              <div className="text-lg font-semibold leading-snug mb-2">{question.prompt}</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="text-sm opacity-90 mb-2">Find the missing variable: <span className="font-semibold">{question.unknown}</span></div>
+              <div className="text-lg font-semibold leading-snug mb-3">{question.prompt}</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 {question.options.map((opt, i) => (
-                  <button key={i} onClick={() => onChoose(opt)} className="rounded-lg bg-white/10 hover:bg-white/20 px-3 py-2 text-left font-medium">
+                  <button key={i} onClick={() => onChoose(opt)} className="rounded-lg bg-white/10 hover:bg-white/20 px-4 py-3 text-left font-medium transition-colors">
                     {question.formatter(opt)}
                   </button>
                 ))}
               </div>
               {lastExplain && (
-                <div className="mt-2 p-2 rounded bg-white/5 text-xs leading-snug"><span className="font-semibold">Prev:</span> {lastExplain}</div>
+                <div className="mt-3 p-3 rounded bg-white/5 text-xs leading-snug"><span className="font-semibold">Prev:</span> {lastExplain}</div>
               )}
             </>
           )}
