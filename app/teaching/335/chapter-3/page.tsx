@@ -13,7 +13,7 @@ import React, { useState, useEffect } from "react";
 const ROCKET_IMG = "/images/rocket.png"; // local rocket image
 
 // UI constants
-const PANEL_PCT = 35; // height % of bottom question panel - increased for better visibility
+const PANEL_PCT = 45; // height % of bottom question panel - much larger for no scrolling
 const TOP_MARGIN_PCT = 4; // keep headroom at the top
 
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
@@ -231,9 +231,9 @@ function Playfield({ pos, question, onChoose, hud, lastExplain, fx, theme, idle 
             <>
               <div className="text-sm opacity-90 mb-2">Find the missing variable: <span className="font-semibold">{question.unknown}</span></div>
               <div className="text-lg font-semibold leading-snug mb-3">{question.prompt}</div>
-              <div className="grid grid-cols-1 gap-4 mb-3">
+              <div className="grid grid-cols-2 gap-4 mb-3">
                 {question.options.map((opt, i) => (
-                  <button key={i} onClick={() => onChoose(opt)} className="rounded-lg bg-white/10 hover:bg-white/20 px-6 py-4 text-left font-medium transition-colors text-lg">
+                  <button key={i} onClick={() => onChoose(opt)} className="rounded-lg bg-white/10 hover:bg-white/20 px-4 py-3 text-left font-medium transition-colors text-base">
                     {question.formatter(opt)}
                   </button>
                 ))}
