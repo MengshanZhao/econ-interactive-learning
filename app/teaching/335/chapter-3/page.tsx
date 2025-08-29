@@ -25,9 +25,9 @@ function toPct(r, dp = 2) { return `${roundTo(r * 100, dp)}%`; }
 function themeClass(theme) {
   switch (theme) {
     case 'stars': return 'bg-stars';
-    case 'clouds': return 'bg-clouds';
+    case 'nebula': return 'bg-nebula';
     case 'galaxy': return 'bg-galaxy';
-    default: return 'bg-lined';
+    default: return 'bg-sky';
   }
 }
 
@@ -97,7 +97,7 @@ export default function TVMRocketGame() {
   const [fx, setFx] = useState({ type: "idle", t: 0 });
 
   // background theme
-  const [theme, setTheme] = useState('lined'); // 'lined' | 'stars' | 'clouds' | 'galaxy'
+  const [theme, setTheme] = useState('sky'); // 'sky' | 'stars' | 'nebula' | 'galaxy'
 
   function nextQuestion() {
     if (qIndex + 1 >= TOTAL) { setPhase("end"); return; }
@@ -155,9 +155,9 @@ export default function TVMRocketGame() {
           <h1 className="text-2xl md:text-3xl font-black tracking-tight">TVM Rocket</h1>
           <div className="flex items-center gap-2">
             <div className="hidden md:flex items-center gap-1 text-xs mr-2">
-              <span className={`theme-chip ${theme==='lined'?'theme-active':''}`} onClick={()=>setTheme('lined')}>Lined Sky</span>
+              <span className={`theme-chip ${theme==='sky'?'theme-active':''}`} onClick={()=>setTheme('sky')}>Sky</span>
               <span className={`theme-chip ${theme==='stars'?'theme-active':''}`} onClick={()=>setTheme('stars')}>Stars</span>
-              <span className={`theme-chip ${theme==='clouds'?'theme-active':''}`} onClick={()=>setTheme('clouds')}>Cloudline</span>
+              <span className={`theme-chip ${theme==='nebula'?'theme-active':''}`} onClick={()=>setTheme('nebula')}>Nebula</span>
               <span className={`theme-chip ${theme==='galaxy'?'theme-active':''}`} onClick={()=>setTheme('galaxy')}>Galaxy</span>
             </div>
             <div className="text-sm opacity-80">
@@ -222,8 +222,8 @@ function Playfield({ pos, question, onChoose, hud, lastExplain, fx, theme, idle 
       {/* ground */}
       <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-emerald-600/60 to-emerald-400/20" />
 
-      {/* bottom question panel – does not cover rocket */}
-      <div className="absolute left-3 right-3" style={{ bottom: "3%", height: `${PANEL_PCT}%` }}>
+      {/* bottom question panel – fixed position */}
+      <div className="absolute left-3 right-3 bottom-3" style={{ height: `${PANEL_PCT}%` }}>
         <div className="h-full rounded-xl bg-black/45 backdrop-blur-sm border border-white/10 p-3 overflow-auto">
           {!question ? (
             <div className="text-center text-base opacity-90">Lesson demo — quiz starts when you click Start.</div>
@@ -322,9 +322,9 @@ const gameStyles = `
   @keyframes burst { from { opacity: 1; } to { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))); } }
 
   /* ----- Theme backgrounds ----- */
-  .bg-lined { background: url('/images/sky-1.jpg') center/cover, radial-gradient(ellipse at center, rgba(12,20,50,.6), rgba(5,10,28,.9)), repeating-linear-gradient(to bottom, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 6px); }
+  .bg-sky { background: url('/images/sky-1.jpg') center/cover, radial-gradient(ellipse at center, rgba(12,20,50,.6), rgba(5,10,28,.9)), repeating-linear-gradient(to bottom, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 6px); }
   .bg-stars { background-color:#0b1020; background-image: radial-gradient(#9cc1ff 1px, transparent 1px), radial-gradient(#6aa0ff 1px, transparent 1px), linear-gradient(to bottom, #0b1020 0%, #131a33 100%); background-size: 24px 24px, 24px 24px, auto; background-position: 0 0, 12px 12px, 0 0; image-rendering: pixelated; }
-  .bg-clouds { background: linear-gradient(#151d3b, #223269 60%), radial-gradient(1200px 200px at 50% 85%, rgba(255,255,255,0.15), transparent 70%); position: relative; }
+  .bg-nebula { background: url('/images/sky-2.png') center/cover, radial-gradient(ellipse at center, rgba(12,20,50,.6), rgba(5,10,28,.9)), repeating-linear-gradient(to bottom, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 6px); }
   .bg-galaxy { background: radial-gradient(circle at 20% 30%, rgba(255, 153, 255, .25), transparent 40%), radial-gradient(circle at 70% 60%, rgba(80,170,255,.25), transparent 45%), linear-gradient(180deg, #0b1020 0%, #1c2450 60%, #2b1d5a 100%); }
 
   .theme-chip { user-select:none; cursor:pointer; padding:2px 8px; border-radius:8px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); }
