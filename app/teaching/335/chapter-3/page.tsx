@@ -81,6 +81,8 @@ function generateQuestion() {
 
 // ------- App -------
 export default function TVMRocketGame() {
+  useGameStyles(); // Inject CSS styles on client side
+  
   const [phase, setPhase] = useState("learn"); // learn | play | end
   const [qIndex, setQIndex] = useState(0);
   const [question, setQuestion] = useState(generateQuestion());
@@ -294,9 +296,8 @@ function Particles({ kind, origin }) {
   );
 }
 
-// Load pixel font (VT323) + helpers + theme CSS
-const style = document.createElement("style");
-style.innerHTML = `
+// CSS styles for the game
+const gameStyles = `
   @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
   .font-pixel { font-family: 'VT323', monospace; letter-spacing: 0.02em; }
   .image-pixelated { image-rendering: pixelated; }
@@ -329,4 +330,20 @@ style.innerHTML = `
   .theme-chip { user-select:none; cursor:pointer; padding:2px 8px; border-radius:8px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); }
   .theme-active { background: rgba(16,185,129,.25); border-color: rgba(16,185,129,.55); }
 `;
-if (typeof document !== "undefined") document.head.appendChild(style);
+
+// Hook to inject CSS styles on client side
+function useGameStyles() {
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      const style = document.createElement("style");
+      style.innerHTML = gameStyles;
+      document.head.appendChild(style);
+      
+      return () => {
+        if (style.parentNode) {
+          style.parentNode.removeChild(style);
+        }
+      };
+    }
+  }, []);
+}
