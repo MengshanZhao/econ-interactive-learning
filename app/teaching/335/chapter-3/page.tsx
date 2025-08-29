@@ -13,7 +13,7 @@ import React, { useState, useEffect } from "react";
 const ROCKET_IMG = "/images/rocket.png"; // local rocket image
 
 // UI constants
-const PANEL_PCT = 45; // height % of bottom question panel - much larger for no scrolling
+const PANEL_PCT = 32; // height % of bottom question panel - reduced for better proportions
 const TOP_MARGIN_PCT = 4; // keep headroom at the top
 
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
