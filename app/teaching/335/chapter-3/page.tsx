@@ -167,8 +167,8 @@ export default function TVMRocketGame() {
         </header>
 
         {phase === "learn" && (
-          <div className="grid md:grid-cols-2 gap-6 items-start">
-            <div className="rounded-2xl bg-white/5 p-4 md:p-6 shadow-xl border border-white/10">
+          <div className="flex flex-col items-center gap-6">
+            <div className="rounded-2xl bg-white/5 p-4 md:p-6 shadow-xl border border-white/10 max-w-md w-full">
               <h2 className="text-lg font-bold mb-3">Time Value of Money — Quick Rules</h2>
               <ol className="list-decimal pl-5 space-y-2 text-base leading-7">
                 <li>Future value: <b>FV = PV · (1 + r)^n</b></li>
@@ -203,7 +203,7 @@ export default function TVMRocketGame() {
 // ------- Playfield (shared rectangle) -------
 function Playfield({ pos, question, onChoose, hud, lastExplain, fx, theme, idle = false }) {
   return (
-    <div className={`relative h-[600px] rounded-2xl border border-white/10 overflow-hidden shadow-xl ${themeClass(theme)} ${fx?.type === 'wrong' ? 'shake' : ''}`}>
+    <div className={`relative w-full max-w-md mx-auto rounded-2xl border border-white/10 overflow-hidden shadow-xl ${themeClass(theme)} ${fx?.type === 'wrong' ? 'shake' : ''}`} style={{ aspectRatio: '9/16', height: 'auto' }}>
       {/* rocket — free movement, always above panel */}
       <div className={`absolute transition-all duration-500 ease-out z-10 ${fx?.type === 'wrong' ? 'wobble' : ''}`} style={{ left: `${pos.x}%`, bottom: `${pos.y}%`, transform: "translate(-50%, 0)" }}>
         <Rocket boost={fx?.type === 'correct'} fail={fx?.type === 'wrong'} />
