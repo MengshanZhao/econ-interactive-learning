@@ -16,9 +16,9 @@ I teach online. Some concepts (T-accounts, cash flows, ratios) stick better with
 Timed questions on profitability, liquidity, and leverage; randomized each run.
 
 **Preview:**
-![Tax Quiz Screenshot 1](public/screenshots/game_1_1.JPG)
-![Tax Quiz Screenshot 2](public/screenshots/game_1_2.JPG)
 ![Tax Quiz Screenshot 3](public/screenshots/game_1_3.JPG)
+![ Quiz 2 Screenshot 1](public/screenshots/game_2.PNG)
+![ Quiz 3 Screenshot 1](public/screenshots/game_3.JPG)
 
 ---
 
