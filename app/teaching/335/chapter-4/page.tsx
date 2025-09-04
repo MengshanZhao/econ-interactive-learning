@@ -210,7 +210,6 @@ export default function Chapter4Page() {
                     <Link href="/teaching/335/chapter-3" className="text-[color:hsl(var(--primary))] hover:underline">
                       ← Chapter 3: Time Value of Money
                     </Link>
-                  </Link>
                   </li>
                 </ul>
               </div>
