@@ -45,6 +45,9 @@ export default function ECONS335Page() {
                   <Link href="/teaching/335/chapter-3" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
                     Chapter 3: Time Value of Money
                   </Link>
+                  <Link href="/teaching/335/chapter-4" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 4: Present Value of Cash Flows
+                  </Link>
                 </div>
               </div>
             </div>
@@ -74,6 +77,11 @@ export default function ECONS335Page() {
                   <li>
                     <Link href="/teaching/335/chapter-3" className="text-[color:hsl(var(--primary))] hover:underline">
                       Chapter 3: Time Value of Money
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-4" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 4: Present Value of Cash Flows
                     </Link>
                   </li>
                 </ol>
