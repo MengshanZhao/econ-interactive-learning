@@ -48,6 +48,9 @@ export default function ECONS335Page() {
                   <Link href="/teaching/335/chapter-4" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
                     Chapter 4: TVM Rocket — Cash Flow PV
                   </Link>
+                  <Link href="/teaching/335/chapter-5" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 5: Bank Boss — Animal Lenders
+                  </Link>
                 </div>
               </div>
             </div>
@@ -82,6 +85,11 @@ export default function ECONS335Page() {
                   <li>
                     <Link href="/teaching/335/chapter-4" className="text-[color:hsl(var(--primary))] hover:underline">
                       Chapter 4: TVM Rocket — Cash Flow PV
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-5" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 5: Bank Boss — Animal Lenders
                     </Link>
                   </li>
                 </ol>
