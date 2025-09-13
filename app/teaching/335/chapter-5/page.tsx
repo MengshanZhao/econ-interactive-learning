@@ -359,7 +359,17 @@ export default function BankBossChapter5() {
             const name = L.label;
             const locked = !!acceptedId && acceptedId !== L.id;
             return (
-              <div key={L.id} className={`pixel-frame-amber bg-[#FFF8EA] p-3 transition ${selectedId === L.id ? "ring-4 ring-amber-300" : "hover:shadow-xl"} ${locked ? "opacity-40" : ""}`}>
+              <div key={L.id} className={`relative pixel-frame-amber bg-[#FFF8EA] p-3 transition ${selectedId === L.id ? "ring-4 ring-amber-300" : "hover:shadow-xl"} ${locked ? "opacity-40" : ""}`}>
+                {/* Deselect X button */}
+                {acceptedId === L.id && (
+                  <button
+                    onClick={() => setAcceptedId(null)}
+                    className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 flex items-center justify-center"
+                    title="Deselect this borrower"
+                  >
+                    ×
+                  </button>
+                )}
                 <div className="flex items-start gap-3">
                   <div className="relative h-20 w-20 overflow-hidden rounded-[2px] bg-[#FFF4DF] shadow-inner">
                     <Image src={L.image} alt={name} fill className="object-cover" />
@@ -443,7 +453,10 @@ export default function BankBossChapter5() {
                   ))}
                 </div>
                 <div className="mt-4 pixel-frame-amber bg-[#FFECC8] p-3 text-[18px] font-ms text-amber-900">
-                  Best pick: {best.L.label} with the highest EPR of {pct(best.ear, 2)}.
+                  <div>Best pick: {best.L.label} with the highest EAR of {pct(best.ear, 2)}.</div>
+                  <div className="mt-2 text-sm text-amber-800">
+                    Remember: For APR offers, EAR = (1 + APR/m)^m - 1, where m is compounding frequency per year.
+                  </div>
                 </div>
               </div>
             )}
@@ -506,7 +519,17 @@ export default function BankBossChapter5() {
                             onClick={() => {
                               const last = log[log.length-1];
                               const answer = last.text.toLowerCase().includes("compound")
-                                ? `${selected.label}: My nominal APR is ${pct(selected.rate || 0, 1)}, compounded ${selected.m || 1}× per year. The per‑${periodLabel(selected.m || 1)} rate is ${pct((selected.rate || 0) / (selected.m || 1), 3)}. Your EPR is (1 + ${pct((selected.rate || 0) / (selected.m || 1), 3)})^${selected.m || 1} − 1 = ${pct(toEAR({ kind: "APR", rate: selected.rate, m: selected.m }), 2)}. I make level payments of ${money(pmtFromPV(selected.rate || 0, selected.m || 1, selected.term, selected.principal))} each ${periodLabel(selected.m || 1)}.`
+                                ? (() => {
+                                    const m = selected.m || 1;
+                                    const rate = selected.rate || 0;
+                                    if (m === 1) {
+                                      return `${selected.label}: My APR is ${pct(rate, 1)} compounded annually. I make level payments of ${money(pmtFromPV(rate, m, selected.term, selected.principal))} each year.`;
+                                    } else {
+                                      const periodRate = rate / m;
+                                      const pmt = pmtFromPV(rate, m, selected.term, selected.principal);
+                                      return `${selected.label}: My nominal APR is ${pct(rate, 1)}, compounded ${m}× per year. The per‑${periodLabel(m)} rate is ${pct(periodRate, 3)}. I make level payments of ${money(pmt)} each ${periodLabel(m)}.`;
+                                    }
+                                  })()
                                 : selected.inflStory;
                               setLog((L) => [...L, { who: selected.label, text: answer }]);
                             }}
