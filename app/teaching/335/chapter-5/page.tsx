@@ -32,10 +32,10 @@ const real = (i: number, pi: number) => (1 + i) / (1 + pi) - 1;
 
 // ---------- Dialogue templates (~100 words each) ----------
 const ANIMAL_IMAGES = [
-  { emoji: "🐕", name: "Dog", image: "/images/dog.jpg" },
-  { emoji: "🦊", name: "Fox", image: "/images/fox.jpg" },
-  { emoji: "🐆", name: "Leopard", image: "/images/leopard.jpg" },
-  { emoji: "🐑", name: "Sheep", image: "/images/sheep.jpg" }
+  { name: "Dog", image: "/images/dog.png" },
+  { name: "Fox", image: "/images/fox.png" },
+  { name: "Leopard", image: "/images/leopard.png" },
+  { name: "Sheep", image: "/images/sheep.png" }
 ];
 
 const PLAYER_IMAGES = [
@@ -102,7 +102,7 @@ interface Round { lenders: Lender[]; }
 
 function makeLender(i: number): Lender {
   const animalData = ANIMAL_IMAGES[i % ANIMAL_IMAGES.length];
-  const label = `${animalData.emoji} ${animalData.name}`;
+  const label = `${animalData.name}`;
   const term = Math.max(1, Math.floor(rnd(1, 31)));
   const principal = Math.round(rnd(50000, 250000, 0) / 1000) * 1000;
   const pick = Math.random();
@@ -245,7 +245,7 @@ export default function BankBossChapter5() {
   const [revealed, setRevealed] = useState(false);
   const [log, setLog] = useState<Array<{ who: string; text: string }>>([]);
   const [soundOn, setSoundOn] = useState(true);
-  const YOU = `🧙‍♂️ ${selectedCharacter || "You"}`;
+  const YOU = `${selectedCharacter || "You"}`;
 
   const round = useMemo(() => {
     const prev = Math.random; let s = seed + 1;
@@ -292,7 +292,7 @@ export default function BankBossChapter5() {
     >
       
       <div className="relative z-10 mx-auto max-w-6xl p-6 pb-72">
-        <h1 className="text-4xl font-extrabold tracking-wide text-amber-900 drop-shadow">Bank Boss — Chapter 5: Animal Lenders</h1>
+        {/* Title intentionally minimal per request */}
         <p className="mt-2 max-w-4xl text-base italic text-slate-800 bg-[#FFF4DF] rounded-lg p-3">
           Chat with <span className="font-semibold">each</span> lender. They may quote APR, EAR, or a simple one‑time payback.
           Compare and pick the friend with the <span className="font-semibold">best real yearly return</span>.
@@ -301,7 +301,7 @@ export default function BankBossChapter5() {
         {/* Cards */}
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {round.lenders.map((L) => {
-            const [emoji, name] = L.label.split(" ");
+            const name = L.label;
             const locked = !!acceptedId && acceptedId !== L.id;
             return (
               <div key={L.id} className={`rounded-3xl border-2 border-amber-200 bg-[#FFF8EA] p-4 shadow-md transition ${selectedId === L.id ? "ring-4 ring-amber-300" : "hover:shadow-xl"} ${locked ? "opacity-40" : ""}`}>
@@ -368,7 +368,7 @@ export default function BankBossChapter5() {
         {selected && (
           <motion.div key={selected.id} initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-6xl p-4">
             <div className="relative rounded-3xl border-4 border-amber-700 bg-[#FFF4DF] p-6 text-amber-900 shadow-2xl">
-              <div className="absolute -top-4 left-24 rounded-md border-2 border-amber-700 bg-[#FFECC8] px-3 py-1 text-sm font-black tracking-wide text-amber-900">{selected.label}</div>
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2 rounded-md border-2 border-amber-700 bg-[#FFECC8] px-4 py-1 text-sm font-black tracking-wide text-amber-900">{selected.label}</div>
               <div className="flex items-start gap-5">
                 {/* Player Portrait (oversized, transparent, overlaps box) */}
                 <div className="pointer-events-none absolute -top-6 -left-2 overflow-visible" style={{ height: "0px", width: "0px" }}></div>
@@ -387,7 +387,7 @@ export default function BankBossChapter5() {
                 </div>
                 
                 {/* Animal Portrait (oversized, transparent, overlaps box) */}
-                <Portrait imageSrc={selected.image} alt={selected.label.split(" ")[1]} side="right" />
+                <Portrait imageSrc={selected.image} alt={selected.label} side="right" />
               </div>
             </div>
           </motion.div>
@@ -437,7 +437,7 @@ function Portrait({ selectedCharacter, imageSrc, alt, side }: { selectedCharacte
       style={{ width: 0, height: 0 }}
     >
       <div
-        className={`absolute ${side === 'left' ? '-top-[40%] -left-4' : '-top-[45%] -right-4'} pointer-events-none`}
+        className={`absolute ${side === 'left' ? '-top-[40%] -left-2' : '-top-[45%] -right-2'} pointer-events-none`}
         style={{ height: `${h}px`, width: `${w}px` }}
       >
         <div className="relative h-full w-full">
