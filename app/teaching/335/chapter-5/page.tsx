@@ -46,29 +46,29 @@ const PLAYER_IMAGES = [
 ];
 
 function storyBakery(n: string, t: number, r: string, P: number) {
-  return `${n}: I'm setting ovens in the old square and lending you ${money(P)} today to finish the hearth and tiles. I learned sweet rolls from my grandmother and I can scale dawn batches without burning a crumb. Market days bring lines that wrap the fountain; evenings we'll sell crusts to inns. If you hold me for ${t} years, my tables price this near ${r} effective annually. Speak plainly about schedules and I'll speak plainly about cash. Bread cools fast; reputations last longer—let's keep both warm.`;
+  return `${n}: I can open a cozy bakery with ${money(P)}. Warm bread, happy mornings. Keep me for ${t} years and it works out to about ${r} a year.`;
 }
 function storyTea(n: string, t: number, r: string, P: number) {
-  return `${n}: The river path needs a tea house and I'll advance ${money(P)} for timber, braziers, and reed mats. Caravan tongues barter better after steam. My cousins will serve, I'll count, and travelers will write about the quiet. Hold the note for ${t} years and the headline works to about ${r} a year. I keep a copper jar for repairs and a ledger for luck—one I trust more than the other. If you value punctual coins and clean books, pour with me.`;
+  return `${n}: A tiny tea house by the river needs ${money(P)}. Steam, stories, and steady coins. Over ${t} years, think roughly ${r}.`;
 }
 function storyBoat(n: string, t: number, r: string, P: number) {
-  return `${n}: I know the lake winds and I'll front ${money(P)} to rig a broad‑keel boat for grain and stone. The west shore starves for ferries when storms sour roads. I price the voyage at ${r} annually over ${t} years if weather behaves and ropes don't lie. I've crew who tie knots like poems and a habit of landing early. Lend steady, and I'll return steady—plus a seat on the prow when the moon is a coin.`;
+  return `${n}: A ferry boat upgrade costs ${money(P)}. Safer trips, smoother days. Held for ${t} years, returns feel like ${r} yearly.`;
 }
 function storyVine(n: string, t: number, r: string, P: number) {
-  return `${n}: Vines outside the wall swell with juice; I'll invest ${money(P)} in barrels, presses, and a mule that doesn't gossip. Cellars want patience and roofs that don't drip. Over ${t} years the yield evens to ${r} give or take a late frost. My family bottles truthfully; labels brag, wine shouldn't. If your appetite is for calm curves and honest sums, let's cork the deal and store it where summers can't find it.`;
+  return `${n}: With ${money(P)} I can bottle sweet village wine. Slow and calm. Over ${t} years, about ${r} if seasons behave.`;
 }
 function storySchool(n: string, t: number, r: string, P: number) {
-  return `${n}: Chalk, slates, benches—${money(P)} gets us a room where numbers stop bullying children. A little school repays the town and the books equally. Keep me for ${t} years, reckon ${r} effective; I post attendance like a merchant posts prices. If we count curiosity as collateral, we're already rich. Still, I bring ledgers and lockboxes because good intentions can't buy chalk twice.`;
+  return `${n}: ${money(P)} builds a sunny classroom. Kids learn, numbers smile. Kept for ${t} years, call it ${r} a year.`;
 }
 function storyWorkshop(n: string, t: number, r: string, P: number) {
-  return `${n}: Wheels wobble, lamps fail, doors sulk; my workshop fixes the patience of the city. I'll stake ${money(P)} on tools and stock, then keep the till honest. Over ${t} years, a tidy operator makes about ${r} if nails stay cheap and apprentices stay curious. I'm partial to boring miracles: hinges that never squeak, balances that never lie, payments that arrive before I notice I'm waiting.`;
+  return `${n}: A neat little workshop with ${money(P)}. Fixes, tools, honest work. Over ${t} years, around ${r}.`;
 }
 function storyLump(n: string, t: number, _r: string, P: number, k: number) {
   const repay = P * k;
-  return `${n}: I keep math simple. I lend you ${money(P)} today so your plan can breathe. At the end of ${t} years you repay ${money(repay)}—one clean sweep, no fiddly coupons. Between, you keep your cash turning. We can still talk compounding if your heart insists, but my promise is a bright line: pay back ${k.toFixed(2)}× the principal at maturity. Simple is not always easy, but it is honest.`;
+  return `${n}: Simple plan! I lend ${money(P)} now. You pay ${money(repay)} in ${t} years — one clean bundle.`;
 }
 function storyMill(n: string, t: number, r: string, P: number) {
-  return `${n}: There's a mill by the falls that grinds hope into flour. Its stones are sharp but its beams sulk; ${money(P)} buys braces, belts, and a fresh coat of paint the color of confidence. Give me ${t} years and I can work to about ${r} if harvests don't play tricks. The baker, the brewer, and I prefer reliable circles: millstones, coin cycles, seasons turning.`;
+  return `${n}: The town mill needs ${money(P)} for sturdy wheels. Over ${t} years, I aim for about ${r}.`;
 }
 
 const OPENERS = [storyBakery, storyTea, storyBoat, storyVine, storySchool, storyWorkshop, storyLump, storyMill];
@@ -145,9 +145,14 @@ function useBlipSound(enabled: boolean) {
     if (!enabled) return;
     const ctx = ctxRef.current; if (!ctx) return;
     const o = ctx.createOscillator(); const g = ctx.createGain();
-    o.type = "square"; o.frequency.value = 180;
-    g.gain.value = 0.03; o.connect(g); g.connect(ctx.destination);
-    o.start(); setTimeout(() => { o.stop(); o.disconnect(); g.disconnect(); }, 40);
+    o.type = "sine"; o.frequency.value = 220;
+    g.gain.setValueAtTime(0.0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.008, ctx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0008, ctx.currentTime + 0.08);
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + 0.09);
+    o.onended = () => { o.disconnect(); g.disconnect(); };
   };
   return blip;
 }
@@ -171,30 +176,28 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
   selectedCharacter: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100">
-      <div className="mx-auto max-w-4xl rounded-3xl border-4 border-purple-800 bg-white/90 p-8 shadow-2xl backdrop-blur-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#FFF4DF]">
+      <div className="mx-auto max-w-4xl rounded-3xl border-4 border-amber-700 bg-[#FFF8EA] p-8 shadow-2xl">
         <div className="text-center">
-          <h1 className="mb-6 text-5xl font-extrabold text-purple-900 drop-shadow-lg">
-            🏦 Bank Boss RPG
+          <h1 className="mb-6 text-5xl font-extrabold text-amber-900 drop-shadow-lg">
+            🏦 Bank Boss
           </h1>
-          <h2 className="mb-4 text-2xl font-bold text-purple-700">Chapter 5: Advanced Financial Lending</h2>
+          <h2 className="mb-4 text-2xl font-bold text-amber-700">Chapter 5: Friendly Lending</h2>
           
-          <div className="mb-6 rounded-2xl bg-purple-50 p-6 text-left">
-            <p className="mb-4 text-lg leading-relaxed text-purple-800">
-              Welcome to your bank! Today you'll meet with <strong>4 animal lenders</strong> from different kingdoms. 
-              Each has their own unique business and inflation outlook. You can only lend to <strong>one lender</strong> 
-              - choose wisely to get the <strong>highest real return ratio</strong>!
+          <div className="mb-6 rounded-2xl bg-[#FFECC8] p-6 text-left">
+            <p className="mb-4 text-lg leading-relaxed text-amber-900">
+              Welcome, banker! Meet <strong>4 animal friends</strong>. Each offers a simple deal.
+              Chat, compare, and pick the one that feels best.
             </p>
-            <p className="text-base leading-relaxed text-purple-700">
-              • Talk with each lender to learn their terms (APR, EAR, or lump-sum)<br/>
-              • Ask about their inflation expectations<br/>
-              • Compare effective and real rates<br/>
-              • Choose the lender with the best real annual return
+            <p className="text-base leading-relaxed text-amber-800">
+              • Ask about their rates and views on prices<br/>
+              • See real returns in the summary<br/>
+              • Choose your favorite and reveal the results
             </p>
           </div>
 
           <div className="mb-6">
-            <h3 className="mb-3 text-xl font-bold text-purple-800">Choose Your Character:</h3>
+            <h3 className="mb-3 text-xl font-bold text-amber-800">Choose Your Character:</h3>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               {PLAYER_IMAGES.map((char) => (
                 <button
@@ -202,8 +205,8 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
                   onClick={() => onCharacterSelect(char.name)}
                   className={`rounded-xl border-2 p-3 transition-all ${
                     selectedCharacter === char.name 
-                      ? "border-purple-600 bg-purple-100 shadow-lg" 
-                      : "border-purple-200 hover:border-purple-400"
+                      ? "border-amber-600 bg-[#FFF4DF] shadow-lg" 
+                      : "border-amber-200 hover:border-amber-400"
                   }`}
                 >
                   <Image
@@ -213,7 +216,7 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
                     height={80}
                     className="mx-auto rounded-lg"
                   />
-                  <div className="mt-2 text-sm font-semibold text-purple-800">{char.name}</div>
+                  <div className="mt-2 text-sm font-semibold text-amber-800">{char.name}</div>
                 </button>
               ))}
             </div>
@@ -222,7 +225,7 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
           <button
             onClick={onStart}
             disabled={!selectedCharacter}
-            className="rounded-xl bg-purple-600 px-8 py-3 text-xl font-bold text-white shadow-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-xl bg-amber-600 px-8 py-3 text-xl font-bold text-white shadow-lg hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Start Your Banking Adventure!
           </button>
@@ -287,16 +290,12 @@ export default function BankBossChapter5() {
         backgroundAttachment: "fixed"
       }}
     >
-      {/* Overlay for better text readability */}
-      <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
       
       <div className="relative z-10 mx-auto max-w-6xl p-6 pb-72">
-        <h1 className="text-4xl font-extrabold tracking-wide text-purple-900 drop-shadow">Bank Boss — Chapter 5: Animal Lenders</h1>
-        <p className="mt-2 max-w-4xl text-base italic text-slate-700 bg-white/60 rounded-lg p-3 backdrop-blur-sm">
-          Talk with <span className="font-semibold">each</span> lender. They quote in different ways: APR, EAR, or a lump‑sum like
-          <em> "repay 2.4× in 7 years"</em>. Every animal kingdom brings its own inflation story. Compare offers and choose the
-          lender with the <span className="font-semibold">highest real annual rate</span>. You receive a principal today—make sure you understand
-          <span className="font-semibold"> how much they lend</span> before judging a lump‑sum promise.
+        <h1 className="text-4xl font-extrabold tracking-wide text-amber-900 drop-shadow">Bank Boss — Chapter 5: Animal Lenders</h1>
+        <p className="mt-2 max-w-4xl text-base italic text-slate-800 bg-[#FFF4DF] rounded-lg p-3">
+          Chat with <span className="font-semibold">each</span> lender. They may quote APR, EAR, or a simple one‑time payback.
+          Compare and pick the friend with the <span className="font-semibold">best real yearly return</span>.
         </p>
 
         {/* Cards */}
@@ -305,26 +304,26 @@ export default function BankBossChapter5() {
             const [emoji, name] = L.label.split(" ");
             const locked = !!acceptedId && acceptedId !== L.id;
             return (
-              <div key={L.id} className={`rounded-3xl border-2 border-purple-200 bg-white/80 p-4 shadow-md backdrop-blur-lg transition ${selectedId === L.id ? "ring-4 ring-purple-400" : "hover:shadow-xl"} ${locked ? "opacity-40" : ""}`}>
+              <div key={L.id} className={`rounded-3xl border-2 border-amber-200 bg-[#FFF8EA] p-4 shadow-md transition ${selectedId === L.id ? "ring-4 ring-amber-300" : "hover:shadow-xl"} ${locked ? "opacity-40" : ""}`}>
                 <div className="flex items-start gap-3">
-                  <div className="relative h-14 w-14 overflow-hidden rounded-full bg-purple-50 shadow-inner">
+                  <div className="relative h-14 w-14 overflow-hidden rounded-full bg-[#FFF4DF] shadow-inner">
                     <Image
                       src={L.image}
                       alt={name}
                       fill
                       className="object-cover"
-                      style={{ mixBlendMode: 'multiply' }}
+                      style={{ mixBlendMode: 'normal' }}
                     />
                   </div>
                   <div className="flex-1">
-                    <div className="text-lg font-bold text-purple-900">{name}</div>
-                    <div className="text-xs text-slate-600">Lends today: <strong>{money(L.principal)}</strong></div>
-                    <div className="text-xs text-slate-600 mt-0.5">Term <strong>{L.term}y</strong> • {L.kind === "LUMP" ? <>repay <strong>{(L.lump || 1).toFixed(2)}×</strong> at maturity (<strong>{money(L.principal*(L.lump||1))}</strong>)</> : <><strong>{pct(L.rate || 0,1)}</strong> {L.kind}{L.kind === "APR" && L.m ? `, comp ${L.m}×/yr` : ""}</>}</div>
+                    <div className="text-lg font-bold text-amber-900">{name}</div>
+                    <div className="text-xs text-slate-700">Lends today: <strong>{money(L.principal)}</strong></div>
+                    <div className="text-xs text-slate-700 mt-0.5">Term <strong>{L.term}y</strong> • {L.kind === "LUMP" ? <>repay <strong>{(L.lump || 1).toFixed(2)}×</strong> at maturity (<strong>{money(L.principal*(L.lump||1))}</strong>)</> : <><strong>{pct(L.rate || 0,1)}</strong> {L.kind}{L.kind === "APR" && L.m ? `, comp ${L.m}×/yr` : ""}</>}</div>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center gap-2">
-                  <button onClick={() => setSelectedId(L.id)} disabled={locked} className="rounded-xl border border-purple-300 px-3 py-1 text-sm text-purple-700 hover:bg-purple-50">Talk</button>
-                  <button onClick={() => setAcceptedId(L.id)} disabled={!!acceptedId && acceptedId!==L.id} className="rounded-xl bg-emerald-600 px-3 py-1 text-sm text-white shadow hover:bg-emerald-700 disabled:opacity-40">Accept</button>
+                  <button onClick={() => setSelectedId(L.id)} disabled={locked} className="rounded-xl border border-amber-300 px-3 py-1 text-sm text-amber-800 hover:bg-[#FFF4DF]">Talk</button>
+                  <button onClick={() => setAcceptedId(L.id)} disabled={!!acceptedId && acceptedId!==L.id} className="rounded-xl bg-amber-600 px-3 py-1 text-sm text-white shadow hover:bg-amber-700 disabled:opacity-40">Accept</button>
                   {acceptedId===L.id && <span className="text-xs font-semibold text-emerald-700">Selected</span>}
                 </div>
               </div>
@@ -333,20 +332,20 @@ export default function BankBossChapter5() {
         </div>
 
         {/* Controls */}
-        <div className="sticky bottom-4 mt-6 rounded-3xl border border-purple-200 bg-white/85 p-4 shadow-xl backdrop-blur">
+        <div className="sticky bottom-4 mt-6 rounded-3xl border border-amber-200 bg-[#FFF8EA] p-4 shadow-xl">
           {!revealed ? (
             <div className="flex flex-wrap items-center gap-3">
-              <div className="text-sm text-purple-800">Talk to lenders first. Then click <strong>Reveal</strong> to compare effective and real rates. <strong>Repeat</strong> rerolls numbers.</div>
-              <button onClick={() => setRevealed(true)} disabled={!acceptedId} className="ml-auto rounded-xl bg-emerald-600 px-4 py-2 text-white shadow hover:bg-emerald-700 disabled:opacity-40">Reveal</button>
-              <button onClick={reset} className="rounded-xl bg-purple-700 px-3 py-2 text-white shadow hover:bg-purple-800">Repeat</button>
-              <button onClick={() => setSoundOn(s=>!s)} className="rounded-xl border border-purple-300 px-3 py-2 text-sm text-purple-700">{soundOn?"🔊 Sound on":"🔇 Sound off"}</button>
+              <div className="text-sm text-amber-900">Talk to lenders, then tap <strong>Reveal</strong> to compare. <strong>Repeat</strong> gets new offers.</div>
+              <button onClick={() => setRevealed(true)} disabled={!acceptedId} className="ml-auto rounded-xl bg-amber-600 px-4 py-2 text-white shadow hover:bg-amber-700 disabled:opacity-40">Reveal</button>
+              <button onClick={reset} className="rounded-xl bg-amber-700 px-3 py-2 text-white shadow hover:bg-amber-800">Repeat</button>
+              <button onClick={() => setSoundOn(s=>!s)} className="rounded-xl border border-amber-300 px-3 py-2 text-sm text-amber-800">{soundOn?"🔊 Soft blip":"🔇 Silent"}</button>
             </div>
           ) : (
             <div>
-              <h2 className="text-xl font-extrabold text-purple-900">Outcomes</h2>
+              <h2 className="text-xl font-extrabold text-amber-900">Outcomes</h2>
               <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
                 {outcomes.map((o) => (
-                  <div key={o.L.id} className={`rounded-2xl border-2 border-purple-200 bg-white/90 p-3 ${acceptedId === o.L.id ? "border-emerald-500 shadow-xl" : ""}`}>
+                  <div key={o.L.id} className={`rounded-2xl border-2 border-amber-200 bg-[#FFF4DF] p-3 ${acceptedId === o.L.id ? "border-emerald-500 shadow-xl" : ""}`}>
                     <div className="font-semibold">{o.L.label}</div>
                     <ul className="mt-2 text-sm leading-6">
                       <li>Principal: <strong>{money(o.L.principal)}</strong></li>
@@ -358,7 +357,7 @@ export default function BankBossChapter5() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4 rounded-2xl bg-purple-50 p-3 text-sm font-semibold text-purple-900">Best pick: {best.L.label} with {pct(best.rReal,2)} real annual.</div>
+              <div className="mt-4 rounded-2xl bg-[#FFECC8] p-3 text-sm font-semibold text-amber-900">Best pick: {best.L.label} with {pct(best.rReal,2)} real annual.</div>
             </div>
           )}
         </div>
@@ -368,43 +367,27 @@ export default function BankBossChapter5() {
       <AnimatePresence initial={false}>
         {selected && (
           <motion.div key={selected.id} initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-6xl p-4">
-            <div className="relative rounded-3xl border-4 border-purple-800 bg-purple-700/95 p-6 text-white shadow-2xl">
-              <div className="absolute -top-4 left-24 rounded-md border-2 border-purple-700 bg-purple-100 px-3 py-1 text-sm font-black tracking-wide text-purple-900">{selected.label}</div>
+            <div className="relative rounded-3xl border-4 border-amber-700 bg-[#FFF4DF] p-6 text-amber-900 shadow-2xl">
+              <div className="absolute -top-4 left-24 rounded-md border-2 border-amber-700 bg-[#FFECC8] px-3 py-1 text-sm font-black tracking-wide text-amber-900">{selected.label}</div>
               <div className="flex items-start gap-5">
-                {/* Player Portrait */}
-                <div className="relative h-24 w-24 overflow-hidden rounded-xl bg-white/90 shadow-inner">
-                  {selectedCharacter && (
-                    <Image
-                      src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
-                      alt={selectedCharacter}
-                      fill
-                      className="object-cover"
-                    />
-                  )}
-                </div>
+                {/* Player Portrait (oversized, transparent, overlaps box) */}
+                <div className="pointer-events-none absolute -top-6 -left-2 overflow-visible" style={{ height: "0px", width: "0px" }}></div>
+                <Portrait selectedCharacter={selectedCharacter} side="left" />
                 
                 {/* Dialogue Text */}
                 <div className="flex-1 text-lg leading-8">
                   {log.length > 0 && <Typewriter text={log[log.length-1].text} sound={soundOn} />}
                   <div className="mt-3 flex flex-wrap gap-3 text-sm">
                     {selected.kind === "APR" && (
-                      <button onClick={() => setLog((L)=>[...L, { who: YOU, text: `${YOU}: Is that a yearly rate? How often compounding?` }, { who: selected.label, text: `${selected.label}: Nominal APR compounded ${selected.m}×/yr.` }])} className="rounded-md bg-white/90 px-3 py-1 font-semibold text-purple-700 shadow hover:bg-white">Ask compounding</button>
+                      <button onClick={() => setLog((L)=>[...L, { who: YOU, text: `${YOU}: Is that a yearly rate? How often does it grow?` }, { who: selected.label, text: `${selected.label}: Nominal APR, compounded ${selected.m}× per year.` }])} className="rounded-md bg-[#FFECC8] px-3 py-1 font-semibold text-amber-800 shadow hover:bg-[#FFF8EA]">Ask compounding</button>
                     )}
-                    <button onClick={() => setLog((L)=>[...L, { who: YOU, text: `${YOU}: What's your inflation outlook?` }, { who: selected.label, text: selected.inflStory }])} className="rounded-md bg-white/90 px-3 py-1 font-semibold text-purple-700 shadow hover:bg-white">Ask inflation</button>
-                    <button onClick={() => setAcceptedId(selected.id)} disabled={!!acceptedId} className="rounded-md bg-emerald-600 px-3 py-1 font-semibold text-white shadow hover:bg-emerald-700 disabled:opacity-40">Accept offer</button>
+                    <button onClick={() => setLog((L)=>[...L, { who: YOU, text: `${YOU}: How fast do prices rise here?` }, { who: selected.label, text: selected.inflStory }])} className="rounded-md bg-[#FFECC8] px-3 py-1 font-semibold text-amber-800 shadow hover:bg-[#FFF8EA]">Ask inflation</button>
+                    <button onClick={() => setAcceptedId(selected.id)} disabled={!!acceptedId} className="rounded-md bg-amber-600 px-3 py-1 font-semibold text-white shadow hover:bg-amber-700 disabled:opacity-40">Accept offer</button>
                   </div>
                 </div>
                 
-                {/* Animal Portrait */}
-                <div className="relative h-32 w-32 overflow-hidden rounded-xl bg-white/90 shadow-inner">
-                  <Image
-                    src={selected.image}
-                    alt={selected.label.split(" ")[1]}
-                    fill
-                    className="object-cover"
-                    style={{ mixBlendMode: 'multiply' }}
-                  />
-                </div>
+                {/* Animal Portrait (oversized, transparent, overlaps box) */}
+                <Portrait imageSrc={selected.image} alt={selected.label.split(" ")[1]} side="right" />
               </div>
             </div>
           </motion.div>
@@ -424,4 +407,52 @@ if (typeof window !== "undefined") {
   console.assert(Math.abs(apr - ear) < 1e-12, "toEAR(APR) incorrect");
   console.assert(Math.abs(lumpEar - lumpEarRef) < 1e-12, "toEAR(LUMP) incorrect");
   console.assert(Math.abs(realRef - ((1 + 0.08) / (1 + 0.03) - 1)) < 1e-12, "real() incorrect");
+}
+
+// --------- Portrait component (oversized, ~1.5x dialog height) ---------
+function Portrait({ selectedCharacter, imageSrc, alt, side }: { selectedCharacter?: string; imageSrc?: string; alt?: string; side: "left" | "right" }) {
+  const boxRef = useRef<HTMLDivElement | null>(null);
+  const [dialogHeight, setDialogHeight] = useState<number>(160);
+
+  useEffect(() => {
+    const el = document.querySelector('[data-dialog-root]') as HTMLDivElement | null;
+    function measure() {
+      if (!el) return;
+      setDialogHeight(el.offsetHeight || 160);
+    }
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
+  const h = Math.round(dialogHeight * 1.5);
+  const w = Math.round(h * 0.9);
+  const src = imageSrc || (PLAYER_IMAGES.find(p => p.name === (selectedCharacter || ""))?.image || "/images/wizard.png");
+  const altText = alt || (selectedCharacter || "Player");
+
+  return (
+    <div
+      ref={boxRef}
+      className={`relative overflow-visible ${side === 'left' ? 'order-first' : ''}`}
+      style={{ width: 0, height: 0 }}
+    >
+      <div
+        className={`absolute ${side === 'left' ? '-top-[40%] -left-4' : '-top-[45%] -right-4'} pointer-events-none`}
+        style={{ height: `${h}px`, width: `${w}px` }}
+      >
+        <div className="relative h-full w-full">
+          <Image
+            src={src}
+            alt={altText}
+            fill
+            className="object-contain drop-shadow-2xl"
+            style={{ mixBlendMode: 'normal' }}
+            priority
+          />
+        </div>
+      </div>
+      {/* Mark dialog container for measurement */}
+      <div data-dialog-root={true}></div>
+    </div>
+  );
 }
