@@ -651,13 +651,14 @@ export default function BankBossChapter5() {
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-6xl p-4"
           >
-            <div className="dialogue-box p-0 text-amber-900" style={{
-              background: `linear-gradient(135deg, #fdf6e3 0%, #f4e5c1 50%, #ede0c2 100%)`,
-              border: '3px solid #8b6914',
+            <div className="dialogue-box p-0" style={{
+              background: `linear-gradient(135deg, #f4ecd8 0%, #ede4d1 50%, #e8ddc8 100%)`,
+              border: '3px solid #8c6d4f',
               borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 3px rgba(255,255,255,0.3)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 3px rgba(255,255,255,0.2)',
               backdropFilter: 'blur(2px)',
-              position: 'relative'
+              position: 'relative',
+              color: '#3c2f2f'
             }}>
               {(() => {
                 const isPlayerSpeaking = !log.length || log[log.length-1].who !== selected.label;
@@ -670,10 +671,10 @@ export default function BankBossChapter5() {
                       <>
                         {/* Player headshot on left */}
                         <div className="portrait relative w-[200px] h-[200px] shrink-0 m-3 -mt-8" style={{
-                          border: '4px solid #8b6914',
+                          border: '4px solid #8c6d4f',
                           borderRadius: '12px',
-                          background: '#fdf6e3',
-                          boxShadow: '0 6px 16px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.4)',
+                          background: '#b9b4a5',
+                          boxShadow: '0 6px 16px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.2)',
                           zIndex: 10
                         }}>
                     <Image
@@ -685,19 +686,21 @@ export default function BankBossChapter5() {
                 </div>
                         {/* Text box */}
                 <div className="flex-1 p-3">
-                        <div className="inline-block mb-3 px-4 py-2 text-amber-900 font-ms text-[18px]" style={{
-                          background: 'linear-gradient(135deg, #f0d49c 0%, #e6c777 100%)',
-                          border: '2px solid #8b6914',
+                        <div className="inline-block mb-3 px-4 py-2 font-ms text-[18px]" style={{
+                          background: 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 100%)',
+                          border: '2px solid #8c6d4f',
                           borderRadius: '6px',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)'
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
+                          color: '#3c2f2f'
                         }}>
                           {currentSpeaker}
                   </div>
                         <div className="p-4 min-h-[120px] text-[20px] leading-7 font-vt323" style={{
-                          background: 'linear-gradient(135deg, #faf5e6 0%, #f2e9d0 100%)',
-                          border: '2px solid #b8956b',
+                          background: 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 100%)',
+                          border: '2px solid #8c6d4f',
                           borderRadius: '8px',
-                          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1), inset 0 -1px 2px rgba(255,255,255,0.5)'
+                          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1), inset 0 -1px 2px rgba(255,255,255,0.3)',
+                          color: '#3c2f2f'
                         }}>
                     {log.length > 0 && (
                       <div className="flex items-start justify-between gap-4">
@@ -726,22 +729,26 @@ export default function BankBossChapter5() {
                             }}
                                     className="rpg-next-btn"
                                     style={{
-                                      background: 'linear-gradient(135deg, #d4af7a 0%, #c19a5b 100%)',
-                                      border: '2px solid #8b6914',
+                                      background: 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 100%)',
+                                      border: '2px solid #8c6d4f',
                                       borderRadius: '6px',
                                       padding: '8px 16px',
-                                      color: '#2d1810',
+                                      color: '#3c2f2f',
                                       fontWeight: 'bold',
-                                      boxShadow: '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)',
+                                      boxShadow: '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
                                       transition: 'all 0.2s ease'
                                     }}
                                     onMouseEnter={(e) => {
-                                      e.currentTarget.style.boxShadow = '0 0 8px rgba(212, 175, 122, 0.6), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)';
+                                      e.currentTarget.style.boxShadow = '0 0 8px rgba(122, 46, 46, 0.6), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
                                       e.currentTarget.style.transform = 'translateY(-1px)';
+                                      e.currentTarget.style.background = 'linear-gradient(135deg, #7a2e2e 0%, #6b2828 100%)';
+                                      e.currentTarget.style.color = '#f4ecd8';
                                     }}
                                     onMouseLeave={(e) => {
-                                      e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)';
+                                      e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
                                       e.currentTarget.style.transform = 'translateY(0)';
+                                      e.currentTarget.style.background = 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 100%)';
+                                      e.currentTarget.style.color = '#3c2f2f';
                                     }}
                           >
                             Next →
@@ -756,19 +763,21 @@ export default function BankBossChapter5() {
                       <>
                         {/* Text box */}
                         <div className="flex-1 p-3">
-                        <div className="inline-block mb-3 px-4 py-2 text-amber-900 font-ms text-[18px]" style={{
-                          background: 'linear-gradient(135deg, #f0d49c 0%, #e6c777 100%)',
-                          border: '2px solid #8b6914',
+                        <div className="inline-block mb-3 px-4 py-2 font-ms text-[18px]" style={{
+                          background: 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 100%)',
+                          border: '2px solid #8c6d4f',
                           borderRadius: '6px',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)'
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
+                          color: '#3c2f2f'
                         }}>
                             {currentSpeaker}
                         </div>
                         <div className="p-4 min-h-[120px] text-[20px] leading-7 font-vt323" style={{
-                          background: 'linear-gradient(135deg, #faf5e6 0%, #f2e9d0 100%)',
-                          border: '2px solid #b8956b',
+                          background: 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 100%)',
+                          border: '2px solid #8c6d4f',
                           borderRadius: '8px',
-                          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1), inset 0 -1px 2px rgba(255,255,255,0.5)'
+                          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1), inset 0 -1px 2px rgba(255,255,255,0.3)',
+                          color: '#3c2f2f'
                         }}>
                             {log.length > 0 && (
                               <div className="flex items-start justify-between gap-4">
@@ -781,10 +790,10 @@ export default function BankBossChapter5() {
                         </div>
                         {/* Animal headshot on right */}
                         <div className="portrait relative w-[200px] h-[200px] shrink-0 m-3 -mt-8" style={{
-                          border: '4px solid #8b6914',
+                          border: '4px solid #8c6d4f',
                           borderRadius: '12px',
-                          background: '#fdf6e3',
-                          boxShadow: '0 6px 16px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.4)',
+                          background: '#b9b4a5',
+                          boxShadow: '0 6px 16px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.2)',
                           zIndex: 10
                         }}>
                           <Image 
@@ -812,25 +821,27 @@ export default function BankBossChapter5() {
                         }}
                         className="rpg-choice-tab group"
                         style={{
-                          background: 'linear-gradient(135deg, #f4e5c1 0%, #ede0c2 50%, #e6d3a3 100%)',
-                          border: '2px solid #8b6914',
+                          background: 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 50%, #e8ddc8 100%)',
+                          border: '2px solid #8c6d4f',
                           borderRadius: '8px',
                           padding: '12px 16px',
                           textAlign: 'left',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
                           transition: 'all 0.2s ease',
                           position: 'relative'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = '0 0 12px rgba(218, 165, 32, 0.6), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)';
+                          e.currentTarget.style.boxShadow = '0 0 12px rgba(122, 46, 46, 0.6), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
                           e.currentTarget.style.transform = 'translateY(-1px)';
+                          e.currentTarget.style.background = 'linear-gradient(135deg, #7a2e2e 0%, #6b2828 100%)';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)';
+                          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
                           e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.background = 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 50%, #e8ddc8 100%)';
                         }}
                       >
-                        <span className="font-ms text-amber-900">📜 Ask about compounding</span>
+                        <span className="font-ms" style={{ color: '#3c2f2f' }}>📜 Ask about compounding</span>
                         </button>
                       )}
                       <button
@@ -840,24 +851,26 @@ export default function BankBossChapter5() {
                       }}
                       className="rpg-choice-tab"
                       style={{
-                        background: 'linear-gradient(135deg, #f4e5c1 0%, #ede0c2 50%, #e6d3a3 100%)',
-                        border: '2px solid #8b6914',
+                        background: 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 50%, #e8ddc8 100%)',
+                        border: '2px solid #8c6d4f',
                         borderRadius: '8px',
                         padding: '12px 16px',
                         textAlign: 'left',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
                         transition: 'all 0.2s ease'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 0 12px rgba(218, 165, 32, 0.6), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)';
+                        e.currentTarget.style.boxShadow = '0 0 12px rgba(122, 46, 46, 0.6), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
                         e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #7a2e2e 0%, #6b2828 100%)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)';
+                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
                         e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 50%, #e8ddc8 100%)';
                       }}
                     >
-                      <span className="font-ms text-amber-900">🌾 Ask about inflation</span>
+                      <span className="font-ms" style={{ color: '#3c2f2f' }}>🌾 Ask about inflation</span>
                       </button>
                       <button
                       onClick={() => { 
@@ -867,24 +880,26 @@ export default function BankBossChapter5() {
                       }}
                       className="rpg-choice-tab"
                       style={{
-                        background: 'linear-gradient(135deg, #d4af7a 0%, #c19a5b 50%, #b8956b 100%)',
-                        border: '2px solid #8b6914',
+                        background: 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 50%, #9a9288 100%)',
+                        border: '2px solid #8c6d4f',
                         borderRadius: '8px',
                         padding: '12px 16px',
                         textAlign: 'left',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
                         transition: 'all 0.2s ease'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 0 12px rgba(184, 134, 11, 0.6), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)';
+                        e.currentTarget.style.boxShadow = '0 0 12px rgba(122, 46, 46, 0.6), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
                         e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #7a2e2e 0%, #6b2828 100%)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4)';
+                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
                         e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 50%, #9a9288 100%)';
                       }}
                     >
-                      <span className="font-ms text-amber-900">🚪 That's all my questions</span>
+                      <span className="font-ms" style={{ color: '#3c2f2f' }}>🚪 That's all my questions</span>
                       </button>
                     </div>
                 </div>
