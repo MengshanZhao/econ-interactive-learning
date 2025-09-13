@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=VT323&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -102,6 +103,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   z-index: -1;
 }
+
 .metallic-bg {
   background: linear-gradient(135deg, #ffffff 0%, #fff9e6 100%);
   border-bottom: 1px solid rgba(255, 215, 0, 0.1);
@@ -165,4 +167,3 @@
   stroke-dasharray: 10, 10;
   animation: dash 30s linear infinite;
 }
-
