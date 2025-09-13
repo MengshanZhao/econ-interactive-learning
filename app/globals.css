@@ -1,23 +1,168 @@
-@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=VT323&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Reset and base styles */
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 220 25% 20%;
+    --card: 0 0% 98%;
+    --card-foreground: 220 25% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 20%;
+    --primary: 45 100% 50%;
+    --primary-foreground: 220 25% 20%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 220 25% 20%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 220 25% 40%;
+    --accent: 0 0% 90%;
+    --accent-foreground: 220 25% 20%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 25% 90%;
+    --input: 220 25% 90%;
+    --ring: 45 100% 50%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 220 30% 60%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 220 30% 60%;
+  }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-/* Make the imported fonts available as font-family options */
-.medieval {
-  font-family: 'MedievalSharp', cursive;
+.clip-diagonal {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 0);
 }
 
-.retro {
-  font-family: 'VT323', monospace;
+.shining-silver {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
+
+.shining-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: all 0.3s ease;
+}
+
+.shining-button:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.field-photo {
+  border-radius: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s ease;
+}
+
+.field-photo:hover {
+  transform: scale(1.02);
+}
+
+.profile-border {
+  position: relative;
+}
+
+.profile-border::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: -1;
+}
+.metallic-bg {
+  background: linear-gradient(135deg, #ffffff 0%, #fff9e6 100%);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.spectrum-metallic-btn {
+  background: linear-gradient(135deg, #fff9e6 0%, #ffd700 100%);
+  color: #1a1a1a;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.spectrum-metallic-btn:hover {
+  background: linear-gradient(135deg, #ffd700 0%, #fff9e6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+
+.avatar-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.card-minimal {
+  background: linear-gradient(135deg, #ffffff 0%, #fff9e6 100%);
+  border: 1px solid rgba(255, 215, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.05);
+}
+
+.golden-accent {
+  background: linear-gradient(135deg, #fff9e6 0%, #ffd700 100%);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.golden-text {
+  background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+.animate-dash {
+  stroke-dasharray: 10, 10;
+  animation: dash 30s linear infinite;
+}
+
