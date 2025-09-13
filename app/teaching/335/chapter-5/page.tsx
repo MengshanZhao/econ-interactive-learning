@@ -404,52 +404,30 @@ export default function BankBossChapter5() {
                     )}
                   </div>
                   {(!log.length || log[log.length-1].who !== "next") && (
-                    <div className="mt-3 space-y-3 text-lg">
-                      {selected.kind === "APR" && (
-                        <div className="flex items-center gap-4">
-                          <div className="w-32 h-32 flex-shrink-0">
-                            <Image
-                              src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
-                              alt={selectedCharacter || "Player"}
-                              width={128}
-                              height={128}
-                              className="object-contain"
-                            />
-                          </div>
+                    <div className="mt-3 space-y-3">
+                      <div className="rounded-xl bg-[#FFECC8] p-4 space-y-3">
+                        {selected.kind === "APR" && (
                           <button 
                             onClick={() => setLog((L)=>[
                               ...L, 
                               { who: YOU, text: `${YOU}: What's your compounding schedule?` },
                               { who: "next", text: "Next" }
                             ])} 
-                            className="flex-1 text-left px-6 py-4 rounded-lg bg-[#FFECC8] hover:bg-[#FFF8EA] transition-colors"
+                            className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
                           >
-                            What's your compounding schedule?
+                            Ask about compounding schedule
                           </button>
-                          <div className="w-32 flex-shrink-0"></div>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-4">
-                        <div className="w-32 h-32 flex-shrink-0">
-                          <Image
-                            src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
-                            alt={selectedCharacter || "Player"}
-                            width={128}
-                            height={128}
-                            className="object-contain"
-                          />
-                        </div>
+                        )}
                         <button 
                           onClick={() => setLog((L)=>[
                             ...L, 
                             { who: YOU, text: `${YOU}: What is the inflation?` },
                             { who: "next", text: "Next" }
                           ])} 
-                          className="flex-1 text-left px-6 py-4 rounded-lg bg-[#FFECC8] hover:bg-[#FFF8EA] transition-colors"
+                          className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
                         >
-                          What is the inflation?
+                          Ask about inflation
                         </button>
-                        <div className="w-32 flex-shrink-0"></div>
                       </div>
                     </div>
                   )}
