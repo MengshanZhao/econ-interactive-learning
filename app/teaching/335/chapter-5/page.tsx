@@ -203,18 +203,16 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
                 <button
                   key={char.name}
                   onClick={() => onCharacterSelect(char.name)}
-                  className={`rounded-xl border-2 p-3 transition-all ${
-                    selectedCharacter === char.name 
-                      ? "border-amber-600 bg-[#FFF4DF] shadow-lg" 
-                      : "border-amber-200 hover:border-amber-400"
-                  }`}
+                  className={`rounded-xl p-2 transition-transform ${
+                    selectedCharacter === char.name ? "ring-2 ring-amber-600" : ""
+                  } hover:scale-105`}
                 >
                   <Image
                     src={char.image}
                     alt={char.name}
-                    width={80}
-                    height={80}
-                    className="mx-auto rounded-lg"
+                    width={140}
+                    height={140}
+                    className="mx-auto rounded-lg drop-shadow-xl"
                   />
                   <div className="mt-2 text-sm font-semibold text-amber-800">{char.name}</div>
                 </button>
@@ -369,11 +367,15 @@ export default function BankBossChapter5() {
           <motion.div key={selected.id} initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-6xl p-4">
             <div className="relative rounded-3xl border-4 border-amber-700 bg-[#FFF4DF] p-6 text-amber-900 shadow-2xl">
               <div className="absolute -top-5 left-1/2 -translate-x-1/2 rounded-md border-2 border-amber-700 bg-[#FFECC8] px-4 py-1 text-sm font-black tracking-wide text-amber-900">{selected.label}</div>
-              <div className="flex items-start gap-5">
-                {/* Player Portrait (oversized, transparent, overlaps box) */}
-                <div className="pointer-events-none absolute -top-6 -left-2 overflow-visible" style={{ height: "0px", width: "0px" }}></div>
-                <Portrait selectedCharacter={selectedCharacter} side="left" />
-                
+              <div className="relative flex items-start gap-5">
+                {/* Player Portrait on left when player speaks; animal on right when animal speaks */}
+                <div className="hidden md:block">
+                  {/* Left portrait appears only when latest line is the player */}
+                  {log.length > 0 && log[log.length-1].who === YOU && (
+                    <Portrait selectedCharacter={selectedCharacter} side="left" />
+                  )}
+                </div>
+
                 {/* Dialogue Text */}
                 <div className="flex-1 text-lg leading-8">
                   {log.length > 0 && <Typewriter text={log[log.length-1].text} sound={soundOn} />}
@@ -386,8 +388,12 @@ export default function BankBossChapter5() {
                   </div>
                 </div>
                 
-                {/* Animal Portrait (oversized, transparent, overlaps box) */}
-                <Portrait imageSrc={selected.image} alt={selected.label} side="right" />
+                {/* Right portrait appears when the latest line is the animal */}
+                <div className="hidden md:block">
+                  {log.length > 0 && log[log.length-1].who !== YOU && (
+                    <Portrait imageSrc={selected.image} alt={selected.label} side="right" />
+                  )}
+                </div>
               </div>
             </div>
           </motion.div>
