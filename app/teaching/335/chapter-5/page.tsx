@@ -406,7 +406,10 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
             </div>
 
             <button
-              onClick={onStart}
+              onClick={() => {
+                console.log('Start button clicked');
+                onStart();
+              }}
               disabled={!selectedCharacter}
               className="rounded-[2px] bg-amber-600 px-6 py-3 text-xl font-ms text-white shadow-lg hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -473,7 +476,13 @@ export default function BankBossChapter5() {
   if (!gameStarted) {
     return (
       <StartScreen
-        onStart={() => { audio.enable(); audio.click(); setGameStarted(true); }}
+        onStart={async () => { 
+          console.log('Enabling audio...');
+          await audio.enable(); 
+          console.log('Audio ready:', audio.ready);
+          audio.click(); 
+          setGameStarted(true); 
+        }}
         onCharacterSelect={setSelectedCharacter}
         selectedCharacter={selectedCharacter}
       />
@@ -533,6 +542,7 @@ export default function BankBossChapter5() {
                 <div className="mt-3 flex items-center gap-2">
                   <button
                     onClick={() => {
+                      audio.click();
                       setSelectedId(L.id);
                       setTalkedIds(prev => { const next = new Set(prev); next.add(L.id); return next; });
                     }}
@@ -542,7 +552,10 @@ export default function BankBossChapter5() {
                     Talk
                   </button>
                   <button
-                    onClick={() => setAcceptedId(L.id)}
+                    onClick={() => {
+                      audio.select();
+                      setAcceptedId(L.id);
+                    }}
                     disabled={!!acceptedId && acceptedId!==L.id}
                     className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700"
                   >
@@ -567,9 +580,11 @@ export default function BankBossChapter5() {
                   <button
                     onClick={() => {
                       if (talkedIds.size < round.lenders.length) {
+                        audio.thud();
                         setAlertMsg("Please talk to each borrower before you reveal the comparison.");
                         return;
                       }
+                      audio.reveal();
                       setRevealed(true);
                     }}
                     className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-40"
@@ -630,52 +645,52 @@ export default function BankBossChapter5() {
         {selected && (
           <motion.div key={selected.id} initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-6xl p-4">
             <div className="pixel-frame-amber bg-[#FFF4DF] p-0 text-amber-900">
+              {(() => {
+                const isPlayerSpeaking = !log.length || log[log.length-1].who !== selected.label;
+                const currentSpeaker = isPlayerSpeaking ? (selectedCharacter || "You") : selected.label;
+                
+                return (
               <div className="flex gap-0">
-                {/* Large SQUARE headshot */}
-                <div className="relative w-[200px] h-[200px] shrink-0 m-3 bg-[#FFF8EA] pixel-inner-amber">
-                  {/* When YOU are speaking, show your portrait; else animal */}
-                  {(!log.length || log[log.length-1].who !== selected.label) ? (
+                    {/* Headshot - left for player, right for animal */}
+                    {isPlayerSpeaking ? (
+                      <>
+                        {/* Player headshot on left */}
+                        <div className="relative w-[200px] h-[200px] shrink-0 m-3">
                     <Image
                       src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
                       alt={selectedCharacter || "Player"}
                       fill
                       className="object-contain"
                     />
-                  ) : (
-                    <Image src={selected.image} alt={selected.label} fill className="object-contain" />
-                  )}
                 </div>
-
-                {/* Text box with name tab */}
+                        {/* Text box */}
                 <div className="flex-1 p-3">
                   <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">
-                    {(log.length > 0 && log[log.length-1].who !== selected.label) ? (selectedCharacter || "You") : selected.label}
+                            {currentSpeaker}
                   </div>
-
                   <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
                     {log.length > 0 && (
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <Typewriter text={log[log.length-1].text} blip={audio.blip} />
+                                  <Typewriter text={log[log.length-1].text} blip={audio.blip} />
                         </div>
-
                         {/* Only show Next when YOU just asked */}
                         {log[log.length-1].who === (selectedCharacter || "You") && (
                           <button
                             onClick={() => {
                               const last = log[log.length-1];
                               const answer = last.text.toLowerCase().includes("compound")
-                                ? (() => {
-                                    const m = selected.m || 1;
-                                    const rate = selected.rate || 0;
-                                    if (m === 1) {
-                                      return `${selected.label}: My APR is ${pct(rate, 1)} compounded annually. I make level payments of ${money(pmtFromPV(rate, m, selected.term, selected.principal))} each year.`;
-                                    } else {
-                                      const periodRate = rate / m;
-                                      const pmt = pmtFromPV(rate, m, selected.term, selected.principal);
-                                      return `${selected.label}: My nominal APR is ${pct(rate, 1)}, compounded ${m}× per year. The per‑${periodLabel(m)} rate is ${pct(periodRate, 3)}. I make level payments of ${money(pmt)} each ${periodLabel(m)}.`;
-                                    }
-                                  })()
+                                        ? (() => {
+                                            const m = selected.m || 1;
+                                            const rate = selected.rate || 0;
+                                            if (m === 1) {
+                                              return `${selected.label}: My APR is ${pct(rate, 1)} compounded annually. I make level payments of ${money(pmtFromPV(rate, m, selected.term, selected.principal))} each year.`;
+                                            } else {
+                                              const periodRate = rate / m;
+                                              const pmt = pmtFromPV(rate, m, selected.term, selected.principal);
+                                              return `${selected.label}: My nominal APR is ${pct(rate, 1)}, compounded ${m}× per year. The per‑${periodLabel(m)} rate is ${pct(periodRate, 3)}. I make level payments of ${money(pmt)} each ${periodLabel(m)}.`;
+                                            }
+                                          })()
                                 : selected.inflStory;
                               setLog((L) => [...L, { who: selected.label, text: answer }]);
                             }}
@@ -687,34 +702,77 @@ export default function BankBossChapter5() {
                       </div>
                     )}
                   </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {/* Text box */}
+                        <div className="flex-1 p-3">
+                          <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">
+                            {currentSpeaker}
+                          </div>
+                          <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
+                            {log.length > 0 && (
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                  <Typewriter text={log[log.length-1].text} blip={audio.blip} />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        {/* Animal headshot on right */}
+                        <div className="relative w-[200px] h-[200px] shrink-0 m-3">
+                          <Image 
+                            src={selected.image} 
+                            alt={selected.label} 
+                            fill 
+                            className="object-contain" 
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
 
                   {/* Choices: appear only after animal speaks OR at start */}
                   {(log.length === 0 || (log[log.length-1].who === selected.label)) && (
-                    <div className="mt-2 grid grid-cols-1 gap-2">
+                <div className="p-3 pt-0">
+                  <div className="grid grid-cols-1 gap-2">
                       {selected.kind === "APR" && (
                         <button
-                          onClick={() => setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: Could you tell me your compounding schedule?` }])}
+                        onClick={() => {
+                          audio.click();
+                          setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: Could you tell me your compounding schedule?` }]);
+                        }}
                           className="pixel-btn-amber"
                         >
                           Ask about compounding
                         </button>
                       )}
                       <button
-                        onClick={() => setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: What’s your view on inflation right now?` }])}
+                      onClick={() => {
+                        audio.click();
+                        setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: What's your view on inflation right now?` }]);
+                      }}
                         className="pixel-btn-amber"
                       >
                         Ask about inflation
                       </button>
                       <button
-                        onClick={() => { setSelectedId(null); setLog([]); }}
+                      onClick={() => { 
+                        audio.click();
+                        setSelectedId(null); 
+                        setLog([]); 
+                      }}
                         className="pixel-btn-amber"
                       >
-                        That’s all my questions
+                      That's all my questions
                       </button>
                     </div>
-                  )}
                 </div>
-              </div>
+              )}
             </div>
           </motion.div>
         )}
