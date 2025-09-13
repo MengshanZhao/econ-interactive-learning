@@ -5,12 +5,13 @@ import Image from "next/image";
 
 /**
  * Bank Boss RPG — Chapter 5 (Amber/Cream theme)
- * - Borrowers ask YOU for a principal today; you pick the one with the HIGHEST TOTAL PAY-BACK RATIO.
+ * - Borrowers ask YOU for a principal today; pick the one with the HIGHEST TOTAL PAY-BACK RATIO.
  * - ~100-word, plain/cute stories; all $ amounts.
  * - Inflation < 10%; effective returns ≤ 15%; no zeros.
  * - Typewriter with gentle key-click (SOUND ON by default).
  * - Dialogue flow: after YOU ask, only "Next →" appears.
- * - Large SQUARE headshot + ornate amber frame (square corners), VT323 body & MedievalSharp name.
+ * - Large SQUARE headshot + ornate amber frame (square corners).
+ * - Fonts: description/cards use old serif; dialogue box uses VT323 (body) + MedievalSharp (name).
  * - “That’s all my questions” closes the dialogue.
  * - Reveal is blocked until you’ve talked to ALL borrowers at least once.
  */
@@ -73,15 +74,7 @@ function storyLump(n: string, t: number, _r: string, P: number, k: number) {
 function storyMill(n: string, t: number, r: string, P: number) {
   return `${n}: The mill by the falls can hum again if I shore up the beams. I’m asking for ${money(P)} to buy belts, braces, and paint the color of confidence. Over ${t} years your return runs about ${r}, assuming harvests behave. The baker, the brewer, and I all like reliable circles: millstones, seasons, and coins returning on time.`;
 }
-const OPENERS = [storyBakery, storyTea, storyBoat, storyVine, storySchool, storyWorkshop, storyLump, storyMill];
-
-const INFLATION_STORIES = [
-  (n: string, pi: number) => `${n}: Fish thin our nets and the cannery eats dawn’s catch; smoke follows the river. Prices for oil and salt rise together—call it ${pct(pi,1)} a year until rains learn manners again.`,
-  (n: string, pi: number) => `${n}: Caravans are late, grain sulks in the fields, and gossip prices itself in fear. I pencil ${pct(pi,1)} inflation because scarcity likes drama.`,
-  (n: string, pi: number) => `${n}: The prefect subsidizes rice and salt to win festivals, so pantries smile. Even so, I budget ${pct(pi,1)}; kindness is not a policy forever.`,
-  (n: string, pi: number) => `${n}: Miners flood markets with cheap metal; coins jingle louder but buy less bread. My ledgers whisper ${pct(pi,1)} and I listen.`,
-  (n: string, pi: number) => `${n}: Fisherfolk teach me the current by what vanishes. When gulls argue over bare water, I assume ${pct(pi,1)} and plan tight.`,
-];
+const OPENERS_NON_LUMP = [storyBakery, storyTea, storyBoat, storyVine, storySchool, storyWorkshop, storyMill];
 
 // ---------- Types ----------
 interface Lender {
@@ -127,7 +120,7 @@ function makeLender(i: number): Lender {
     if (rate == null) rate = 0.12;
   } else if (kind === "EAR") {
     rate = rnd(0.03, 0.15, 4);                 // 3%–15% EAR
-  } else { // LUMP: choose k so implied EAR ≤ 15% (and ≥ ~3%)
+  } else { // LUMP: choose k so implied EAR ≤ 15% (and ≥ ~3%), k > 1
     const maxK = (1 + 0.15) ** term;
     const minK = (1 + 0.03) ** term;
     const k = rnd(Math.min(minK, maxK * 0.9), maxK, 3);
@@ -137,16 +130,24 @@ function makeLender(i: number): Lender {
   const ear = toEAR({ kind, rate, m, years: term, lump });
   const rStr = pct(Math.min(ear, 0.15), 1);
 
-  const open = OPENERS[Math.floor(Math.random() * OPENERS.length)](label, term, rStr, principal, lump || 0);
+  // IMPORTANT: use LUMP story ONLY for LUMP; otherwise pick a non-LUMP story
+  let open: string;
+  if (kind === "LUMP") {
+    open = storyLump(label, term, rStr, principal, lump!);
+  } else {
+    const op = OPENERS_NON_LUMP[Math.floor(Math.random() * OPENERS_NON_LUMP.length)];
+    open = op(label, term, rStr, principal);
+  }
+
   const infl = rnd(0.00, 0.08, 3);             // under 10%
-  const inflStory = INFLATION_STORIES[Math.floor(Math.random() * INFLATION_STORIES.length)](label, infl);
+  const inflStory = `${label}: ${INFLATION_STORIES[Math.floor(Math.random() * INFLATION_STORIES.length)](label, infl).split(": ").slice(1).join(": ")}`;
 
   return { id: `L${i}_${Math.random().toString(36).slice(2,8)}`, label, image: animalData.image, term, kind, rate, m, lump, principal, infl, open, inflStory };
 }
 
 function makeRound(): Round { return { lenders: Array.from({ length: 4 }, (_, i) => makeLender(i)) }; }
 
-// ---------- Typewriter with soft key-click (sound ON by default in component) ----------
+// ---------- Typewriter with soft key-click ----------
 function useBlipSound(enabled: boolean) {
   const ctxRef = useRef<AudioContext | null>(null);
   useEffect(() => {
@@ -209,10 +210,10 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
         <div className="pixel-frame-amber p-6 bg-[#FFF8EA]">
           <div className="text-center">
             <div className="mb-6 pixel-frame-amber bg-[#FFECC8] text-left p-4">
-              <p className="mb-3 text-lg leading-relaxed text-amber-900 font-vt323">
+              <p className="mb-3 text-lg leading-relaxed text-amber-900">
                 Welcome, banker! Meet <strong className="font-black">4 animal borrowers</strong>. Each asks for a principal now and promises how they’ll pay you back.
               </p>
-              <p className="text-base leading-relaxed text-amber-900 font-vt323">
+              <p className="text-base leading-relaxed text-amber-900">
                 • Ask about their rates and inflation views<br/>
                 • See real returns and total pay-backs in the summary<br/>
                 • Choose the borrower with the <strong>highest total pay-back ratio</strong>
@@ -302,7 +303,7 @@ export default function BankBossChapter5() {
 
   return (
     <div
-      className="relative min-h-screen text-slate-800 font-vt323"
+      className="relative min-h-screen text-slate-800 font-serif"
       style={{
         backgroundImage: "url('/images/bank.jpg')",
         backgroundSize: "cover",
@@ -311,14 +312,15 @@ export default function BankBossChapter5() {
       }}
     >
       <div className="relative z-10 mx-auto max-w-6xl p-6 pb-72">
+        {/* Description uses old serif font */}
         <div className="pixel-frame-amber bg-[#FFF8EA] p-3">
           <p className="mt-1 max-w-4xl text-[19px] text-amber-900">
-            Chat with <span className="font-ms font-bold">each borrower</span>. They’ll ask to borrow a principal amount today and promise a way to pay you back (APR, EAR, or one-time lump sum).
+            Chat with <span className="font-ms font-bold">each borrower</span>. They’ll ask to borrow a principal today and promise a way to pay you back (APR, EAR, or one-time lump sum).
             Compare and pick the friend with the <span className="font-ms font-bold">highest total pay-back ratio</span>.
           </p>
         </div>
 
-        {/* Cards */}
+        {/* Cards (old serif font) */}
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {round.lenders.map((L) => {
             const name = L.label;
@@ -432,7 +434,7 @@ export default function BankBossChapter5() {
         </div>
       )}
 
-      {/* Bottom Dialogue — big square portrait + ornate amber frame */}
+      {/* Bottom Dialogue — big square portrait + ornate amber frame, VT323 text */}
       <AnimatePresence initial={false}>
         {selected && (
           <motion.div key={selected.id} initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-6xl p-4">
@@ -459,7 +461,7 @@ export default function BankBossChapter5() {
                     {(log.length > 0 && log[log.length-1].who !== selected.label) ? (selectedCharacter || "You") : selected.label}
                   </div>
 
-                  <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7">
+                  <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
                     {log.length > 0 && (
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
