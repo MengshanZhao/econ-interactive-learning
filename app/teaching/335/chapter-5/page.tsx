@@ -46,29 +46,29 @@ const PLAYER_IMAGES = [
 ];
 
 function storyBakery(n: string, t: number, r: string, P: number) {
-  return `${n}: I can open a cozy bakery with ${money(P)}. Warm bread, happy mornings. Keep me for ${t} years and it works out to about ${r} a year.`;
+  return `${n}: I'm setting ovens in the old square and lending you ${money(P)} today to finish the hearth and tiles. I learned sweet rolls from my grandmother and I can scale dawn batches without burning a crumb. Market days bring lines that wrap the fountain; evenings we'll sell crusts to inns. If you hold me for ${t} years, my tables price this near ${r} effective annually. Speak plainly about schedules and I'll speak plainly about cash. Bread cools fast; reputations last longer—let's keep both warm.`;
 }
 function storyTea(n: string, t: number, r: string, P: number) {
-  return `${n}: A tiny tea house by the river needs ${money(P)}. Steam, stories, and steady coins. Over ${t} years, think roughly ${r}.`;
+  return `${n}: The river path needs a tea house and I'll advance ${money(P)} for timber, braziers, and reed mats. Caravan tongues barter better after steam. My cousins will serve, I'll count, and travelers will write about the quiet. Hold the note for ${t} years and the headline works to about ${r} a year. I keep a copper jar for repairs and a ledger for luck—one I trust more than the other. If you value punctual coins and clean books, pour with me.`;
 }
 function storyBoat(n: string, t: number, r: string, P: number) {
-  return `${n}: A ferry boat upgrade costs ${money(P)}. Safer trips, smoother days. Held for ${t} years, returns feel like ${r} yearly.`;
+  return `${n}: I know the lake winds and I'll front ${money(P)} to rig a broad‑keel boat for grain and stone. The west shore starves for ferries when storms sour roads. I price the voyage at ${r} annually over ${t} years if weather behaves and ropes don't lie. I've crew who tie knots like poems and a habit of landing early. Lend steady, and I'll return steady—plus a seat on the prow when the moon is a coin.`;
 }
 function storyVine(n: string, t: number, r: string, P: number) {
-  return `${n}: With ${money(P)} I can bottle sweet village wine. Slow and calm. Over ${t} years, about ${r} if seasons behave.`;
+  return `${n}: Vines outside the wall swell with juice; I'll invest ${money(P)} in barrels, presses, and a mule that doesn't gossip. Cellars want patience and roofs that don't drip. Over ${t} years the yield evens to ${r} give or take a late frost. My family bottles truthfully; labels brag, wine shouldn't. If your appetite is for calm curves and honest sums, let's cork the deal and store it where summers can't find it.`;
 }
 function storySchool(n: string, t: number, r: string, P: number) {
-  return `${n}: ${money(P)} builds a sunny classroom. Kids learn, numbers smile. Kept for ${t} years, call it ${r} a year.`;
+  return `${n}: Chalk, slates, benches—${money(P)} gets us a room where numbers stop bullying children. A little school repays the town and the books equally. Keep me for ${t} years, reckon ${r} effective; I post attendance like a merchant posts prices. If we count curiosity as collateral, we're already rich. Still, I bring ledgers and lockboxes because good intentions can't buy chalk twice.`;
 }
 function storyWorkshop(n: string, t: number, r: string, P: number) {
-  return `${n}: A neat little workshop with ${money(P)}. Fixes, tools, honest work. Over ${t} years, around ${r}.`;
+  return `${n}: Wheels wobble, lamps fail, doors sulk; my workshop fixes the patience of the city. I'll stake ${money(P)} on tools and stock, then keep the till honest. Over ${t} years, a tidy operator makes about ${r} if nails stay cheap and apprentices stay curious. I'm partial to boring miracles: hinges that never squeak, balances that never lie, payments that arrive before I notice I'm waiting.`;
 }
 function storyLump(n: string, t: number, _r: string, P: number, k: number) {
   const repay = P * k;
-  return `${n}: Simple plan! I lend ${money(P)} now. You pay ${money(repay)} in ${t} years — one clean bundle.`;
+  return `${n}: I keep math simple. I lend you ${money(P)} today so your plan can breathe. At the end of ${t} years you repay ${money(repay)}—one clean sweep, no fiddly coupons. Between, you keep your cash turning. We can still talk compounding if your heart insists, but my promise is a bright line: pay back ${k.toFixed(2)}× the principal at maturity. Simple is not always easy, but it is honest.`;
 }
 function storyMill(n: string, t: number, r: string, P: number) {
-  return `${n}: The town mill needs ${money(P)} for sturdy wheels. Over ${t} years, I aim for about ${r}.`;
+  return `${n}: There's a mill by the falls that grinds hope into flour. Its stones are sharp but its beams sulk; ${money(P)} buys braces, belts, and a fresh coat of paint the color of confidence. Give me ${t} years and I can work to about ${r} if harvests don't play tricks. The baker, the brewer, and I prefer reliable circles: millstones, coin cycles, seasons turning.`;
 }
 
 const OPENERS = [storyBakery, storyTea, storyBoat, storyVine, storySchool, storyWorkshop, storyLump, storyMill];
@@ -179,10 +179,7 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#FFF4DF]">
       <div className="mx-auto max-w-4xl rounded-3xl border-4 border-amber-700 bg-[#FFF8EA] p-8 shadow-2xl">
         <div className="text-center">
-          <h1 className="mb-6 text-5xl font-extrabold text-amber-900 drop-shadow-lg">
-            🏦 Bank Boss
-          </h1>
-          <h2 className="mb-4 text-2xl font-bold text-amber-700">Chapter 5: Friendly Lending</h2>
+          {/* Title removed as requested */}
           
           <div className="mb-6 rounded-2xl bg-[#FFECC8] p-6 text-left">
             <p className="mb-4 text-lg leading-relaxed text-amber-900">
@@ -380,11 +377,37 @@ export default function BankBossChapter5() {
                 <div className="flex-1 text-lg leading-8">
                   {log.length > 0 && <Typewriter text={log[log.length-1].text} sound={soundOn} />}
                   <div className="mt-3 flex flex-wrap gap-3 text-sm">
-                    {selected.kind === "APR" && (
-                      <button onClick={() => setLog((L)=>[...L, { who: YOU, text: `${YOU}: Is that a yearly rate? How often does it grow?` }, { who: selected.label, text: `${selected.label}: Nominal APR, compounded ${selected.m}× per year.` }])} className="rounded-md bg-[#FFECC8] px-3 py-1 font-semibold text-amber-800 shadow hover:bg-[#FFF8EA]">Ask compounding</button>
-                    )}
-                    <button onClick={() => setLog((L)=>[...L, { who: YOU, text: `${YOU}: How fast do prices rise here?` }, { who: selected.label, text: selected.inflStory }])} className="rounded-md bg-[#FFECC8] px-3 py-1 font-semibold text-amber-800 shadow hover:bg-[#FFF8EA]">Ask inflation</button>
-                    <button onClick={() => setAcceptedId(selected.id)} disabled={!!acceptedId} className="rounded-md bg-amber-600 px-3 py-1 font-semibold text-white shadow hover:bg-amber-700 disabled:opacity-40">Accept offer</button>
+                    <div className="rounded-xl bg-[#FFECC8] p-4 space-y-3">
+                      {selected.kind === "APR" && (
+                        <button 
+                          onClick={() => setLog((L)=>[
+                            ...L, 
+                            { who: YOU, text: `${YOU}: What's your compounding schedule?` },
+                            { who: selected.label, text: `${selected.label}: Nominal APR, compounded ${selected.m}× per year.` }
+                          ])} 
+                          className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
+                        >
+                          Ask about interest rate compounding
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => setLog((L)=>[
+                          ...L, 
+                          { who: YOU, text: `${YOU}: What's the inflation outlook in your region?` },
+                          { who: selected.label, text: selected.inflStory }
+                        ])} 
+                        className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
+                      >
+                        Ask about local inflation
+                      </button>
+                      <button 
+                        onClick={() => setAcceptedId(selected.id)} 
+                        disabled={!!acceptedId} 
+                        className="w-full text-center px-4 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-40 transition-colors"
+                      >
+                        Accept this offer
+                      </button>
+                    </div>
                   </div>
                 </div>
                 
@@ -443,8 +466,8 @@ function Portrait({ selectedCharacter, imageSrc, alt, side }: { selectedCharacte
       style={{ width: 0, height: 0 }}
     >
       <div
-        className={`absolute ${side === 'left' ? '-top-[40%] -left-2' : '-top-[45%] -right-2'} pointer-events-none`}
-        style={{ height: `${h}px`, width: `${w}px` }}
+        className={`absolute ${side === 'left' ? '-bottom-0 -left-2' : '-bottom-0 -right-2'} pointer-events-none`}
+        style={{ height: `${h}px`, width: `${w}px`, transform: 'translateY(-100%)' }}
       >
         <div className="relative h-full w-full">
           <Image
