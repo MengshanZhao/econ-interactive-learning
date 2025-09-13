@@ -33,6 +33,21 @@ function toEAR(opts: { kind: "APR" | "EAR" | "LUMP"; rate?: number; m?: number; 
 }
 const real = (i: number, pi: number) => (1 + i) / (1 + pi) - 1;
 
+// Level-payment loan helpers for 2-year terms
+function pmtFromPV(apr: number, m: number, years: number, pv: number) {
+  const i = apr / m; // per-period rate
+  const n = m * years; // total periods
+  const denom = 1 - Math.pow(1 + i, -n);
+  if (denom === 0 || i === 0) return pv / n; // fallback for zero rate
+  return pv * i / denom;
+}
+function periodLabel(m: number) {
+  if (m === 12) return "month";
+  if (m === 4) return "quarter";
+  if (m === 2) return "half‑year";
+  return "year";
+}
+
 // ---------- Assets ----------
 const ANIMAL_IMAGES = [
   { name: "Dog", image: "/images/dog.png" },
@@ -66,6 +81,11 @@ function storySchool(n: string, t: number, r: string, P: number) {
 }
 function storyWorkshop(n: string, t: number, r: string, P: number) {
   return `${n}: Doors stick, lamps flicker, wheels wobble—my fix-it workshop will keep the town’s patience alive. I’m asking to borrow ${money(P)} for tools and parts. Over ${t} years you’d earn about ${r} if nails stay fairly priced and we stay busy. I like boring miracles: hinges that hush, scales that tell the truth, and payments that arrive before you wonder.`;
+}
+function storyAPR(n: string, t: number, apr: number, P: number, m: number) {
+  const periodName = periodLabel(m);
+  const pmt = pmtFromPV(apr, m, t, P);
+  return `${n}: I'd like to borrow ${money(P)} from you. My quote is a nominal APR of ${pct(apr,1)} for ${t} years with ${periodName}ly payments of ${money(pmt)}. Ask me about compounding to see how that APR turns into an effective annual rate (EPR). The per‑${periodName} rate is APR/${m}, and EPR = (1 + APR/${m})^${m} − 1.`;
 }
 function storyLump(n: string, t: number, _r: string, P: number, k: number) {
   const repay = Math.round(P * k);
@@ -106,14 +126,13 @@ interface Round { lenders: Lender[]; }
 function makeLender(i: number): Lender {
   const animalData = ANIMAL_IMAGES[i % ANIMAL_IMAGES.length];
   const label = `${animalData.name}`;
-  const term = Math.max(1, Math.floor(rnd(1, 31)));
+  const term = 2; // All offers are 2-year loans
 
   // Borrow amounts in sensible round dollars
   const principal = Math.round(rnd(50_000, 250_000, 0) / 1000) * 1000;
 
-  // Offer type with EAR cap
-  const pick = Math.random();
-  let kind: "APR" | "EAR" | "LUMP" = pick < 0.45 ? "APR" : pick < 0.85 ? "EAR" : "LUMP";
+  // Offer type: only APR or LUMP (no direct EAR quotes)
+  let kind: "APR" | "EAR" | "LUMP" = Math.random() < 0.6 ? "APR" : "LUMP";
 
   let rate: number | undefined;
   let m: number | undefined;
@@ -127,8 +146,6 @@ function makeLender(i: number): Lender {
       if (ear <= 0.15) { rate = apr; break; }
     }
     if (rate == null) rate = 0.12;
-  } else if (kind === "EAR") {
-    rate = rnd(0.03, 0.15, 4);                 // 3%–15% EAR
   } else { // LUMP: choose k so implied EAR ≤ 15% (and ≥ ~3%), k > 1
     const maxK = (1 + 0.15) ** term;
     const minK = (1 + 0.03) ** term;
@@ -139,13 +156,12 @@ function makeLender(i: number): Lender {
   const ear = toEAR({ kind, rate, m, years: term, lump });
   const rStr = pct(Math.min(ear, 0.15), 1);
 
-  // Use LUMP story ONLY for LUMP; otherwise pick a non-LUMP story.
+  // Use LUMP story for LUMP; APR gets an APR-focused story inviting compounding discussion
   let open: string;
   if (kind === "LUMP") {
     open = storyLump(label, term, rStr, principal, lump!);
   } else {
-    const op = OPENERS_NON_LUMP[Math.floor(Math.random() * OPENERS_NON_LUMP.length)];
-    open = op(label, term, rStr, principal);
+    open = storyAPR(label, term, rate!, principal, m!);
   }
 
   const infl = rnd(0.00, 0.08, 3); // under 10%
@@ -195,7 +211,7 @@ function useBlipSound(enabled: boolean) {
   return blip;
 }
 
-function Typewriter({ text, speed=18, sound=false }: { text: string; speed?: number; sound?: boolean }) {
+function Typewriter({ text, speed=18, sound=true }: { text: string; speed?: number; sound?: boolean }) {
   const [i, setI] = useState(0);
   const blip = useBlipSound(sound);
   useEffect(() => { setI(0); }, [text]);
@@ -220,12 +236,12 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
           <div className="text-center">
             <div className="mb-6 pixel-frame-amber bg-[#FFECC8] text-left p-4">
               <p className="mb-3 text-lg leading-relaxed text-amber-900">
-                Welcome, banker! Meet <strong className="font-black">4 animal borrowers</strong>. Each asks for a principal now and promises how they’ll pay you back.
+                Welcome, banker! Meet <strong className="font-black">4 animal borrowers</strong>. Each asks to borrow a principal now and promises how they’ll pay you back in <strong>2 years</strong>.
               </p>
               <p className="text-base leading-relaxed text-amber-900">
-                • Ask about their rates and inflation views<br/>
-                • See real returns and total pay-backs in the summary<br/>
-                • Choose the borrower with the <strong>highest total pay-back ratio</strong>
+                • Offers are either <strong>APR</strong> (ask about compounding) or a <strong>one-time lump sum</strong><br/>
+                • Ask about inflation if you want to think in real terms<br/>
+                • Choose the borrower with the <strong>highest effective annual rate (EPR)</strong>
               </p>
             </div>
 
@@ -289,7 +305,15 @@ export default function BankBossChapter5() {
   const outcomes = round.lenders.map((L) => {
     const ear = toEAR({ kind: L.kind, rate: L.rate, m: L.m, years: L.term, lump: L.lump });
     const rReal = real(ear, L.infl);
-    const repay = L.kind === "LUMP" ? (L.principal * (L.lump || 1)) : L.principal * Math.pow(1 + ear, L.term);
+    let repay: number;
+    if (L.kind === "LUMP") {
+      repay = L.principal * (L.lump || 1);
+    } else {
+      // APR with level payments: total of all payments over the term
+      const pmt = pmtFromPV(L.rate || 0, L.m || 1, L.term, L.principal);
+      const n = (L.m || 1) * L.term;
+      repay = pmt * n;
+    }
     const paybackRatio = repay / L.principal;
     return { L, ear, rReal, repay, paybackRatio };
   });
@@ -324,8 +348,8 @@ export default function BankBossChapter5() {
         {/* Description uses old serif font */}
         <div className="pixel-frame-amber bg-[#FFF8EA] p-3">
           <p className="mt-1 max-w-4xl text-[19px] text-amber-900">
-            Chat with <span className="font-ms font-bold">each borrower</span>. They’ll ask to borrow a principal today and promise a way to pay you back (APR, EAR, or one-time lump sum).
-            Compare and pick the friend with the <span className="font-ms font-bold">highest total pay-back ratio</span>.
+            Chat with <span className="font-ms font-bold">each borrower</span>. All loans are for <strong>2 years</strong> and are either <strong>APR quotes</strong> (you ask about compounding) or a <strong>one-time lump sum</strong> at maturity.
+            Compare and pick the friend with the <span className="font-ms font-bold">highest effective annual rate (EPR)</span>.
           </p>
         </div>
 
@@ -387,12 +411,11 @@ export default function BankBossChapter5() {
                   <button
                     onClick={() => {
                       if (talkedIds.size < round.lenders.length) {
-                        setAlertMsg("Please talk to each borrower before you make your decision");
+                        setAlertMsg("Please talk to each borrower before you reveal the comparison.");
                         return;
                       }
                       setRevealed(true);
                     }}
-                    disabled={!acceptedId}
                     className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-40"
                   >
                     Reveal
@@ -410,7 +433,7 @@ export default function BankBossChapter5() {
                       <div className="font-ms text-amber-900">{o.L.label}</div>
                       <ul className="mt-2 text-[18px] leading-7 text-amber-900">
                         <li>Principal: <strong>{money(o.L.principal)}</strong></li>
-                        <li>Effective annual: <strong>{pct(o.ear, 2)}</strong></li>
+                        <li>EPR (effective annual): <strong>{pct(o.ear, 2)}</strong></li>
                         <li>Inflation view: <strong>{pct(o.L.infl, 1)}</strong></li>
                         <li>Real annual: <strong className={o.rReal >= 0 ? "text-emerald-700" : "text-rose-700"}>{pct(o.rReal, 2)}</strong></li>
                         <li>Total repay: <strong>{money(o.repay)}</strong></li>
@@ -420,7 +443,7 @@ export default function BankBossChapter5() {
                   ))}
                 </div>
                 <div className="mt-4 pixel-frame-amber bg-[#FFECC8] p-3 text-[18px] font-ms text-amber-900">
-                  Best pick: {best.L.label} with a {best.paybackRatio.toFixed(2)}× total pay-back.
+                  Best pick: {best.L.label} with the highest EPR of {pct(best.ear, 2)}.
                 </div>
               </div>
             )}
@@ -483,7 +506,7 @@ export default function BankBossChapter5() {
                             onClick={() => {
                               const last = log[log.length-1];
                               const answer = last.text.toLowerCase().includes("compound")
-                                ? `${selected.label}: Nominal APR, compounded ${selected.m || 1}× per year.`
+                                ? `${selected.label}: My nominal APR is ${pct(selected.rate || 0, 1)}, compounded ${selected.m || 1}× per year. The per‑${periodLabel(selected.m || 1)} rate is ${pct((selected.rate || 0) / (selected.m || 1), 3)}. Your EPR is (1 + ${pct((selected.rate || 0) / (selected.m || 1), 3)})^${selected.m || 1} − 1 = ${pct(toEAR({ kind: "APR", rate: selected.rate, m: selected.m }), 2)}. I make level payments of ${money(pmtFromPV(selected.rate || 0, selected.m || 1, selected.term, selected.principal))} each ${periodLabel(selected.m || 1)}.`
                                 : selected.inflStory;
                               setLog((L) => [...L, { who: selected.label, text: answer }]);
                             }}
