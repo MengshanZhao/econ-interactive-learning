@@ -662,9 +662,7 @@ export default function BankBossChapter5() {
                     {isPlayerSpeaking ? (
                       <>
                         {/* Player headshot on left */}
-                        <div className="relative w-[200px] h-[200px] shrink-0 m-3 -mt-8 bg-[#FFF4DF] pixel-inner-amber" style={{
-                          zIndex: 10
-                        }}>
+                        <div className="relative w-[200px] h-[200px] shrink-0 m-3 bg-[#FFF4DF] pixel-inner-amber">
                     <Image
                       src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
                       alt={selectedCharacter || "Player"}
@@ -731,9 +729,7 @@ export default function BankBossChapter5() {
                           </div>
                         </div>
                         {/* Animal headshot on right */}
-                        <div className="relative w-[200px] h-[200px] shrink-0 m-3 -mt-8 bg-[#FFF4DF] pixel-inner-amber" style={{
-                          zIndex: 10
-                        }}>
+                        <div className="relative w-[200px] h-[200px] shrink-0 m-3 bg-[#FFF4DF] pixel-inner-amber">
                           <Image 
                             src={selected.image} 
                             alt={selected.label} 
