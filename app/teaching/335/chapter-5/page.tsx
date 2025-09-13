@@ -119,12 +119,55 @@ const OPENERS_PLAIN = [
   storyBookshop,
 ];
 
-// ---------- Optional inflation flavor (still plain language; no numbers required) ----------
-const INFLATION_PLAIN = [
-  (n: string) => `${n}: Lately, supplies feel a bit pricier—nothing wild, just a nudge. I plan ahead so payments stay calm.`,
-  (n: string) => `${n}: Deliveries wander in late sometimes. I keep a small cushion so your envelopes arrive on time.`,
-  (n: string) => `${n}: The market has its moods. I budget with a steady hand and a clear head.`,
-];
+// =========================
+// INFLATION LINES — 6 variants, 2–4 sentences, with a random number −1.0%..5.0%
+// =========================
+const pct1 = (x: number) => `${x.toFixed(1)}%`;
+
+/** Picks −1.0 to 5.0, one decimal. */
+function randomInflationNumber() {
+  const v = rnd(-1, 5);
+  // clamp + round to one decimal
+  const clamped = Math.max(-1, Math.min(5, v));
+  return Math.round(clamped * 10) / 10;
+}
+
+/** Six plain-language templates. Returns { text, pi }. */
+function makeInflationLine(name: string) {
+  const pi = randomInflationNumber(); // −1.0 .. 5.0
+  const pistr = pct1(pi);
+
+  // Buckets for vibe (low/medium/high/negative)
+  const NEG = pi < 0;
+  const LOW = pi >= 0 && pi < 2;
+  const MID = pi >= 2 && pi < 3.5;
+  const HIGH = pi >= 3.5;
+
+  const variants: ((n: string) => string)[] = [
+    // 1) Low / calm
+    (n) => `${n}: Prices feel mostly calm this month, about ${pistr}. I plan my shopping list ahead and keep a small cushion. Your payment schedule stays steady.`,
+    // 2) Middle / gentle rise
+    (n) => `${n}: Things cost a touch more lately—around ${pistr}. I watch suppliers and order in batches when it helps. Your envelopes go out like clockwork.`,
+    // 3) High / watchful
+    (n) => `${n}: Prices have been jumpy, roughly ${pistr}. I set aside a buffer and adjust menus before I adjust promises. Your payments stay on time.`,
+    // 4) Negative / slight dip
+    (n) => `${n}: Funny week—some tags even dipped, about ${pistr}. I'll restock basics while they're friendly. Your plan doesn't change: tidy, regular payments.`,
+    // 5) Middle / supply hiccups
+    (n) => `${n}: Deliveries wander and costs inch up—call it ${pistr}. I keep extras of the boring stuff so surprises stay small. You'll see the same steady envelopes.`,
+    // 6) High / practical coping
+    (n) => `${n}: Shelves change stickers often, near ${pistr}. I swap to reliable suppliers and trim waste first, never your payback. We stay simple and on schedule.`,
+  ];
+
+  // Nudge selection toward a matching vibe
+  let poolIdxs: number[];
+  if (NEG) poolIdxs = [3];              // template 4 (index 3) mentions dip (works with negative)
+  else if (LOW) poolIdxs = [0, 4];      // low/middle calmish (indices 0, 4)
+  else if (MID) poolIdxs = [1, 4];      // middle (indices 1, 4)
+  else poolIdxs = [2, 5];               // high (indices 2, 5)
+
+  const pick = poolIdxs[Math.floor(Math.random() * poolIdxs.length)];
+  return { text: variants[pick](name), pi };
+}
 
 // ---------- Random story factory (call this on each game load) ----------
 function makeRandomPlainStory(name: string) {
@@ -191,19 +234,22 @@ function makeLender(i: number): Lender {
   // Use plain stories for both APR and LUMP offers
   let open: string;
   let inflStory: string;
+  let infl: number;
   
   if (kind === "LUMP") {
     open = storyLump(label, term, principal, lump!);
-    inflStory = choice(INFLATION_PLAIN)(label);
+    const inflData = makeInflationLine(label);
+    inflStory = inflData.text;
+    infl = inflData.pi / 100; // convert percentage to decimal
   } else {
     const storyData = makeRandomPlainStory(label);
     open = storyData.story;
-    inflStory = storyData.flavor;
     // Override the random principal with our calculated one for consistency
     principal = storyData.principal;
+    const inflData = makeInflationLine(label);
+    inflStory = inflData.text;
+    infl = inflData.pi / 100; // convert percentage to decimal
   }
-
-  const infl = rnd(0.00, 0.08, 3); // under 10% (still used for calculations)
 
   return { id: `L${i}_${Math.random().toString(36).slice(2,8)}`, label, image: animalData.image, term, kind, rate, m, lump, principal, infl, open, inflStory };
 }
@@ -211,66 +257,74 @@ function makeLender(i: number): Lender {
 function makeRound(): Round { return { lenders: Array.from({ length: 4 }, (_, i) => makeLender(i)) }; }
 
 // =========================
-// Soft sound system (Web Audio)
+// SOUNDS — gesture-unlocked Web Audio (works on Chrome/Safari/Firefox)
 // =========================
 
-/** Tiny typewriter blip — gentle, airy click */
-function useBlipSound(enabled: boolean) {
-  const ctxRef = useRef<AudioContext | null>(null);
+type Ctx = AudioContext | (AudioContext & { resume?: () => Promise<void> });
 
-  useEffect(() => {
-    if (!enabled) return;
-    if (!ctxRef.current) {
-      // @ts-ignore
-      ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    }
-  }, [enabled]);
-
-  const blip = () => {
-    if (!enabled) return;
-    const ctx = ctxRef.current; if (!ctx) return;
-
-    const noise = ctx.createBuffer(1, 256, ctx.sampleRate);
-    const data = noise.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.25;
-
-    const src = ctx.createBufferSource();
-    src.buffer = noise;
-
-    const bp = ctx.createBiquadFilter();
-    bp.type = "bandpass";
-    bp.frequency.value = 1600;
-    bp.Q.value = 4;
-
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0, ctx.currentTime);
-    g.gain.linearRampToValueAtTime(0.035, ctx.currentTime + 0.006);
-    g.gain.exponentialRampToValueAtTime(0.004, ctx.currentTime + 0.06);
-
-    src.connect(bp); bp.connect(g); g.connect(ctx.destination);
-    src.start();
-    src.stop(ctx.currentTime + 0.08);
-    src.onended = () => { src.disconnect(); bp.disconnect(); g.disconnect(); };
-  };
-
-  return blip;
+function makeCtx(): Ctx | null {
+  if (typeof window === "undefined") return null;
+  const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
+  return AC ? new AC() : null;
 }
 
-/** UI one-shots: click, select, reveal, success, thud — soft classroom-friendly */
-function useUISounds(enabled: boolean) {
-  const ctxRef = useRef<AudioContext | null>(null);
+/** Hook that returns UI sounds + a blip for the typewriter.
+ *  IMPORTANT: call `enable()` once from a user action (e.g., Start button)
+ *  or let the built-in unlock listeners do it automatically on first interaction.
+ */
+function useAudio(enabled: boolean = true) {
+  const ctxRef = useRef<Ctx | null>(null);
+  const [ready, setReady] = useState(false);
 
+  // Create context lazily
   useEffect(() => {
     if (!enabled) return;
-    if (!ctxRef.current) {
-      // @ts-ignore
-      ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    }
+    if (!ctxRef.current) ctxRef.current = makeCtx();
   }, [enabled]);
 
+  // One-time unlock on first user gesture
+  useEffect(() => {
+    if (!enabled) return;
+    const tryUnlock = async () => {
+      if (!ctxRef.current) ctxRef.current = makeCtx();
+      const ctx = ctxRef.current;
+      if (!ctx) return;
+      // Resume if suspended (autoplay policy)
+      // @ts-ignore
+      if (ctx.state === "suspended" && ctx.resume) await ctx.resume();
+      setReady(ctx.state === "running");
+      if (ctx.state === "running") {
+        window.removeEventListener("pointerdown", tryUnlock as any);
+        window.removeEventListener("keydown", tryUnlock as any);
+        window.removeEventListener("touchstart", tryUnlock as any);
+      }
+    };
+    window.addEventListener("pointerdown", tryUnlock as any, { once: true, passive: true });
+    window.addEventListener("keydown", tryUnlock as any, { once: true, passive: true });
+    window.addEventListener("touchstart", tryUnlock as any, { once: true, passive: true });
+    return () => {
+      window.removeEventListener("pointerdown", tryUnlock as any);
+      window.removeEventListener("keydown", tryUnlock as any);
+      window.removeEventListener("touchstart", tryUnlock as any);
+    };
+  }, [enabled]);
+
+  /** Manually enable from a button, e.g. onClick={() => enable()} */
+  const enable = async () => {
+    if (!enabled) return;
+    if (!ctxRef.current) ctxRef.current = makeCtx();
+    const ctx = ctxRef.current;
+    if (!ctx) return;
+    // @ts-ignore
+    if (ctx.state === "suspended" && ctx.resume) await ctx.resume();
+    setReady(ctx.state === "running");
+  };
+
+  // Core tone
   function tone(freq: number, dur = 0.12, type: OscillatorType = "sine", gainPeak = 0.04) {
     if (!enabled) return;
-    const ctx = ctxRef.current; if (!ctx) return;
+    const ctx = ctxRef.current;
+    if (!ctx || ctx.state !== "running") return;
     const o = ctx.createOscillator();
     const g = ctx.createGain();
     o.type = type;
@@ -284,21 +338,37 @@ function useUISounds(enabled: boolean) {
     o.onended = () => { o.disconnect(); g.disconnect(); };
   }
 
+  // Soft typewriter blip (noise through bandpass)
+  const blip = () => {
+    if (!enabled) return;
+    const ctx = ctxRef.current;
+    if (!ctx || ctx.state !== "running") return;
+    const noise = ctx.createBuffer(1, 256, ctx.sampleRate);
+    const data = noise.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.22;
+    const src = ctx.createBufferSource(); src.buffer = noise;
+    const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1600; bp.Q.value = 4;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.003, ctx.currentTime + 0.06);
+    src.connect(bp); bp.connect(g); g.connect(ctx.destination);
+    src.start();
+    src.stop(ctx.currentTime + 0.08);
+    src.onended = () => { src.disconnect(); bp.disconnect(); g.disconnect(); };
+  };
+
   const click  = () => tone(380, 0.08, "triangle", 0.03);
   const select = () => tone(520, 0.10, "triangle", 0.035);
   const reveal = () => { tone(420, 0.10, "sine", 0.03); setTimeout(()=>tone(640, 0.12, "sine", 0.03), 90); };
   const success = () => { tone(540, 0.10, "triangle", 0.035); setTimeout(()=>tone(760, 0.12, "triangle", 0.035), 100); };
   const thud   = () => tone(120, 0.12, "sawtooth", 0.025);
 
-  return { click, select, reveal, success, thud };
+  return { ready, enable, blip, click, select, reveal, success, thud };
 }
 
-/** Typewriter using the blip; pass blip from useBlipSound(true/false) */
-function Typewriter({
-  text,
-  speed = 18,
-  blip,
-}: { text: string; speed?: number; blip?: () => void }) {
+/** Example: Typewriter that uses the blip */
+function Typewriter({ text, speed = 18, blip }: { text: string; speed?: number; blip?: () => void }) {
   const [i, setI] = useState(0);
   useEffect(() => { setI(0); }, [text]);
   useEffect(() => {
@@ -375,8 +445,7 @@ export default function BankBossChapter5() {
   const [alertMsg, setAlertMsg] = useState<string | null>(null);      // simple modal
   const YOU = `${selectedCharacter || "You"}`;
   
-  const blip = useBlipSound(soundOn);
-  const sounds = useUISounds(soundOn);
+  const audio = useAudio(soundOn);
 
   const round = useMemo(() => {
     const prev = Math.random; let s = seed + 1;
@@ -416,7 +485,7 @@ export default function BankBossChapter5() {
   if (!gameStarted) {
     return (
       <StartScreen
-        onStart={() => setGameStarted(true)}
+        onStart={() => { audio.enable(); audio.click(); setGameStarted(true); }}
         onCharacterSelect={setSelectedCharacter}
         selectedCharacter={selectedCharacter}
       />
@@ -599,7 +668,7 @@ export default function BankBossChapter5() {
                     {log.length > 0 && (
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <Typewriter text={log[log.length-1].text} blip={blip} />
+                          <Typewriter text={log[log.length-1].text} blip={audio.blip} />
                         </div>
 
                         {/* Only show Next when YOU just asked */}
