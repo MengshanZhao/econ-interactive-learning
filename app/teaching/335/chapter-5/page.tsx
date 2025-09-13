@@ -145,10 +145,10 @@ function useBlipSound(enabled: boolean) {
     if (!enabled) return;
     const ctx = ctxRef.current; if (!ctx) return;
     const o = ctx.createOscillator(); const g = ctx.createGain();
-    o.type = "sine"; o.frequency.value = 220;
+    o.type = "sine"; o.frequency.value = 440;
     g.gain.setValueAtTime(0.0, ctx.currentTime);
-    g.gain.linearRampToValueAtTime(0.008, ctx.currentTime + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0008, ctx.currentTime + 0.08);
+    g.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
     o.connect(g); g.connect(ctx.destination);
     o.start();
     o.stop(ctx.currentTime + 0.09);
@@ -404,30 +404,52 @@ export default function BankBossChapter5() {
                     )}
                   </div>
                   {(!log.length || log[log.length-1].who !== "next") && (
-                    <div className="mt-3 flex flex-wrap gap-3 text-sm">
-                      <div className="rounded-xl bg-[#FFECC8] p-4 space-y-3 w-full">
-                        {selected.kind === "APR" && (
+                    <div className="mt-3 space-y-3 text-lg">
+                      {selected.kind === "APR" && (
+                        <div className="flex items-center gap-4">
+                          <div className="w-32 h-32 flex-shrink-0">
+                            <Image
+                              src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
+                              alt={selectedCharacter || "Player"}
+                              width={128}
+                              height={128}
+                              className="object-contain"
+                            />
+                          </div>
                           <button 
                             onClick={() => setLog((L)=>[
                               ...L, 
                               { who: YOU, text: `${YOU}: What's your compounding schedule?` },
                               { who: "next", text: "Next" }
                             ])} 
-                            className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
+                            className="flex-1 text-left px-6 py-4 rounded-lg bg-[#FFECC8] hover:bg-[#FFF8EA] transition-colors"
                           >
-                            Ask about interest rate compounding
+                            What's your compounding schedule?
                           </button>
-                        )}
+                          <div className="w-32 flex-shrink-0"></div>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-4">
+                        <div className="w-32 h-32 flex-shrink-0">
+                          <Image
+                            src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
+                            alt={selectedCharacter || "Player"}
+                            width={128}
+                            height={128}
+                            className="object-contain"
+                          />
+                        </div>
                         <button 
                           onClick={() => setLog((L)=>[
                             ...L, 
                             { who: YOU, text: `${YOU}: What is the inflation?` },
                             { who: "next", text: "Next" }
                           ])} 
-                          className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
+                          className="flex-1 text-left px-6 py-4 rounded-lg bg-[#FFECC8] hover:bg-[#FFF8EA] transition-colors"
                         >
-                          Ask about local inflation
+                          What is the inflation?
                         </button>
+                        <div className="w-32 flex-shrink-0"></div>
                       </div>
                     </div>
                   )}
