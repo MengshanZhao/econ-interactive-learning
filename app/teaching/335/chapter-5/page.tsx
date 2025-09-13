@@ -120,53 +120,42 @@ const OPENERS_PLAIN = [
 ];
 
 // =========================
-// INFLATION LINES — 6 variants, 2–4 sentences, with a random number −1.0%..5.0%
+// Cute Animal Kingdom Inflation Lines
 // =========================
 const pct1 = (x: number) => `${x.toFixed(1)}%`;
 
-/** Picks −1.0 to 5.0, one decimal. */
 function randomInflationNumber() {
   const v = rnd(-1, 5);
-  // clamp + round to one decimal
-  const clamped = Math.max(-1, Math.min(5, v));
-  return Math.round(clamped * 10) / 10;
+  return Math.round(v * 10) / 10; // one decimal
 }
 
-/** Six plain-language templates. Returns { text, pi }. */
+/** Six themed inflation stories (2–4 sentences). */
 function makeInflationLine(name: string) {
-  const pi = randomInflationNumber(); // −1.0 .. 5.0
+  const pi = randomInflationNumber();
   const pistr = pct1(pi);
 
-  // Buckets for vibe (low/medium/high/negative)
-  const NEG = pi < 0;
-  const LOW = pi >= 0 && pi < 2;
-  const MID = pi >= 2 && pi < 3.5;
-  const HIGH = pi >= 3.5;
-
   const variants: ((n: string) => string)[] = [
-    // 1) Low / calm
-    (n) => `${n}: Prices feel mostly calm this month, about ${pistr}. I plan my shopping list ahead and keep a small cushion. Your payment schedule stays steady.`,
-    // 2) Middle / gentle rise
-    (n) => `${n}: Things cost a touch more lately—around ${pistr}. I watch suppliers and order in batches when it helps. Your envelopes go out like clockwork.`,
-    // 3) High / watchful
-    (n) => `${n}: Prices have been jumpy, roughly ${pistr}. I set aside a buffer and adjust menus before I adjust promises. Your payments stay on time.`,
-    // 4) Negative / slight dip
-    (n) => `${n}: Funny week—some tags even dipped, about ${pistr}. I'll restock basics while they're friendly. Your plan doesn't change: tidy, regular payments.`,
-    // 5) Middle / supply hiccups
-    (n) => `${n}: Deliveries wander and costs inch up—call it ${pistr}. I keep extras of the boring stuff so surprises stay small. You'll see the same steady envelopes.`,
-    // 6) High / practical coping
-    (n) => `${n}: Shelves change stickers often, near ${pistr}. I swap to reliable suppliers and trim waste first, never your payback. We stay simple and on schedule.`,
+    // 1. Recession / low inflation
+    (n) => `${n}: The new iron factory upstream pours smoke, the river fish drift belly-up, and markets look sad. Shops whisper of a slowdown, so inflation drifts low, around ${pistr}. I budget tight and keep your coins safe in a dry jar.`,
+
+    // 2. Calm / small rise
+    (n) => `${n}: Squirrels store extra nuts, owls hoot about steady harvests. Prices nibble upward just a bit, near ${pistr}. It feels calm; I save a handful of grain so your payments stay smooth.`,
+
+    // 3. Middle / playful
+    (n) => `${n}: Foxes opened a sweet stand and everyone queues for candy. Treats make coins jingle faster, so inflation prances around ${pistr}. I keep my purse knotted; your envelopes arrive tidy and on time.`,
+
+    // 4. High / stormy
+    (n) => `${n}: Storms drowned the carrot fields and rabbits must buy turnips instead. Food feels dearer, roughly ${pistr}. I stretch recipes and cut frills before I ever touch your repayment.`,
+
+    // 5. Supply hiccups / mixed
+    (n) => `${n}: The beavers' dam broke, barges stalled, and grain sacks sulked on the shore. Prices wander upward, about ${pistr}. I keep extra flour tucked away so your payback doesn't wander too.`,
+
+    // 6. Negative / cheerful dip
+    (n) => `${n}: A bumper berry crop makes baskets overflow. Stalls lower their chalk marks, even dipping to ${pistr}. I refill the pantry while it's cheap and keep your payments cheerful and exact.`,
   ];
 
-  // Nudge selection toward a matching vibe
-  let poolIdxs: number[];
-  if (NEG) poolIdxs = [3];              // template 4 (index 3) mentions dip (works with negative)
-  else if (LOW) poolIdxs = [0, 4];      // low/middle calmish (indices 0, 4)
-  else if (MID) poolIdxs = [1, 4];      // middle (indices 1, 4)
-  else poolIdxs = [2, 5];               // high (indices 2, 5)
-
-  const pick = poolIdxs[Math.floor(Math.random() * poolIdxs.length)];
-  return { text: variants[pick](name), pi };
+  const pick = variants[Math.floor(Math.random() * variants.length)];
+  return { text: pick(name), pi };
 }
 
 // ---------- Random story factory (call this on each game load) ----------
@@ -176,8 +165,8 @@ function makeRandomPlainStory(name: string) {
   const principal = Math.round(rnd(50_000, 250_000) / 1000) * 1000; // rounded to $1,000
   const opener = choice(OPENERS_PLAIN);
   const story = opener(name, tYears, principal);
-  const flavor = choice(INFLATION_PLAIN)(name);
-  return { story, principal, termYears: tYears, flavor }; // use flavor after a "What's the price scene like?" question
+  const inflationData = makeInflationLine(name);
+  return { story, principal, termYears: tYears, flavor: inflationData.text, inflationRate: inflationData.pi }; // use flavor after a "What's the price scene like?" question
 }
 
 // ---------- Types ----------
@@ -246,9 +235,8 @@ function makeLender(i: number): Lender {
     open = storyData.story;
     // Override the random principal with our calculated one for consistency
     principal = storyData.principal;
-    const inflData = makeInflationLine(label);
-    inflStory = inflData.text;
-    infl = inflData.pi / 100; // convert percentage to decimal
+    inflStory = storyData.flavor;
+    infl = storyData.inflationRate / 100; // convert percentage to decimal
   }
 
   return { id: `L${i}_${Math.random().toString(36).slice(2,8)}`, label, image: animalData.image, term, kind, rate, m, lump, principal, infl, open, inflStory };
