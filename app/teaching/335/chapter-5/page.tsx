@@ -239,7 +239,7 @@ export default function BankBossChapter5() {
   const [acceptedId, setAcceptedId] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [log, setLog] = useState<Array<{ who: string; text: string }>>([]);
-  const [soundOn, setSoundOn] = useState(true);
+  const [soundOn, setSoundOn] = useState(false);
   const YOU = `${selectedCharacter || "You"}`;
 
   const round = useMemo(() => {
@@ -333,7 +333,7 @@ export default function BankBossChapter5() {
               <div className="text-sm text-amber-900">Talk to lenders, then tap <strong>Reveal</strong> to compare. <strong>Repeat</strong> gets new offers.</div>
               <button onClick={() => setRevealed(true)} disabled={!acceptedId} className="ml-auto rounded-xl bg-amber-600 px-4 py-2 text-white shadow hover:bg-amber-700 disabled:opacity-40">Reveal</button>
               <button onClick={reset} className="rounded-xl bg-amber-700 px-3 py-2 text-white shadow hover:bg-amber-800">Repeat</button>
-              <button onClick={() => setSoundOn(s=>!s)} className="rounded-xl border border-amber-300 px-3 py-2 text-sm text-amber-800">{soundOn?"🔊 Soft blip":"🔇 Silent"}</button>
+              <button onClick={() => setSoundOn(s=>!s)} className="rounded-xl border border-amber-300 px-3 py-2 text-sm text-amber-800">{soundOn?"Sound on":"Sound off"}</button>
             </div>
           ) : (
             <div>
@@ -364,57 +364,85 @@ export default function BankBossChapter5() {
           <motion.div key={selected.id} initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-6xl p-4">
             <div className="relative rounded-3xl border-4 border-amber-700 bg-[#FFF4DF] p-6 text-amber-900 shadow-2xl">
               <div className="absolute -top-5 left-1/2 -translate-x-1/2 rounded-md border-2 border-amber-700 bg-[#FFECC8] px-4 py-1 text-sm font-black tracking-wide text-amber-900">{selected.label}</div>
-              <div className="relative flex items-start gap-5">
-                {/* Player Portrait on left when player speaks; animal on right when animal speaks */}
-                <div className="hidden md:block">
-                  {/* Left portrait appears only when latest line is the player */}
+              <div className="flex items-center gap-4">
+                {/* Left portrait (your character when asking, empty when animal answers) */}
+                <div className="w-32 h-32 flex-shrink-0">
                   {log.length > 0 && log[log.length-1].who === YOU && (
-                    <Portrait selectedCharacter={selectedCharacter} side="left" />
+                    <Image
+                      src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
+                      alt={selectedCharacter || "Player"}
+                      width={128}
+                      height={128}
+                      className="object-contain"
+                    />
                   )}
                 </div>
 
                 {/* Dialogue Text */}
-                <div className="flex-1 text-lg leading-8">
-                  {log.length > 0 && <Typewriter text={log[log.length-1].text} sound={soundOn} />}
-                  <div className="mt-3 flex flex-wrap gap-3 text-sm">
-                    <div className="rounded-xl bg-[#FFECC8] p-4 space-y-3">
-                      {selected.kind === "APR" && (
+                <div className="flex-1 min-h-[8rem] flex flex-col justify-between">
+                  <div className="text-lg">
+                    {log.length > 0 && (
+                      <>
+                        <Typewriter text={log[log.length-1].text} sound={soundOn} />
+                        {log[log.length-1].who === "next" && (
+                          <div className="mt-4">
+                            <button
+                              onClick={() => setLog((L) => [
+                                ...L.slice(0, -1),
+                                { who: selected.label, text: L[L.length-2].text.includes("compounding") 
+                                  ? `${selected.label}: Nominal APR, compounded ${selected.m}× per year.`
+                                  : selected.inflStory
+                                }
+                              ])}
+                              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+                            >
+                              Next →
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                  {(!log.length || log[log.length-1].who !== "next") && (
+                    <div className="mt-3 flex flex-wrap gap-3 text-sm">
+                      <div className="rounded-xl bg-[#FFECC8] p-4 space-y-3 w-full">
+                        {selected.kind === "APR" && (
+                          <button 
+                            onClick={() => setLog((L)=>[
+                              ...L, 
+                              { who: YOU, text: `${YOU}: What's your compounding schedule?` },
+                              { who: "next", text: "Next" }
+                            ])} 
+                            className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
+                          >
+                            Ask about interest rate compounding
+                          </button>
+                        )}
                         <button 
                           onClick={() => setLog((L)=>[
                             ...L, 
-                            { who: YOU, text: `${YOU}: What's your compounding schedule?` },
-                            { who: selected.label, text: `${selected.label}: Nominal APR, compounded ${selected.m}× per year.` }
+                            { who: YOU, text: `${YOU}: What is the inflation?` },
+                            { who: "next", text: "Next" }
                           ])} 
                           className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
                         >
-                          Ask about interest rate compounding
+                          Ask about local inflation
                         </button>
-                      )}
-                      <button 
-                        onClick={() => setLog((L)=>[
-                          ...L, 
-                          { who: YOU, text: `${YOU}: What's the inflation outlook in your region?` },
-                          { who: selected.label, text: selected.inflStory }
-                        ])} 
-                        className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
-                      >
-                        Ask about local inflation
-                      </button>
-                      <button 
-                        onClick={() => setAcceptedId(selected.id)} 
-                        disabled={!!acceptedId} 
-                        className="w-full text-center px-4 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-40 transition-colors"
-                      >
-                        Accept this offer
-                      </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
-                
-                {/* Right portrait appears when the latest line is the animal */}
-                <div className="hidden md:block">
-                  {log.length > 0 && log[log.length-1].who !== YOU && (
-                    <Portrait imageSrc={selected.image} alt={selected.label} side="right" />
+
+                {/* Right portrait (animal when answering, empty when you're asking) */}
+                <div className="w-32 h-32 flex-shrink-0">
+                  {log.length > 0 && log[log.length-1].who !== YOU && log[log.length-1].who !== "next" && (
+                    <Image
+                      src={selected.image}
+                      alt={selected.label}
+                      width={128}
+                      height={128}
+                      className="object-contain"
+                    />
                   )}
                 </div>
               </div>
