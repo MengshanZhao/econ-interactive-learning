@@ -167,3 +167,37 @@
   stroke-dasharray: 10, 10;
   animation: dash 30s linear infinite;
 }
+
+/* Fonts */
+.font-vt323 { font-family: "VT323", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+.font-ms { font-family: "MedievalSharp", "Palatino Linotype", "Book Antiqua", Palatino, serif; }
+
+/* Ornate AMBER frame with square corners (matches your warm theme) */
+.pixel-frame-amber {
+  position: relative;
+  border: 3px solid #d1a86a;                  /* gold-ish */
+  box-shadow:
+    0 0 0 2px #FFF8EA inset,                  /* inner light trim */
+    0 0 0 4px #d1a86a inset;                  /* gold inner trim */
+  border-radius: 2px;                          /* square vibe */
+}
+.pixel-inner-amber {
+  position: relative;
+  border: 2px solid #d1a86a;
+  box-shadow:
+    0 0 0 2px #FFF4DF inset,
+    0 0 0 4px #d1a86a inset;
+  border-radius: 2px;
+}
+
+/* Pixel-ish buttons in amber palette */
+.pixel-btn-amber {
+  border-radius: 2px;
+  padding: 0.45rem 0.75rem;
+  font-size: 18px;
+  background: #FFF4DF;
+  color: #8b5e22;
+  border: 1px solid #d1a86a;
+  transition: filter .15s ease, background .15s ease;
+}
+.pixel-btn-amber:hover { filter: brightness(1.05); }
