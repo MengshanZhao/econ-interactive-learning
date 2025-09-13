@@ -16,14 +16,21 @@ import Image from "next/image";
  * - Reveal is blocked until you’ve talked to ALL borrowers at least once.
  */
 
-// ---------- Utility ----------
+// =========================
+// Plain-language stories + soft sounds
+// Randomized each time the game opens.
+// (No APR/EAR anywhere; no calculations shown.)
+// =========================
+
+// ---------- Small helpers ----------
+function money(n: number) { return `$${Math.round(n).toLocaleString()}`; }
 function rnd(min: number, max: number, dp = 0) {
   const v = Math.random() * (max - min) + min;
   const f = 10 ** dp;
   return Math.round(v * f) / f;
 }
+const choice = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 const pct = (x: number, dp = 1) => `${(x * 100).toFixed(dp)}%`;
-function money(n: number) { return `$${Math.round(n).toLocaleString()}`; }
 
 function toEAR(opts: { kind: "APR" | "EAR" | "LUMP"; rate?: number; m?: number; years?: number; lump?: number }) {
   if (opts.kind === "EAR") return opts.rate || 0;
@@ -63,47 +70,72 @@ const PLAYER_IMAGES = [
   { name: "Pirate", image: "/images/pirate.png" }
 ];
 
-// ---------- ~100-word borrower stories ----------
-function storyBakery(n: string, t: number, r: string, P: number) {
-  return `${n}: I’m fixing up a little bakery by the old square and I’m asking to borrow ${money(P)} from you to finish the oven and counters. I bake early, keep it warm, and sell out by sunset on market days. I’ll keep simple books and send you tidy updates. If you hold the note for ${t} years, it works out to about ${r} a year on your side. I want this to be friendly and clear: I’ll show schedules, you’ll see cash. Bread cools fast, promises shouldn’t—let’s keep both warm and honest.`;
+// ---------- ~100-word, plain/cute borrower stories (no APR/EAR, no math shown) ----------
+function storyBakery(name: string, tYears: number, P: number) {
+  return `${name}: I'm fixing up a tiny bakery near the old square. The room smells like warm butter even before sunrise. With ${money(P)}, I'll repair the oven, paint the shelves cream, and hang a hand-lettered sign. Mornings, I'll bake simple loaves and cinnamon knots; afternoons, I'll box leftovers for neighbors. I keep a small notebook with dates, sales, and a list of repairs. I'll send you a short note each month so you know how it's going. I can repay a little at a time, steady and polite, for ${tYears} years. If you ever visit, your bread is on the house.`;
 }
-function storyTea(n: string, t: number, r: string, P: number) {
-  return `${n}: I’d like to borrow ${money(P)} to open a small tea house by the river path—timber, braziers, reed mats, the cozy bits. Travelers relax after steam, then they buy snacks. My cousins pour, I count. If you keep the loan for ${t} years, your return is about ${r} annually. I keep a repair jar and a careful ledger. No fancy talk, just steady coins and clean tables. If you like punctual pay-backs and easy books, pour with me.`;
-}
-function storyBoat(n: string, t: number, r: string, P: number) {
-  return `${n}: I’m asking to borrow ${money(P)} to rig a sturdy ferry boat for grain and stone. When storms muddy the road, the lake is the shortcut. I plan to repay you at about ${r} a year over ${t} years if weather behaves. My crew ties knots like poems and docks early. You lend steady; I pay steady—plus I’ll save you a seat at sunset when the moon looks like a silver coin.`;
-}
-function storyVine(n: string, t: number, r: string, P: number) {
-  return `${n}: The vines outside the wall are heavy this season. I need ${money(P)} to buy barrels, a hand press, and one well-mannered mule. Wine takes patience, so I’ll plan calm cash flows. Over ${t} years it evens to about ${r} for you. My labels won’t brag and my numbers won’t wobble. If you prefer quiet curves and straight sums, lend to me and I’ll repay on time, corked tight and counted twice.`;
-}
-function storySchool(n: string, t: number, r: string, P: number) {
-  return `${n}: With ${money(P)} I can rent a sunny room, buy chalk and slates, and start a small after-school class. I’ll post attendance and keep neat notes so you always know where your coins go. If you hold for ${t} years, expect around ${r} yearly. Curiosity is our collateral, but I still carry a lockbox and a ledger. I’ll repay you first, then buy more chalk.`;
-}
-function storyWorkshop(n: string, t: number, r: string, P: number) {
-  return `${n}: Doors stick, lamps flicker, wheels wobble—my fix-it workshop will keep the town’s patience alive. I’m asking to borrow ${money(P)} for tools and parts. Over ${t} years you’d earn about ${r} if nails stay fairly priced and we stay busy. I like boring miracles: hinges that hush, scales that tell the truth, and payments that arrive before you wonder.`;
-}
-function storyAPR(n: string, t: number, apr: number, P: number, m: number) {
-  const periodName = periodLabel(m);
-  const pmt = pmtFromPV(apr, m, t, P);
-  return `${n}: I'd like to borrow ${money(P)} from you. My quote is a nominal APR of ${pct(apr,1)} for ${t} years with ${periodName}ly payments of ${money(pmt)}. Ask me about compounding to see how that APR turns into an effective annual rate (EPR). The per‑${periodName} rate is APR/${m}, and EPR = (1 + APR/${m})^${m} − 1.`;
-}
-function storyLump(n: string, t: number, _r: string, P: number, k: number) {
-  const repay = Math.round(P * k);
-  return `${n}: I like simple promises. I borrow ${money(P)} from you today and in ${t} years I repay ${money(repay)} in one clean payment. No coupons or fiddly bits between. If you want the compounding math, we can write it down, but the headline is clear: you get back ${money(repay)} at maturity. Simple to remember, simple to check.`;
-}
-function storyMill(n: string, t: number, r: string, P: number) {
-  return `${n}: The mill by the falls can hum again if I shore up the beams. I’m asking for ${money(P)} to buy belts, braces, and paint the color of confidence. Over ${t} years your return runs about ${r}, assuming harvests behave. The baker, the brewer, and I all like reliable circles: millstones, seasons, and coins returning on time.`;
-}
-const OPENERS_NON_LUMP = [storyBakery, storyTea, storyBoat, storyVine, storySchool, storyWorkshop, storyMill];
 
-// 🔧 RESTORED: Inflation story snippets
-const INFLATION_STORIES = [
-  (n: string, pi: number) => `${n}: Fish thin our nets and the cannery eats dawn’s catch; smoke follows the river. Prices for oil and salt rise together—call it ${pct(pi,1)} a year until rains learn manners again.`,
-  (n: string, pi: number) => `${n}: Caravans are late, grain sulks in the fields, and gossip prices itself in fear. I pencil ${pct(pi,1)} inflation because scarcity likes drama.`,
-  (n: string, pi: number) => `${n}: The prefect subsidizes rice and salt to win festivals, so pantries smile. Even so, I budget ${pct(pi,1)}; kindness is not a policy forever.`,
-  (n: string, pi: number) => `${n}: Miners flood markets with cheap metal; coins jingle louder but buy less bread. My ledgers whisper ${pct(pi,1)} and I listen.`,
-  (n: string, pi: number) => `${n}: Fisherfolk teach me the current by what vanishes. When gulls argue over bare water, I assume ${pct(pi,1)} and plan tight.`,
+function storyTea(name: string, tYears: number, P: number) {
+  return `${name}: I want to open a cozy tea corner by the river path. The plan is simple: woven mats, low stools, a shelf of jars that click when opened. With ${money(P)}, I'll buy kettles, cups, and a small sign shaped like a teapot. Travelers stop, breathe, and talk; I listen and keep careful notes. I'll repay you gently over ${tYears} years, the same way steam rises—quiet and regular. On market days I'll add sweet buns and lemon slices. If storms come, I'll close early and wipe everything dry. You'll always know how we're doing, because I'll write you every month.`;
+}
+
+function storyFerry(name: string, tYears: number, P: number) {
+  return `${name}: I'm outfitting a sturdy little ferry for the lake. When the road gets muddy, boats keep life moving. With ${money(P)}, I'll patch the planks, oil the lines, and paint the hull a cheerful blue. My cousin knows the weather; I trust his nose for wind. We'll carry grain in the morning and folks at dusk. I track trips with pencil marks on a board—nothing fancy, always honest. I'll repay you bit by bit over ${tYears} years. If the waves grow bossy, we wait, then try again. You'll get updates that read like the lake: clear, calm, and steady.`;
+}
+
+function storyVines(name: string, tYears: number, P: number) {
+  return `${name}: The vines outside the walls had a kind spring—lots of shy little grapes. With ${money(P)}, I'll buy a hand press, a few barrels, and a mule with good manners. The work is slow and kind: wash, press, wait, taste, label. I keep my ledger clean and my cellar cooler than a secret. I'll repay you on a simple rhythm for ${tYears} years: small payments, on time, no surprises. If a barrel misbehaves, I'll fix it before I brag. You'll get short letters with smudges of purple and news about harvest days. When the corks pop, you're invited first.`;
+}
+
+function storySchool(name: string, tYears: number, P: number) {
+  return `${name}: I'm renting a sunny room to run an after-school class. With ${money(P)}, I'll buy chalk, slates, storybooks, and a sturdy clock that actually ticks. We'll practice sums, read short adventures, and celebrate tiny wins with stickers. I keep attendance on a board and tuck the coins into a tin with a polite rattle. I'll repay you slowly and surely across ${tYears} years. Each month you'll get a friendly note—what we learned, which shelf wobbled, and when I fixed it. The goal is simple: keep the lights warm, the pencils sharp, and the promises even sharper.`;
+}
+
+function storyWorkshop(name: string, tYears: number, P: number) {
+  return `${name}: I'm opening a little fix-it workshop where fussy things become patient again. Hinges that squeak, lamps that blink, scales that lie—bring them in. With ${money(P)}, I'll stock screws, wires, glue that smells like school, and a pegboard that makes me look organized. I write neat tickets and return parts I don't use. I'll repay you in steady, regular pieces for ${tYears} years. On slow days, I sweep; on busy days, I whistle. If a job takes two tries, I own it and finish it right. You'll get monthly updates, short and clear, with a smudge of honest grease.`;
+}
+
+function storyMill(name: string, tYears: number, P: number) {
+  return `${name}: The mill by the falls can hum again if I shore up the beams and calm the gears. With ${money(P)}, I'll buy belts, wedges, and paint the color of fresh oats. Farmers like early starts; I'll meet them with a thermos and a smile. The work is loud but friendly; the ledger is quiet and square. I'll repay you over ${tYears} years, same amount each time, the way wheels turn—round and reliable. When the river runs high, we pause and sip tea; when it settles, we grind and grin. I'll send you simple notes that smell faintly of flour.`;
+}
+
+function storyBookshop(name: string, tYears: number, P: number) {
+  return `${name}: I'm starting a tiny bookshop with a bell that rings like a giggle. With ${money(P)}, I'll buy shelves, a plant that forgives me, and stories that fit into pockets. Kids will trade jokes for bookmarks; grownups will trade quiet for a chair. I stamp dates with confident thumps and keep a jar for lost buttons. I'll repay you evenly for ${tYears} years—nothing tricky, just tidy envelopes. If a rainy day slows us, I'll host read-alouds and cocoa. You'll get monthly postcards with doodles in the margins and a line about what made someone smile that week.`;
+}
+
+function storyLump(name: string, tYears: number, P: number, k: number) {
+  const repay = Math.round(P * k);
+  return `${name}: I like simple promises. I borrow ${money(P)} from you today and in ${tYears} years I repay ${money(repay)} in one clean payment. No coupons or fiddly bits between. If you want the compounding math, we can write it down, but the headline is clear: you get back ${money(repay)} at maturity. Simple to remember, simple to check.`;
+}
+
+const OPENERS_PLAIN = [
+  storyBakery,
+  storyTea,
+  storyFerry,
+  storyVines,
+  storySchool,
+  storyWorkshop,
+  storyMill,
+  storyBookshop,
 ];
+
+// ---------- Optional inflation flavor (still plain language; no numbers required) ----------
+const INFLATION_PLAIN = [
+  (n: string) => `${n}: Lately, supplies feel a bit pricier—nothing wild, just a nudge. I plan ahead so payments stay calm.`,
+  (n: string) => `${n}: Deliveries wander in late sometimes. I keep a small cushion so your envelopes arrive on time.`,
+  (n: string) => `${n}: The market has its moods. I budget with a steady hand and a clear head.`,
+];
+
+// ---------- Random story factory (call this on each game load) ----------
+function makeRandomPlainStory(name: string) {
+  const tYears = 2; // all loans last 2 years in this chapter
+  // fresh principal each time you open the game
+  const principal = Math.round(rnd(50_000, 250_000) / 1000) * 1000; // rounded to $1,000
+  const opener = choice(OPENERS_PLAIN);
+  const story = opener(name, tYears, principal);
+  const flavor = choice(INFLATION_PLAIN)(name);
+  return { story, principal, termYears: tYears, flavor }; // use flavor after a "What's the price scene like?" question
+}
 
 // ---------- Types ----------
 interface Lender {
@@ -156,71 +188,125 @@ function makeLender(i: number): Lender {
   const ear = toEAR({ kind, rate, m, years: term, lump });
   const rStr = pct(Math.min(ear, 0.15), 1);
 
-  // Use LUMP story for LUMP; APR gets an APR-focused story inviting compounding discussion
+  // Use plain stories for both APR and LUMP offers
   let open: string;
+  let inflStory: string;
+  
   if (kind === "LUMP") {
-    open = storyLump(label, term, rStr, principal, lump!);
+    open = storyLump(label, term, principal, lump!);
+    inflStory = choice(INFLATION_PLAIN)(label);
   } else {
-    open = storyAPR(label, term, rate!, principal, m!);
+    const storyData = makeRandomPlainStory(label);
+    open = storyData.story;
+    inflStory = storyData.flavor;
+    // Override the random principal with our calculated one for consistency
+    principal = storyData.principal;
   }
 
-  const infl = rnd(0.00, 0.08, 3); // under 10%
-  const inflStory = INFLATION_STORIES[Math.floor(Math.random() * INFLATION_STORIES.length)](label, infl);
+  const infl = rnd(0.00, 0.08, 3); // under 10% (still used for calculations)
 
   return { id: `L${i}_${Math.random().toString(36).slice(2,8)}`, label, image: animalData.image, term, kind, rate, m, lump, principal, infl, open, inflStory };
 }
 
 function makeRound(): Round { return { lenders: Array.from({ length: 4 }, (_, i) => makeLender(i)) }; }
 
-// ---------- Typewriter with soft key-click ----------
+// =========================
+// Soft sound system (Web Audio)
+// =========================
+
+/** Tiny typewriter blip — gentle, airy click */
 function useBlipSound(enabled: boolean) {
   const ctxRef = useRef<AudioContext | null>(null);
+
   useEffect(() => {
     if (!enabled) return;
-    if (!ctxRef.current) ctxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    if (!ctxRef.current) {
+      // @ts-ignore
+      ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
   }, [enabled]);
 
   const blip = () => {
     if (!enabled) return;
     const ctx = ctxRef.current; if (!ctx) return;
 
-    // Short noise burst through bandpass -> gentle key click
-    const bufferSize = 256;
-    const noise = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const noise = ctx.createBuffer(1, 256, ctx.sampleRate);
     const data = noise.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.25;
 
     const src = ctx.createBufferSource();
     src.buffer = noise;
 
     const bp = ctx.createBiquadFilter();
     bp.type = "bandpass";
-    bp.frequency.value = 1800;
-    bp.Q.value = 3;
+    bp.frequency.value = 1600;
+    bp.Q.value = 4;
 
     const g = ctx.createGain();
-    g.gain.setValueAtTime(0.0, ctx.currentTime);
-    g.gain.linearRampToValueAtTime(0.02, ctx.currentTime + 0.005);
-    g.gain.exponentialRampToValueAtTime(0.003, ctx.currentTime + 0.05);
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.035, ctx.currentTime + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.004, ctx.currentTime + 0.06);
 
     src.connect(bp); bp.connect(g); g.connect(ctx.destination);
     src.start();
-    src.stop(ctx.currentTime + 0.06);
+    src.stop(ctx.currentTime + 0.08);
     src.onended = () => { src.disconnect(); bp.disconnect(); g.disconnect(); };
   };
+
   return blip;
 }
 
-function Typewriter({ text, speed=18, sound=true }: { text: string; speed?: number; sound?: boolean }) {
+/** UI one-shots: click, select, reveal, success, thud — soft classroom-friendly */
+function useUISounds(enabled: boolean) {
+  const ctxRef = useRef<AudioContext | null>(null);
+
+  useEffect(() => {
+    if (!enabled) return;
+    if (!ctxRef.current) {
+      // @ts-ignore
+      ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  }, [enabled]);
+
+  function tone(freq: number, dur = 0.12, type: OscillatorType = "sine", gainPeak = 0.04) {
+    if (!enabled) return;
+    const ctx = ctxRef.current; if (!ctx) return;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, ctx.currentTime);
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(gainPeak, ctx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + dur + 0.02);
+    o.onended = () => { o.disconnect(); g.disconnect(); };
+  }
+
+  const click  = () => tone(380, 0.08, "triangle", 0.03);
+  const select = () => tone(520, 0.10, "triangle", 0.035);
+  const reveal = () => { tone(420, 0.10, "sine", 0.03); setTimeout(()=>tone(640, 0.12, "sine", 0.03), 90); };
+  const success = () => { tone(540, 0.10, "triangle", 0.035); setTimeout(()=>tone(760, 0.12, "triangle", 0.035), 100); };
+  const thud   = () => tone(120, 0.12, "sawtooth", 0.025);
+
+  return { click, select, reveal, success, thud };
+}
+
+/** Typewriter using the blip; pass blip from useBlipSound(true/false) */
+function Typewriter({
+  text,
+  speed = 18,
+  blip,
+}: { text: string; speed?: number; blip?: () => void }) {
   const [i, setI] = useState(0);
-  const blip = useBlipSound(sound);
   useEffect(() => { setI(0); }, [text]);
   useEffect(() => {
     if (i >= text.length) return;
-    const id = setTimeout(() => { const step = 1; setI(i + step); if ((i % 3) === 0) blip(); }, speed);
+    const id = setTimeout(() => { setI(i + 1); if (blip && (i % 3 === 0)) blip(); }, speed);
     return () => clearTimeout(id);
-  }, [i, text, speed]);
-  return <div>{text.slice(0, i)}</div>;
+  }, [i, text, speed, blip]);
+  return <span>{text.slice(0, i)}</span>;
 }
 
 // ---------- Start Screen ----------
@@ -288,6 +374,9 @@ export default function BankBossChapter5() {
   const [talkedIds, setTalkedIds] = useState<Set<string>>(new Set()); // track conversations
   const [alertMsg, setAlertMsg] = useState<string | null>(null);      // simple modal
   const YOU = `${selectedCharacter || "You"}`;
+  
+  const blip = useBlipSound(soundOn);
+  const sounds = useUISounds(soundOn);
 
   const round = useMemo(() => {
     const prev = Math.random; let s = seed + 1;
@@ -510,7 +599,7 @@ export default function BankBossChapter5() {
                     {log.length > 0 && (
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <Typewriter text={log[log.length-1].text} sound={soundOn} />
+                          <Typewriter text={log[log.length-1].text} blip={blip} />
                         </div>
 
                         {/* Only show Next when YOU just asked */}
