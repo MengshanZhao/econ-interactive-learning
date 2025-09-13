@@ -381,27 +381,27 @@ export default function BankBossChapter5() {
                 {/* Dialogue Text */}
                 <div className="flex-1 min-h-[8rem] flex flex-col justify-between">
                   <div className="text-lg">
-                    {log.length > 0 && (
-                      <>
+                  {log.length > 0 && (
+                    <>
+                      <div className="flex justify-between items-center">
                         <Typewriter text={log[log.length-1].text} sound={soundOn} />
-                        {log[log.length-1].who === "next" && (
-                          <div className="mt-4">
-                            <button
-                              onClick={() => setLog((L) => [
-                                ...L.slice(0, -1),
-                                { who: selected.label, text: L[L.length-2].text.includes("compounding") 
-                                  ? `${selected.label}: Nominal APR, compounded ${selected.m}× per year.`
-                                  : selected.inflStory
-                                }
-                              ])}
-                              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-                            >
-                              Next →
-                            </button>
-                          </div>
+                        {log[log.length-1].who === YOU && (
+                          <button
+                            onClick={() => setLog((L) => [
+                              ...L.slice(0, -1),
+                              { who: selected.label, text: L[L.length-1].text.includes("compounding") 
+                                ? `${selected.label}: Nominal APR, compounded ${selected.m}× per year.`
+                                : selected.inflStory
+                              }
+                            ])}
+                            className="ml-4 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+                          >
+                            Next →
+                          </button>
                         )}
-                      </>
-                    )}
+                      </div>
+                    </>
+                  )}
                   </div>
                   {(!log.length || log[log.length-1].who !== "next") && (
                     <div className="mt-3 space-y-3">
@@ -410,8 +410,7 @@ export default function BankBossChapter5() {
                           <button 
                             onClick={() => setLog((L)=>[
                               ...L, 
-                              { who: YOU, text: `${YOU}: What's your compounding schedule?` },
-                              { who: "next", text: "Next" }
+                              { who: YOU, text: `${YOU}: What's your compounding schedule?` }
                             ])} 
                             className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
                           >
@@ -421,8 +420,7 @@ export default function BankBossChapter5() {
                         <button 
                           onClick={() => setLog((L)=>[
                             ...L, 
-                            { who: YOU, text: `${YOU}: What is the inflation?` },
-                            { who: "next", text: "Next" }
+                            { who: YOU, text: `${YOU}: What is the inflation?` }
                           ])} 
                           className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
                         >
