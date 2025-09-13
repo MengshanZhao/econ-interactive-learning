@@ -4,13 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
 /**
- * Bank Boss RPG — Artsy JRPG UI (principal amounts + typewriter + richer prose)
- * Chapter 5: Advanced Financial Lending Game
- * - Each lender now clearly states the **principal lent today** so lump-sum quotes are computable.
- * - Longer (~100 words) story paragraphs with vivid RPG flavor.
- * - Typewriter effect + optional blip sound for the dialogue box.
- * - APR/EAR or LUMP (repay k× in Y years) offers; each animal has its own inflation story.
- * - Reveal compares effective and real rates (Fisher). Repeat to reroll.
+ * Bank Boss RPG — Chapter 5
+ * - Borrowers ask YOU for a principal today; you pick the one with the HIGHEST TOTAL PAY-BACK RATIO.
+ * - ~100 word, plain/cute stories; all $ amounts (no "k× principal").
+ * - Inflation < 10%; effective returns ≤ 15%; no zeros.
+ * - Typewriter with very soft key-click.
+ * - Dialogue flow: after YOU ask, only "Next →" appears.
+ * - New UI: large SQUARE headshot + ornate pixel frame + VT323 (body) & MedievalSharp (name).
  */
 
 // ---------- Utility ----------
@@ -30,7 +30,7 @@ function toEAR(opts: { kind: "APR" | "EAR" | "LUMP"; rate?: number; m?: number; 
 }
 const real = (i: number, pi: number) => (1 + i) / (1 + pi) - 1;
 
-// ---------- Dialogue templates (~100 words each) ----------
+// ---------- Assets ----------
 const ANIMAL_IMAGES = [
   { name: "Dog", image: "/images/dog.png" },
   { name: "Fox", image: "/images/fox.png" },
@@ -45,36 +45,36 @@ const PLAYER_IMAGES = [
   { name: "Pirate", image: "/images/pirate.png" }
 ];
 
+// ---------- ~100-word borrower stories (plain, friendly; all $ amounts) ----------
 function storyBakery(n: string, t: number, r: string, P: number) {
-  return `${n}: I'm setting ovens in the old square and lending you ${money(P)} today to finish the hearth and tiles. I learned sweet rolls from my grandmother and I can scale dawn batches without burning a crumb. Market days bring lines that wrap the fountain; evenings we'll sell crusts to inns. If you hold me for ${t} years, my tables price this near ${r} effective annually. Speak plainly about schedules and I'll speak plainly about cash. Bread cools fast; reputations last longer—let's keep both warm.`;
+  return `${n}: I’m fixing up a little bakery by the old square and I’m asking to borrow ${money(P)} from you to finish the oven and counters. I bake early, keep it warm, and sell out by sunset on market days. I’ll keep simple books and send you tidy updates. If you hold the note for ${t} years, it works out to about ${r} a year on your side. I want this to be friendly and clear: I’ll show schedules, you’ll see cash. Bread cools fast, promises shouldn’t—let’s keep both warm and honest.`;
 }
 function storyTea(n: string, t: number, r: string, P: number) {
-  return `${n}: The river path needs a tea house and I'll advance ${money(P)} for timber, braziers, and reed mats. Caravan tongues barter better after steam. My cousins will serve, I'll count, and travelers will write about the quiet. Hold the note for ${t} years and the headline works to about ${r} a year. I keep a copper jar for repairs and a ledger for luck—one I trust more than the other. If you value punctual coins and clean books, pour with me.`;
+  return `${n}: I’d like to borrow ${money(P)} to open a small tea house by the river path—timber, braziers, reed mats, the cozy bits. Travelers relax after steam, then they buy snacks. My cousins pour, I count. If you keep the loan for ${t} years, your return is about ${r} annually. I keep a repair jar and a careful ledger. No fancy talk, just steady coins and clean tables. If you like punctual pay-backs and easy reading books, pour with me.`;
 }
 function storyBoat(n: string, t: number, r: string, P: number) {
-  return `${n}: I know the lake winds and I'll front ${money(P)} to rig a broad‑keel boat for grain and stone. The west shore starves for ferries when storms sour roads. I price the voyage at ${r} annually over ${t} years if weather behaves and ropes don't lie. I've crew who tie knots like poems and a habit of landing early. Lend steady, and I'll return steady—plus a seat on the prow when the moon is a coin.`;
+  return `${n}: I’m asking to borrow ${money(P)} to rig a sturdy ferry boat for grain and stone. When storms muddy the road, the lake is the shortcut. I plan to repay you at about ${r} a year over ${t} years if weather behaves. My crew ties knots like poems and docks early. You lend steady; I pay steady—plus I’ll save you a seat at sunset when the moon looks like a silver coin.`;
 }
 function storyVine(n: string, t: number, r: string, P: number) {
-  return `${n}: Vines outside the wall swell with juice; I'll invest ${money(P)} in barrels, presses, and a mule that doesn't gossip. Cellars want patience and roofs that don't drip. Over ${t} years the yield evens to ${r} give or take a late frost. My family bottles truthfully; labels brag, wine shouldn't. If your appetite is for calm curves and honest sums, let's cork the deal and store it where summers can't find it.`;
+  return `${n}: The vines outside the wall are heavy this season. I need ${money(P)} to buy barrels, a hand press, and one well-mannered mule. Wine takes patience, so I’ll plan calm cash flows. Over ${t} years it evens to about ${r} for you. My labels won’t brag and my numbers won’t wobble. If you prefer quiet curves and straight sums, lend to me and I’ll repay on time, corked tight and counted twice.`;
 }
 function storySchool(n: string, t: number, r: string, P: number) {
-  return `${n}: Chalk, slates, benches—${money(P)} gets us a room where numbers stop bullying children. A little school repays the town and the books equally. Keep me for ${t} years, reckon ${r} effective; I post attendance like a merchant posts prices. If we count curiosity as collateral, we're already rich. Still, I bring ledgers and lockboxes because good intentions can't buy chalk twice.`;
+  return `${n}: With ${money(P)} I can rent a sunny room, buy chalk and slates, and start a small after-school class. I’ll post attendance and keep neat notes so you always know where your coins go. If you hold for ${t} years, expect around ${r} yearly. Curiosity is our collateral, but I still carry a lockbox and a ledger. I’ll repay you first, then buy more chalk.`;
 }
 function storyWorkshop(n: string, t: number, r: string, P: number) {
-  return `${n}: Wheels wobble, lamps fail, doors sulk; my workshop fixes the patience of the city. I'll stake ${money(P)} on tools and stock, then keep the till honest. Over ${t} years, a tidy operator makes about ${r} if nails stay cheap and apprentices stay curious. I'm partial to boring miracles: hinges that never squeak, balances that never lie, payments that arrive before I notice I'm waiting.`;
+  return `${n}: Doors stick, lamps flicker, wheels wobble—my fix-it workshop will keep the town’s patience alive. I’m asking to borrow ${money(P)} for tools and parts. Over ${t} years you’d earn about ${r} if nails stay fairly priced and we stay busy. I like boring miracles: hinges that hush, scales that tell the truth, and payments that arrive before you wonder.`;
 }
 function storyLump(n: string, t: number, _r: string, P: number, k: number) {
-  const repay = P * k;
-  return `${n}: I keep math simple. I lend you ${money(P)} today so your plan can breathe. At the end of ${t} years you repay ${money(repay)}—one clean sweep, no fiddly coupons. Between, you keep your cash turning. We can still talk compounding if your heart insists, but my promise is a bright line: pay back ${k.toFixed(2)}× the principal at maturity. Simple is not always easy, but it is honest.`;
+  const repay = Math.round(P * k);
+  return `${n}: I like simple promises. I borrow ${money(P)} from you today and in ${t} years I repay ${money(repay)} in one clean payment. No coupons or fiddly bits between. If you want the compounding math, we can write it down, but the headline is clear: you get back ${money(repay)} at maturity. Simple to remember, simple to check.`;
 }
 function storyMill(n: string, t: number, r: string, P: number) {
-  return `${n}: There's a mill by the falls that grinds hope into flour. Its stones are sharp but its beams sulk; ${money(P)} buys braces, belts, and a fresh coat of paint the color of confidence. Give me ${t} years and I can work to about ${r} if harvests don't play tricks. The baker, the brewer, and I prefer reliable circles: millstones, coin cycles, seasons turning.`;
+  return `${n}: The mill by the falls can hum again if I shore up the beams. I’m asking for ${money(P)} to buy belts, braces, and paint the color of confidence. Over ${t} years your return runs about ${r}, assuming harvests behave. The baker, the brewer, and I all like reliable circles: millstones, seasons, and coins returning on time.`;
 }
-
 const OPENERS = [storyBakery, storyTea, storyBoat, storyVine, storySchool, storyWorkshop, storyLump, storyMill];
 
 const INFLATION_STORIES = [
-  (n: string, pi: number) => `${n}: Fish thin our nets and the cannery eats dawn's catch; smoke follows the river. Prices for oil and salt rise together—call it ${pct(pi,1)} a year until rains learn manners again.`,
+  (n: string, pi: number) => `${n}: Fish thin our nets and the cannery eats dawn’s catch; smoke follows the river. Prices for oil and salt rise together—call it ${pct(pi,1)} a year until rains learn manners again.`,
   (n: string, pi: number) => `${n}: Caravans are late, grain sulks in the fields, and gossip prices itself in fear. I pencil ${pct(pi,1)} inflation because scarcity likes drama.`,
   (n: string, pi: number) => `${n}: The prefect subsidizes rice and salt to win festivals, so pantries smile. Even so, I budget ${pct(pi,1)}; kindness is not a policy forever.`,
   (n: string, pi: number) => `${n}: Miners flood markets with cheap metal; coins jingle louder but buy less bread. My ledgers whisper ${pct(pi,1)} and I listen.`,
@@ -84,80 +84,107 @@ const INFLATION_STORIES = [
 // ---------- Types ----------
 interface Lender {
   id: string;
-  label: string; // emoji + name
-  image: string; // animal image path
+  label: string;
+  image: string;
   term: number;  // years 1–30
   kind: "APR" | "EAR" | "LUMP";
-  rate?: number; // APR/EAR
-  m?: number;    // APR comp/yr
-  lump?: number; // payoff multiple for LUMP
-  principal: number; // amount lent today
-  infl: number;  // lender inflation outlook
-  open: string;  // long paragraph
+  rate?: number;
+  m?: number;
+  lump?: number; // payoff multiple at maturity (for LUMP)
+  principal: number; // BORROWED from you today
+  infl: number;  // inflation expectation
+  open: string;  // ~100 words
   inflStory: string;
-  asked: { comp?: boolean; infl?: boolean };
 }
 
 interface Round { lenders: Lender[]; }
 
+// ---------- Random offer generator with sensible caps ----------
 function makeLender(i: number): Lender {
   const animalData = ANIMAL_IMAGES[i % ANIMAL_IMAGES.length];
   const label = `${animalData.name}`;
   const term = Math.max(1, Math.floor(rnd(1, 31)));
-  const principal = Math.round(rnd(50000, 250000, 0) / 1000) * 1000;
+
+  // Borrow amounts in sensible round dollars
+  const principal = Math.round(rnd(50_000, 250_000, 0) / 1000) * 1000;
+
+  // Offer type with EAR cap
   const pick = Math.random();
-  const kind: "APR" | "EAR" | "LUMP" = pick < 0.45 ? "APR" : pick < 0.85 ? "EAR" : "LUMP";
-  const rate = kind !== "LUMP" ? rnd(0.02, 0.14, 4) : undefined;
-  const m = kind === "APR" ? [1, 2, 4, 12][Math.floor(Math.random() * 4)] : undefined;
-  const lump = kind === "LUMP" ? rnd(1.10, 3.0, 3) : undefined;
+  let kind: "APR" | "EAR" | "LUMP" = pick < 0.45 ? "APR" : pick < 0.85 ? "EAR" : "LUMP";
+
+  let rate: number | undefined;
+  let m: number | undefined;
+  let lump: number | undefined;
+
+  if (kind === "APR") {
+    m = [1, 2, 4, 12][Math.floor(Math.random() * 4)];
+    for (let tries = 0; tries < 8; tries++) {
+      const apr = rnd(0.03, 0.14, 4);          // 3%–14% APR
+      const ear = (1 + apr / m) ** m - 1;
+      if (ear <= 0.15) { rate = apr; break; }
+    }
+    if (rate == null) rate = 0.12;
+  } else if (kind === "EAR") {
+    rate = rnd(0.03, 0.15, 4);                 // 3%–15% EAR
+  } else { // LUMP: choose k so implied EAR ≤ 15% (and ≥ about 3%)
+    const maxK = (1 + 0.15) ** term;
+    const minK = (1 + 0.03) ** term;
+    const k = rnd(Math.min(minK, maxK * 0.9), maxK, 3);
+    lump = Math.max(1.05, Math.min(k, maxK));
+  }
+
   const ear = toEAR({ kind, rate, m, years: term, lump });
-  const rStr = pct(ear, 1);
+  const rStr = pct(Math.min(ear, 0.15), 1);
+
   const open = OPENERS[Math.floor(Math.random() * OPENERS.length)](label, term, rStr, principal, lump || 0);
-  const infl = rnd(0.00, 0.08, 3);
+  const infl = rnd(0.00, 0.08, 3);             // under 10%
   const inflStory = INFLATION_STORIES[Math.floor(Math.random() * INFLATION_STORIES.length)](label, infl);
-  return { 
-    id: `L${i}_${Math.random().toString(36).slice(2,8)}`, 
-    label, 
-    image: animalData.image,
-    term, 
-    kind, 
-    rate, 
-    m, 
-    lump, 
-    principal, 
-    infl, 
-    open, 
-    inflStory, 
-    asked: {} 
-  };
+
+  return { id: `L${i}_${Math.random().toString(36).slice(2,8)}`, label, image: animalData.image, term, kind, rate, m, lump, principal, infl, open, inflStory };
 }
 
 function makeRound(): Round { return { lenders: Array.from({ length: 4 }, (_, i) => makeLender(i)) }; }
 
-// ---------- Typewriter with blip ----------
+// ---------- Typewriter with soft key-click ----------
 function useBlipSound(enabled: boolean) {
   const ctxRef = useRef<AudioContext | null>(null);
   useEffect(() => {
     if (!enabled) return;
     if (!ctxRef.current) ctxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
   }, [enabled]);
+
   const blip = () => {
     if (!enabled) return;
     const ctx = ctxRef.current; if (!ctx) return;
-    const o = ctx.createOscillator(); const g = ctx.createGain();
-    o.type = "sine"; o.frequency.value = 440;
+
+    // Short noise burst through bandpass -> gentle key click
+    const bufferSize = 256;
+    const noise = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = noise.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
+
+    const src = ctx.createBufferSource();
+    src.buffer = noise;
+
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 1800;
+    bp.Q.value = 3;
+
+    const g = ctx.createGain();
     g.gain.setValueAtTime(0.0, ctx.currentTime);
-    g.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
-    o.connect(g); g.connect(ctx.destination);
-    o.start();
-    o.stop(ctx.currentTime + 0.09);
-    o.onended = () => { o.disconnect(); g.disconnect(); };
+    g.gain.linearRampToValueAtTime(0.02, ctx.currentTime + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.003, ctx.currentTime + 0.05);
+
+    src.connect(bp); bp.connect(g); g.connect(ctx.destination);
+    src.start();
+    src.stop(ctx.currentTime + 0.06);
+    src.onended = () => { src.disconnect(); bp.disconnect(); g.disconnect(); };
   };
   return blip;
 }
 
-function Typewriter({ text, speed=18, sound=false }: { text: string; speed?: number; sound?: boolean }) {
+function Typewriter({ text, speed=18, sound=true }: { text: string; speed?: number; sound?: boolean }) {
   const [i, setI] = useState(0);
   const blip = useBlipSound(sound);
   useEffect(() => { setI(0); }, [text]);
@@ -169,61 +196,52 @@ function Typewriter({ text, speed=18, sound=false }: { text: string; speed?: num
   return <div>{text.slice(0, i)}</div>;
 }
 
-// ---------- Start Screen Component ----------
-function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: { 
-  onStart: () => void; 
+// ---------- Start Screen ----------
+function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
+  onStart: () => void;
   onCharacterSelect: (character: string) => void;
   selectedCharacter: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#FFF4DF]">
-      <div className="mx-auto max-w-4xl rounded-3xl border-4 border-amber-700 bg-[#FFF8EA] p-8 shadow-2xl">
-        <div className="text-center">
-          {/* Title removed as requested */}
-          
-          <div className="mb-6 rounded-2xl bg-[#FFECC8] p-6 text-left">
-            <p className="mb-4 text-lg leading-relaxed text-amber-900">
-              Welcome, banker! Meet <strong>4 animal friends</strong>. Each offers a simple deal.
-              Chat, compare, and pick the one that feels best.
-            </p>
-            <p className="text-base leading-relaxed text-amber-800">
-              • Ask about their rates and views on prices<br/>
-              • See real returns in the summary<br/>
-              • Choose your favorite and reveal the results
-            </p>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="mb-3 text-xl font-bold text-amber-800">Choose Your Character:</h3>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {PLAYER_IMAGES.map((char) => (
-                <button
-                  key={char.name}
-                  onClick={() => onCharacterSelect(char.name)}
-                  className={`rounded-xl p-2 transition-transform ${
-                    selectedCharacter === char.name ? "ring-2 ring-amber-600" : ""
-                  } hover:scale-105`}
-                >
-                  <Image
-                    src={char.image}
-                    alt={char.name}
-                    width={140}
-                    height={140}
-                    className="mx-auto rounded-lg drop-shadow-xl"
-                  />
-                  <div className="mt-2 text-sm font-semibold text-amber-800">{char.name}</div>
-                </button>
-              ))}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2b2331]">
+      <div className="mx-auto max-w-4xl p-2">
+        <div className="pixel-frame p-6 bg-[#3b313f]">
+          <div className="text-center">
+            <div className="mb-6 pixel-frame bg-[#4a3f50] text-left p-4">
+              <p className="mb-3 text-lg leading-relaxed text-amber-200 font-vt323">
+                Welcome, banker! Meet <strong className="font-black">4 animal borrowers</strong>. Each asks for a principal now and promises how they’ll pay you back.
+              </p>
+              <p className="text-base leading-relaxed text-amber-100 font-vt323">
+                • Ask about their rates and inflation views<br/>
+                • See real returns and total pay-backs in the summary<br/>
+                • Choose the borrower with the <strong>highest total pay-back ratio</strong>
+              </p>
             </div>
-          </div>
 
-          <button
-            onClick={onStart}
-            disabled={!selectedCharacter}
-            className="rounded-xl bg-amber-600 px-8 py-3 text-xl font-bold text-white shadow-lg hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Start Your Banking Adventure!
-          </button>
+            <div className="mb-5">
+              <h3 className="mb-2 text-xl text-amber-200 font-ms">Choose Your Character</h3>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                {PLAYER_IMAGES.map((char) => (
+                  <button
+                    key={char.name}
+                    onClick={() => onCharacterSelect(char.name)}
+                    className={`rounded-sm p-2 transition-transform ${selectedCharacter === char.name ? "ring-2 ring-amber-400" : ""} hover:scale-105`}
+                  >
+                    <Image src={char.image} alt={char.name} width={140} height={140} className="mx-auto rounded-sm drop-shadow-xl" />
+                    <div className="mt-2 text-sm font-ms text-amber-100">{char.name}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={onStart}
+              disabled={!selectedCharacter}
+              className="rounded-sm bg-amber-500 px-6 py-3 text-xl font-ms text-[#2b2331] shadow-lg hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Start Your Banking Adventure!
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -231,7 +249,7 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
 }
 
 // ---------- Main Component ----------
-export default function BankBossChapter5() {
+export default function BankBossChapter6() {
   const [gameStarted, setGameStarted] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState("");
   const [seed, setSeed] = useState(0);
@@ -259,15 +277,16 @@ export default function BankBossChapter5() {
     const ear = toEAR({ kind: L.kind, rate: L.rate, m: L.m, years: L.term, lump: L.lump });
     const rReal = real(ear, L.infl);
     const repay = L.kind === "LUMP" ? (L.principal * (L.lump || 1)) : L.principal * Math.pow(1 + ear, L.term);
-    return { L, ear, rReal, repay };
+    const paybackRatio = repay / L.principal;
+    return { L, ear, rReal, repay, paybackRatio };
   });
-  const best = [...outcomes].sort((a, b) => b.rReal - a.rReal)[0];
+  const best = [...outcomes].sort((a, b) => b.paybackRatio - a.paybackRatio)[0];
 
   function reset() { setSelectedId(null); setAcceptedId(null); setRevealed(false); setLog([]); setSeed((x) => x + 1); }
 
   if (!gameStarted) {
     return (
-      <StartScreen 
+      <StartScreen
         onStart={() => setGameStarted(true)}
         onCharacterSelect={setSelectedCharacter}
         selectedCharacter={selectedCharacter}
@@ -276,8 +295,8 @@ export default function BankBossChapter5() {
   }
 
   return (
-    <div 
-      className="relative min-h-screen font-serif text-slate-800"
+    <div
+      className="relative min-h-screen text-amber-100 bg-[#2b2331] font-vt323"
       style={{
         backgroundImage: "url('/images/bank.jpg')",
         backgroundSize: "cover",
@@ -285,41 +304,39 @@ export default function BankBossChapter5() {
         backgroundAttachment: "fixed"
       }}
     >
-      
       <div className="relative z-10 mx-auto max-w-6xl p-6 pb-72">
-        {/* Title intentionally minimal per request */}
-        <p className="mt-2 max-w-4xl text-base italic text-slate-800 bg-[#FFF4DF] rounded-lg p-3">
-          Chat with <span className="font-semibold">each</span> lender. They may quote APR, EAR, or a simple one‑time payback.
-          Compare and pick the friend with the <span className="font-semibold">best real yearly return</span>.
-        </p>
+        <div className="pixel-frame bg-[#3b313f] p-3">
+          <p className="mt-1 max-w-4xl text-[19px] text-amber-100">
+            Chat with <span className="font-ms font-bold">each borrower</span>. They’ll ask to borrow a principal amount today and promise a way to pay you back (APR, EAR, or one-time lump sum).
+            Compare and pick the friend with the <span className="font-ms font-bold">highest total pay-back ratio</span>.
+          </p>
+        </div>
 
         {/* Cards */}
-        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {round.lenders.map((L) => {
             const name = L.label;
             const locked = !!acceptedId && acceptedId !== L.id;
             return (
-              <div key={L.id} className={`rounded-3xl border-2 border-amber-200 bg-[#FFF8EA] p-4 shadow-md transition ${selectedId === L.id ? "ring-4 ring-amber-300" : "hover:shadow-xl"} ${locked ? "opacity-40" : ""}`}>
+              <div key={L.id} className={`pixel-frame bg-[#3b313f] p-3 transition ${selectedId === L.id ? "ring-2 ring-amber-400" : "hover:brightness-110"} ${locked ? "opacity-40" : ""}`}>
                 <div className="flex items-start gap-3">
-                  <div className="relative h-14 w-14 overflow-hidden rounded-full bg-[#FFF4DF] shadow-inner">
-                    <Image
-                      src={L.image}
-                      alt={name}
-                      fill
-                      className="object-cover"
-                      style={{ mixBlendMode: 'normal' }}
-                    />
+                  <div className="relative h-16 w-16 overflow-hidden rounded-[2px] bg-[#2b2331] shadow-inner">
+                    <Image src={L.image} alt={name} fill className="object-cover" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-lg font-bold text-amber-900">{name}</div>
-                    <div className="text-xs text-slate-700">Lends today: <strong>{money(L.principal)}</strong></div>
-                    <div className="text-xs text-slate-700 mt-0.5">Term <strong>{L.term}y</strong> • {L.kind === "LUMP" ? <>repay <strong>{(L.lump || 1).toFixed(2)}×</strong> at maturity (<strong>{money(L.principal*(L.lump||1))}</strong>)</> : <><strong>{pct(L.rate || 0,1)}</strong> {L.kind}{L.kind === "APR" && L.m ? `, comp ${L.m}×/yr` : ""}</>}</div>
+                    <div className="text-lg font-ms text-amber-200">{name}</div>
+                    <div className="text-sm text-amber-100">Wants to borrow: <strong>{money(L.principal)}</strong></div>
+                    <div className="text-sm text-amber-100 mt-0.5">
+                      Term <strong>{L.term}y</strong> • {L.kind === "LUMP"
+                        ? <>repay <strong>{money(L.principal*(L.lump||1))}</strong> at maturity</>
+                        : <><strong>{pct(L.rate || 0,1)}</strong> {L.kind}{L.kind === "APR" && L.m ? `, comp ${L.m}×/yr` : ""}</>}
+                    </div>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center gap-2">
-                  <button onClick={() => setSelectedId(L.id)} disabled={locked} className="rounded-xl border border-amber-300 px-3 py-1 text-sm text-amber-800 hover:bg-[#FFF4DF]">Talk</button>
-                  <button onClick={() => setAcceptedId(L.id)} disabled={!!acceptedId && acceptedId!==L.id} className="rounded-xl bg-amber-600 px-3 py-1 text-sm text-white shadow hover:bg-amber-700 disabled:opacity-40">Accept</button>
-                  {acceptedId===L.id && <span className="text-xs font-semibold text-emerald-700">Selected</span>}
+                  <button onClick={() => setSelectedId(L.id)} disabled={locked} className="pixel-btn">Talk</button>
+                  <button onClick={() => setAcceptedId(L.id)} disabled={!!acceptedId && acceptedId!==L.id} className="pixel-btn bg-amber-500 text-[#2b2331] hover:bg-amber-400">Choose borrower</button>
+                  {acceptedId===L.id && <span className="text-sm font-ms text-emerald-300">Selected</span>}
                 </div>
               </div>
             );
@@ -327,120 +344,117 @@ export default function BankBossChapter5() {
         </div>
 
         {/* Controls */}
-        <div className="sticky bottom-4 mt-6 rounded-3xl border border-amber-200 bg-[#FFF8EA] p-4 shadow-xl">
-          {!revealed ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="text-sm text-amber-900">Talk to lenders, then tap <strong>Reveal</strong> to compare. <strong>Repeat</strong> gets new offers.</div>
-              <button onClick={() => setRevealed(true)} disabled={!acceptedId} className="ml-auto rounded-xl bg-amber-600 px-4 py-2 text-white shadow hover:bg-amber-700 disabled:opacity-40">Reveal</button>
-              <button onClick={reset} className="rounded-xl bg-amber-700 px-3 py-2 text-white shadow hover:bg-amber-800">Repeat</button>
-              <button onClick={() => setSoundOn(s=>!s)} className="rounded-xl border border-amber-300 px-3 py-2 text-sm text-amber-800">{soundOn?"Sound on":"Sound off"}</button>
-            </div>
-          ) : (
-            <div>
-              <h2 className="text-xl font-extrabold text-amber-900">Outcomes</h2>
-              <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
-                {outcomes.map((o) => (
-                  <div key={o.L.id} className={`rounded-2xl border-2 border-amber-200 bg-[#FFF4DF] p-3 ${acceptedId === o.L.id ? "border-emerald-500 shadow-xl" : ""}`}>
-                    <div className="font-semibold">{o.L.label}</div>
-                    <ul className="mt-2 text-sm leading-6">
-                      <li>Principal: <strong>{money(o.L.principal)}</strong></li>
-                      <li>Effective annual: <strong>{pct(o.ear, 2)}</strong></li>
-                      <li>Inflation view: <strong>{pct(o.L.infl, 1)}</strong></li>
-                      <li>Real annual: <strong className={o.rReal >= 0 ? "text-emerald-700" : "text-rose-700"}>{pct(o.rReal, 2)}</strong></li>
-                      <li>Total repay at end: <strong>{money(o.repay)}</strong></li>
-                    </ul>
-                  </div>
-                ))}
+        <div className="sticky bottom-4 mt-6">
+          <div className="pixel-frame bg-[#3b313f] p-3 flex flex-wrap items-center gap-3">
+            {!revealed ? (
+              <>
+                <div className="text-[18px]">Talk to borrowers, then tap <span className="font-ms">Reveal</span> to compare. <span className="font-ms">Repeat</span> gets new offers.</div>
+                <div className="ml-auto flex gap-2">
+                  <button onClick={() => setRevealed(true)} disabled={!acceptedId} className="pixel-btn bg-amber-500 text-[#2b2331] hover:bg-amber-400 disabled:opacity-40">Reveal</button>
+                  <button onClick={reset} className="pixel-btn bg-amber-600 text-[#2b2331] hover:bg-amber-500">Repeat</button>
+                  <button onClick={() => setSoundOn(s=>!s)} className="pixel-btn">{soundOn?"Sound on":"Sound off"}</button>
+                </div>
+              </>
+            ) : (
+              <div className="w-full">
+                <h2 className="text-xl font-ms text-amber-200">Outcomes</h2>
+                <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
+                  {outcomes.map((o) => (
+                    <div key={o.L.id} className={`pixel-frame bg-[#4a3f50] p-3 ${acceptedId === o.L.id ? "ring-2 ring-emerald-400" : ""}`}>
+                      <div className="font-ms text-amber-100">{o.L.label}</div>
+                      <ul className="mt-2 text-[18px] leading-7">
+                        <li>Principal: <strong>{money(o.L.principal)}</strong></li>
+                        <li>Effective annual: <strong>{pct(o.ear, 2)}</strong></li>
+                        <li>Inflation view: <strong>{pct(o.L.infl, 1)}</strong></li>
+                        <li>Real annual: <strong className={o.rReal >= 0 ? "text-emerald-300" : "text-rose-300"}>{pct(o.rReal, 2)}</strong></li>
+                        <li>Total repay: <strong>{money(o.repay)}</strong></li>
+                        <li>Pay-back ratio: <strong>{o.paybackRatio.toFixed(2)}×</strong></li>
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 pixel-frame bg-[#4a3f50] p-3 text-[18px] font-ms text-amber-100">
+                  Best pick: {best.L.label} with a {best.paybackRatio.toFixed(2)}× total pay-back.
+                </div>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#FFECC8] p-3 text-sm font-semibold text-amber-900">Best pick: {best.L.label} with {pct(best.rReal,2)} real annual.</div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Artsy Bottom Dialogue with Typewriter */}
+      {/* Bottom Dialogue — large square portrait + ornate frame */}
       <AnimatePresence initial={false}>
         {selected && (
           <motion.div key={selected.id} initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-6xl p-4">
-            <div className="relative rounded-3xl border-4 border-amber-700 bg-[#FFF4DF] p-6 text-amber-900 shadow-2xl">
-              <div className="absolute -top-5 left-1/2 -translate-x-1/2 rounded-md border-2 border-amber-700 bg-[#FFECC8] px-4 py-1 text-sm font-black tracking-wide text-amber-900">{selected.label}</div>
-              <div className="flex items-center gap-4">
-                {/* Left portrait (your character when asking, empty when animal answers) */}
-                <div className="w-32 h-32 flex-shrink-0">
-                  {log.length > 0 && log[log.length-1].who === YOU && (
+            <div className="pixel-frame bg-[#3b313f] p-0 text-amber-100">
+              <div className="flex gap-0">
+                {/* Large SQUARE headshot (like reference) */}
+                <div className="relative w-[180px] h-[180px] shrink-0 m-3 bg-[#2b2331] pixel-inner">
+                  {/* When YOU are speaking, show your portrait; else animal */}
+                  {(!log.length || log[log.length-1].who !== selected.label) ? (
                     <Image
                       src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
                       alt={selectedCharacter || "Player"}
-                      width={128}
-                      height={128}
+                      fill
                       className="object-contain"
                     />
+                  ) : (
+                    <Image src={selected.image} alt={selected.label} fill className="object-contain" />
                   )}
                 </div>
 
-                {/* Dialogue Text */}
-                <div className="flex-1 min-h-[8rem] flex flex-col justify-between">
-                  <div className="text-lg">
-                  {log.length > 0 && (
-                    <>
-                      <div className="flex justify-between items-center">
-                        <Typewriter text={log[log.length-1].text} sound={soundOn} />
-                        {log[log.length-1].who === YOU && (
+                {/* Text box with title tab */}
+                <div className="flex-1 p-3">
+                  {/* Name tab */}
+                  <div className="inline-block mb-2 px-3 py-1 pixel-frame bg-[#4a3f50] text-amber-200 font-ms text-[18px]">
+                    {(log.length > 0 && log[log.length-1].who !== selected.label) ? (selectedCharacter || "You") : selected.label}
+                  </div>
+
+                  {/* Message + controls */}
+                  <div className="pixel-inner bg-[#2b2331] p-4 min-h-[110px] text-[20px] leading-7">
+                    {log.length > 0 && (
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <Typewriter text={log[log.length-1].text} sound={soundOn} />
+                        </div>
+
+                        {/* Only show Next when YOU just asked */}
+                        {log[log.length-1].who === (selectedCharacter || "You") && (
                           <button
-                            onClick={() => setLog((L) => [
-                              ...L.slice(0, -1),
-                              { who: selected.label, text: L[L.length-1].text.includes("compounding") 
-                                ? `${selected.label}: Nominal APR, compounded ${selected.m}× per year.`
-                                : selected.inflStory
-                              }
-                            ])}
-                            className="ml-4 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+                            onClick={() => {
+                              const last = log[log.length-1];
+                              const answer = last.text.toLowerCase().includes("compound")
+                                ? `${selected.label}: Nominal APR, compounded ${selected.m || 1}× per year.`
+                                : selected.inflStory;
+                              setLog((L) => [...L, { who: selected.label, text: answer }]);
+                            }}
+                            className="pixel-btn bg-amber-500 text-[#2b2331] hover:bg-amber-400"
                           >
                             Next →
                           </button>
                         )}
                       </div>
-                    </>
-                  )}
+                    )}
                   </div>
-                  {(!log.length || log[log.length-1].who !== "next") && (
-                    <div className="mt-3 space-y-3">
-                      <div className="rounded-xl bg-[#FFECC8] p-4 space-y-3">
-                        {selected.kind === "APR" && (
-                          <button 
-                            onClick={() => setLog((L)=>[
-                              ...L, 
-                              { who: YOU, text: `${YOU}: What's your compounding schedule?` }
-                            ])} 
-                            className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
-                          >
-                            Ask about compounding schedule
-                          </button>
-                        )}
-                        <button 
-                          onClick={() => setLog((L)=>[
-                            ...L, 
-                            { who: YOU, text: `${YOU}: What is the inflation?` }
-                          ])} 
-                          className="w-full text-left px-4 py-2 rounded-lg bg-[#FFF8EA] hover:bg-white transition-colors"
-                        >
-                          Ask about inflation
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
 
-                {/* Right portrait (animal when answering, empty when you're asking) */}
-                <div className="w-32 h-32 flex-shrink-0">
-                  {log.length > 0 && log[log.length-1].who !== YOU && log[log.length-1].who !== "next" && (
-                    <Image
-                      src={selected.image}
-                      alt={selected.label}
-                      width={128}
-                      height={128}
-                      className="object-contain"
-                    />
+                  {/* Choices appear only after animal speaks OR at start */}
+                  {(log.length === 0 || (log[log.length-1].who === selected.label)) && (
+                    <div className="mt-2 grid grid-cols-1 gap-2">
+                      {selected.kind === "APR" && (
+                        <button
+                          onClick={() => setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: Could you tell me your compounding schedule?` }])}
+                          className="pixel-btn"
+                        >
+                          Ask about compounding
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: What’s your view on inflation right now?` }])}
+                        className="pixel-btn"
+                      >
+                        Ask about inflation
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -452,7 +466,7 @@ export default function BankBossChapter5() {
   );
 }
 
-// ---------- Tiny runtime tests (dev only) ----------
+// ---------- Tiny runtime tests ----------
 if (typeof window !== "undefined") {
   const apr = toEAR({ kind: "APR", rate: 0.12, m: 12 });
   const ear = (1 + 0.12 / 12) ** 12 - 1;
@@ -462,52 +476,4 @@ if (typeof window !== "undefined") {
   console.assert(Math.abs(apr - ear) < 1e-12, "toEAR(APR) incorrect");
   console.assert(Math.abs(lumpEar - lumpEarRef) < 1e-12, "toEAR(LUMP) incorrect");
   console.assert(Math.abs(realRef - ((1 + 0.08) / (1 + 0.03) - 1)) < 1e-12, "real() incorrect");
-}
-
-// --------- Portrait component (oversized, ~1.5x dialog height) ---------
-function Portrait({ selectedCharacter, imageSrc, alt, side }: { selectedCharacter?: string; imageSrc?: string; alt?: string; side: "left" | "right" }) {
-  const boxRef = useRef<HTMLDivElement | null>(null);
-  const [dialogHeight, setDialogHeight] = useState<number>(160);
-
-  useEffect(() => {
-    const el = document.querySelector('[data-dialog-root]') as HTMLDivElement | null;
-    function measure() {
-      if (!el) return;
-      setDialogHeight(el.offsetHeight || 160);
-    }
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
-
-  const h = Math.round(dialogHeight * 1.5);
-  const w = Math.round(h * 0.9);
-  const src = imageSrc || (PLAYER_IMAGES.find(p => p.name === (selectedCharacter || ""))?.image || "/images/wizard.png");
-  const altText = alt || (selectedCharacter || "Player");
-
-  return (
-    <div
-      ref={boxRef}
-      className={`relative overflow-visible ${side === 'left' ? 'order-first' : ''}`}
-      style={{ width: 0, height: 0 }}
-    >
-      <div
-        className={`absolute ${side === 'left' ? '-bottom-0 -left-2' : '-bottom-0 -right-2'} pointer-events-none`}
-        style={{ height: `${h}px`, width: `${w}px`, transform: 'translateY(-100%)' }}
-      >
-        <div className="relative h-full w-full">
-          <Image
-            src={src}
-            alt={altText}
-            fill
-            className="object-contain drop-shadow-2xl"
-            style={{ mixBlendMode: 'normal' }}
-            priority
-          />
-        </div>
-      </div>
-      {/* Mark dialog container for measurement */}
-      <div data-dialog-root={true}></div>
-    </div>
-  );
 }
