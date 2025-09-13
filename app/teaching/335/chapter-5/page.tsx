@@ -651,15 +651,7 @@ export default function BankBossChapter5() {
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-6xl p-4"
           >
-            <div className="dialogue-box p-0" style={{
-              background: `linear-gradient(135deg, #f4ecd8 0%, #ede4d1 50%, #e8ddc8 100%)`,
-              border: '3px solid #8c6d4f',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 3px rgba(255,255,255,0.2)',
-              backdropFilter: 'blur(2px)',
-              position: 'relative',
-              color: '#3c2f2f'
-            }}>
+            <div className="pixel-frame-amber bg-[#FFF4DF] p-0 text-amber-900">
               {(() => {
                 const isPlayerSpeaking = !log.length || log[log.length-1].who !== selected.label;
                 const currentSpeaker = isPlayerSpeaking ? (selectedCharacter || "You") : selected.label;
@@ -670,11 +662,7 @@ export default function BankBossChapter5() {
                     {isPlayerSpeaking ? (
                       <>
                         {/* Player headshot on left */}
-                        <div className="portrait relative w-[200px] h-[200px] shrink-0 m-3 -mt-8" style={{
-                          border: '4px solid #8c6d4f',
-                          borderRadius: '12px',
-                          background: '#b9b4a5',
-                          boxShadow: '0 6px 16px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.2)',
+                        <div className="relative w-[200px] h-[200px] shrink-0 m-3 -mt-8 bg-[#FFF4DF] pixel-inner-amber" style={{
                           zIndex: 10
                         }}>
                     <Image
@@ -686,22 +674,10 @@ export default function BankBossChapter5() {
                 </div>
                         {/* Text box */}
                 <div className="flex-1 p-3">
-                        <div className="inline-block mb-3 px-4 py-2 font-ms text-[18px]" style={{
-                          background: 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 100%)',
-                          border: '2px solid #8c6d4f',
-                          borderRadius: '6px',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
-                          color: '#3c2f2f'
-                        }}>
+                  <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">
                           {currentSpeaker}
                   </div>
-                        <div className="p-4 min-h-[120px] text-[20px] leading-7 font-vt323" style={{
-                          background: 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 100%)',
-                          border: '2px solid #8c6d4f',
-                          borderRadius: '8px',
-                          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1), inset 0 -1px 2px rgba(255,255,255,0.3)',
-                          color: '#3c2f2f'
-                        }}>
+                  <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
                     {log.length > 0 && (
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
@@ -727,29 +703,7 @@ export default function BankBossChapter5() {
                                 : selected.inflStory;
                               setLog((L) => [...L, { who: selected.label, text: answer }]);
                             }}
-                                    className="rpg-next-btn"
-                                    style={{
-                                      background: 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 100%)',
-                                      border: '2px solid #8c6d4f',
-                                      borderRadius: '6px',
-                                      padding: '8px 16px',
-                                      color: '#3c2f2f',
-                                      fontWeight: 'bold',
-                                      boxShadow: '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
-                                      transition: 'all 0.2s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      e.currentTarget.style.boxShadow = '0 0 8px rgba(122, 46, 46, 0.6), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
-                                      e.currentTarget.style.transform = 'translateY(-1px)';
-                                      e.currentTarget.style.background = 'linear-gradient(135deg, #7a2e2e 0%, #6b2828 100%)';
-                                      e.currentTarget.style.color = '#f4ecd8';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
-                                      e.currentTarget.style.transform = 'translateY(0)';
-                                      e.currentTarget.style.background = 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 100%)';
-                                      e.currentTarget.style.color = '#3c2f2f';
-                                    }}
+                            className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700"
                           >
                             Next →
                           </button>
@@ -763,22 +717,10 @@ export default function BankBossChapter5() {
                       <>
                         {/* Text box */}
                         <div className="flex-1 p-3">
-                        <div className="inline-block mb-3 px-4 py-2 font-ms text-[18px]" style={{
-                          background: 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 100%)',
-                          border: '2px solid #8c6d4f',
-                          borderRadius: '6px',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
-                          color: '#3c2f2f'
-                        }}>
+                        <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">
                             {currentSpeaker}
                         </div>
-                        <div className="p-4 min-h-[120px] text-[20px] leading-7 font-vt323" style={{
-                          background: 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 100%)',
-                          border: '2px solid #8c6d4f',
-                          borderRadius: '8px',
-                          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1), inset 0 -1px 2px rgba(255,255,255,0.3)',
-                          color: '#3c2f2f'
-                        }}>
+                        <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
                             {log.length > 0 && (
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
@@ -789,11 +731,7 @@ export default function BankBossChapter5() {
                           </div>
                         </div>
                         {/* Animal headshot on right */}
-                        <div className="portrait relative w-[200px] h-[200px] shrink-0 m-3 -mt-8" style={{
-                          border: '4px solid #8c6d4f',
-                          borderRadius: '12px',
-                          background: '#b9b4a5',
-                          boxShadow: '0 6px 16px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.2)',
+                        <div className="relative w-[200px] h-[200px] shrink-0 m-3 -mt-8 bg-[#FFF4DF] pixel-inner-amber" style={{
                           zIndex: 10
                         }}>
                           <Image 
@@ -809,39 +747,19 @@ export default function BankBossChapter5() {
                 );
               })()}
 
-              {/* RPG-style choice tabs */}
+                  {/* Choices: appear only after animal speaks OR at start */}
                   {(log.length === 0 || (log[log.length-1].who === selected.label)) && (
-                <div className="p-4 pt-2">
-                  <div className="flex flex-col gap-3">
+                <div className="p-3 pt-0">
+                    <div className="mt-2 grid grid-cols-1 gap-2">
                       {selected.kind === "APR" && (
                         <button
                         onClick={() => {
                           audio.click();
                           setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: Could you tell me your compounding schedule?` }]);
                         }}
-                        className="rpg-choice-tab group"
-                        style={{
-                          background: 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 50%, #e8ddc8 100%)',
-                          border: '2px solid #8c6d4f',
-                          borderRadius: '8px',
-                          padding: '12px 16px',
-                          textAlign: 'left',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
-                          transition: 'all 0.2s ease',
-                          position: 'relative'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = '0 0 12px rgba(122, 46, 46, 0.6), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                          e.currentTarget.style.background = 'linear-gradient(135deg, #7a2e2e 0%, #6b2828 100%)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.background = 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 50%, #e8ddc8 100%)';
-                        }}
-                      >
-                        <span className="font-ms" style={{ color: '#3c2f2f' }}>📜 Ask about compounding</span>
+                          className="pixel-btn-amber"
+                        >
+                          Ask about compounding
                         </button>
                       )}
                       <button
@@ -849,28 +767,9 @@ export default function BankBossChapter5() {
                         audio.click();
                         setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: What's your view on inflation right now?` }]);
                       }}
-                      className="rpg-choice-tab"
-                      style={{
-                        background: 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 50%, #e8ddc8 100%)',
-                        border: '2px solid #8c6d4f',
-                        borderRadius: '8px',
-                        padding: '12px 16px',
-                        textAlign: 'left',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 0 12px rgba(122, 46, 46, 0.6), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
-                        e.currentTarget.style.transform = 'translateY(-1px)';
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #7a2e2e 0%, #6b2828 100%)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #f4ecd8 0%, #ede4d1 50%, #e8ddc8 100%)';
-                      }}
-                    >
-                      <span className="font-ms" style={{ color: '#3c2f2f' }}>🌾 Ask about inflation</span>
+                        className="pixel-btn-amber"
+                      >
+                        Ask about inflation
                       </button>
                       <button
                       onClick={() => { 
@@ -878,28 +777,9 @@ export default function BankBossChapter5() {
                         setSelectedId(null); 
                         setLog([]); 
                       }}
-                      className="rpg-choice-tab"
-                      style={{
-                        background: 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 50%, #9a9288 100%)',
-                        border: '2px solid #8c6d4f',
-                        borderRadius: '8px',
-                        padding: '12px 16px',
-                        textAlign: 'left',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 0 12px rgba(122, 46, 46, 0.6), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
-                        e.currentTarget.style.transform = 'translateY(-1px)';
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #7a2e2e 0%, #6b2828 100%)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #b9b4a5 0%, #a8a399 50%, #9a9288 100%)';
-                      }}
-                    >
-                      <span className="font-ms" style={{ color: '#3c2f2f' }}>🚪 That's all my questions</span>
+                        className="pixel-btn-amber"
+                      >
+                      That's all my questions
                       </button>
                     </div>
                 </div>
