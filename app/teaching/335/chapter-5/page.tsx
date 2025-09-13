@@ -11,7 +11,7 @@ import Image from "next/image";
  * - Typewriter with gentle key-click (SOUND ON by default).
  * - Dialogue flow: after YOU ask, only "Next →" appears.
  * - Large SQUARE headshot + ornate amber frame (square corners).
- * - Fonts: description/cards use old serif; dialogue box uses VT323 (body) + MedievalSharp (name).
+ * - Fonts: description/cards use old serif; dialogue uses VT323 (body) + MedievalSharp (name).
  * - “That’s all my questions” closes the dialogue.
  * - Reveal is blocked until you’ve talked to ALL borrowers at least once.
  */
@@ -76,6 +76,15 @@ function storyMill(n: string, t: number, r: string, P: number) {
 }
 const OPENERS_NON_LUMP = [storyBakery, storyTea, storyBoat, storyVine, storySchool, storyWorkshop, storyMill];
 
+// 🔧 RESTORED: Inflation story snippets
+const INFLATION_STORIES = [
+  (n: string, pi: number) => `${n}: Fish thin our nets and the cannery eats dawn’s catch; smoke follows the river. Prices for oil and salt rise together—call it ${pct(pi,1)} a year until rains learn manners again.`,
+  (n: string, pi: number) => `${n}: Caravans are late, grain sulks in the fields, and gossip prices itself in fear. I pencil ${pct(pi,1)} inflation because scarcity likes drama.`,
+  (n: string, pi: number) => `${n}: The prefect subsidizes rice and salt to win festivals, so pantries smile. Even so, I budget ${pct(pi,1)}; kindness is not a policy forever.`,
+  (n: string, pi: number) => `${n}: Miners flood markets with cheap metal; coins jingle louder but buy less bread. My ledgers whisper ${pct(pi,1)} and I listen.`,
+  (n: string, pi: number) => `${n}: Fisherfolk teach me the current by what vanishes. When gulls argue over bare water, I assume ${pct(pi,1)} and plan tight.`,
+];
+
 // ---------- Types ----------
 interface Lender {
   id: string;
@@ -130,7 +139,7 @@ function makeLender(i: number): Lender {
   const ear = toEAR({ kind, rate, m, years: term, lump });
   const rStr = pct(Math.min(ear, 0.15), 1);
 
-  // IMPORTANT: use LUMP story ONLY for LUMP; otherwise pick a non-LUMP story
+  // Use LUMP story ONLY for LUMP; otherwise pick a non-LUMP story.
   let open: string;
   if (kind === "LUMP") {
     open = storyLump(label, term, rStr, principal, lump!);
@@ -139,8 +148,8 @@ function makeLender(i: number): Lender {
     open = op(label, term, rStr, principal);
   }
 
-  const infl = rnd(0.00, 0.08, 3);             // under 10%
-  const inflStory = `${label}: ${INFLATION_STORIES[Math.floor(Math.random() * INFLATION_STORIES.length)](label, infl).split(": ").slice(1).join(": ")}`;
+  const infl = rnd(0.00, 0.08, 3); // under 10%
+  const inflStory = INFLATION_STORIES[Math.floor(Math.random() * INFLATION_STORIES.length)](label, infl);
 
   return { id: `L${i}_${Math.random().toString(36).slice(2,8)}`, label, image: animalData.image, term, kind, rate, m, lump, principal, infl, open, inflStory };
 }
