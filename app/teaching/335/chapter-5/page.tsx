@@ -5,11 +5,17 @@ import Image from "next/image";
 
 /**
  * Bank Boss RPG — Chapter 5 (Amber/Cream theme)
- * - iOS scroll fix: sticky dialog, no transforms on the scroll container, svh units, touch-action: pan-y
- * - Continuous typing loop while ANIMAL text renders (buffer loop, not setInterval).
+ * Phone-safe final build (no further edits):
+ * - Phone (<=768px): dialogue is INLINE (no fixed/sticky/transform) so the PAGE scrolls normally on iOS.
+ * - Tablet/Desktop: bottom overlay with scrollable inner panel.
+ * - Continuous typing loop while ANIMAL text is typing (adjustable volume).
+ * - Sound ON by default; gentle per-char blips remain.
+ * - Reveal gated until you’ve talked to all borrowers at least once.
  */
 
-// ---------- Small helpers ----------
+// =========================
+// Small helpers
+// =========================
 function money(n: number) { return `$${Math.round(n).toLocaleString()}`; }
 function rnd(min: number, max: number, dp = 0) {
   const v = Math.random() * (max - min) + min;
@@ -27,11 +33,13 @@ function toEAR(opts: { kind: "APR" | "EAR" | "LUMP"; rate?: number; m?: number; 
 }
 const real = (i: number, pi: number) => (1 + i) / (1 + pi) - 1;
 
+// Level-payment loan helpers for 2-year terms
 function pmtFromPV(apr: number, m: number, years: number, pv: number) {
-  const i = apr / m, n = m * years;
+  const i = apr / m; // per-period rate
+  const n = m * years; // total periods
   const denom = 1 - Math.pow(1 + i, -n);
-  if (denom === 0 || i === 0) return pv / n;
-  return pv * i / denom;
+  if (denom === 0 || i === 0) return pv / n; // fallback
+  return (pv * i) / denom;
 }
 function periodLabel(m: number) {
   if (m === 12) return "month";
@@ -40,7 +48,9 @@ function periodLabel(m: number) {
   return "year";
 }
 
-// ---------- Assets ----------
+// =========================
+// Assets
+// =========================
 const ANIMAL_IMAGES = [
   { name: "Dog", image: "/images/dog.png" },
   { name: "Fox", image: "/images/fox.png" },
@@ -54,7 +64,9 @@ const PLAYER_IMAGES = [
   { name: "Pirate", image: "/images/pirate.png" }
 ];
 
-// ---------- ~100-word stories ----------
+// =========================
+// ~100-word borrower stories (no APR/EAR text shown)
+// =========================
 function storyBakery(name: string, tYears: number, P: number) {
   return `${name}: I'm fixing up a tiny bakery near the old square. The room smells like warm butter even before sunrise. With ${money(P)}, I'll repair the oven, paint the shelves cream, and hang a hand-lettered sign. Mornings, I'll bake simple loaves and cinnamon knots; afternoons, I'll box leftovers for neighbors. I keep a small notebook with dates, sales, and a list of repairs. I'll send you a short note each month so you know how it's going. I can repay a little at a time, steady and polite, for ${tYears} years. If you ever visit, your bread is on the house.`;
 }
@@ -83,9 +95,20 @@ function storyLump(name: string, tYears: number, P: number, k: number) {
   const repay = Math.round(P * k);
   return `${name}: I like simple promises. I borrow ${money(P)} from you today and in ${tYears} years I repay ${money(repay)} in one clean payment. No coupons or fiddly bits between. If you want the compounding math, we can write it down, but the headline is clear: you get back ${money(repay)} at maturity. Simple to remember, simple to check.`;
 }
-const OPENERS_PLAIN = [storyBakery, storyTea, storyFerry, storyVines, storySchool, storyWorkshop, storyMill, storyBookshop];
+const OPENERS_PLAIN = [
+  storyBakery,
+  storyTea,
+  storyFerry,
+  storyVines,
+  storySchool,
+  storyWorkshop,
+  storyMill,
+  storyBookshop,
+];
 
-// ---------- Inflation ----------
+// =========================
+// Inflation flavor lines
+// =========================
 const pct1 = (x: number) => `${x.toFixed(1)}%`;
 const randomInflationNumber = () => Math.round(rnd(-1, 5) * 10) / 10;
 function makeInflationLine(name: string) {
@@ -103,23 +126,35 @@ function makeInflationLine(name: string) {
   return { text: pick(name), pi };
 }
 function makeRandomPlainStory(name: string) {
-  const tYears = 2;
-  const principal = Math.round(rnd(50_000, 250_000) / 1000) * 1000;
+  const tYears = 2; // all loans last 2 years in this chapter
+  const principal = Math.round(rnd(50_000, 250_000) / 1000) * 1000; // rounded to $1,000
   const story = choice(OPENERS_PLAIN)(name, tYears, principal);
   const infl = makeInflationLine(name);
   return { story, principal, termYears: tYears, flavor: infl.text, inflationRate: infl.pi };
 }
 
-// ---------- Types ----------
+// =========================
+// Types
+// =========================
 interface Lender {
-  id: string; label: string; image: string;
-  term: number; kind: "APR" | "EAR" | "LUMP";
-  rate?: number; m?: number; lump?: number;
-  principal: number; infl: number; open: string; inflStory: string;
+  id: string;
+  label: string;
+  image: string;
+  term: number;
+  kind: "APR" | "EAR" | "LUMP";
+  rate?: number;
+  m?: number;
+  lump?: number;
+  principal: number;
+  infl: number;
+  open: string;
+  inflStory: string;
 }
 interface Round { lenders: Lender[]; }
 
-// ---------- Lenders ----------
+// =========================
+// Random offer generator
+// =========================
 function makeLender(i: number): Lender {
   const animal = ANIMAL_IMAGES[i % ANIMAL_IMAGES.length];
   const label = animal.name;
@@ -159,8 +194,9 @@ function makeLender(i: number): Lender {
 function makeRound(): Round { return { lenders: Array.from({ length: 4 }, (_, i) => makeLender(i)) }; }
 
 // =========================
-// Audio with continuous typing loop (buffer looping)
+// SOUNDS — gesture-unlocked Web Audio
 // =========================
+
 type Ctx = AudioContext | (AudioContext & { resume?: () => Promise<void> });
 function makeCtx(): Ctx | null {
   if (typeof window === "undefined") return null;
@@ -219,10 +255,10 @@ function useAudio(enabled: boolean = true) {
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
     o.connect(g); g.connect(ctx.destination);
     o.start(); o.stop(ctx.currentTime + dur + 0.02);
-    o.onended = () => { o.disconnect(); g.disconnect(); };
+    o.onended = () => { try { o.disconnect(); g.disconnect(); } catch {} };
   }
 
-  // Per-char blip
+  // Per-char blip (soft typewriter click)
   const blip = () => {
     if (!enabled) return;
     const ctx = ctxRef.current; if (!ctx || ctx.state !== "running") return;
@@ -237,7 +273,7 @@ function useAudio(enabled: boolean = true) {
     g.gain.exponentialRampToValueAtTime(0.003, ctx.currentTime + 0.06);
     src.connect(bp); bp.connect(g); g.connect(ctx.destination);
     src.start(); src.stop(ctx.currentTime + 0.08);
-    src.onended = () => { src.disconnect(); bp.disconnect(); g.disconnect(); };
+    src.onended = () => { try { src.disconnect(); bp.disconnect(); g.disconnect(); } catch {} };
   };
 
   const click  = () => tone(380, 0.08, "triangle", 0.03);
@@ -246,50 +282,44 @@ function useAudio(enabled: boolean = true) {
   const success = () => { tone(540, 0.10, "triangle", 0.035); setTimeout(()=>tone(760, 0.12, "triangle", 0.035), 100); };
   const thud   = () => tone(120, 0.12, "sawtooth", 0.025);
 
-  // ---- Continuous typing loop via looping AudioBuffer (smoother on iOS than setInterval)
+  // Continuous typing loop via looping AudioBuffer (adjustable volume)
   function makeTickBuffer(ctx: AudioContext, periodMs = 70) {
     const length = Math.max(1, Math.floor(ctx.sampleRate * (periodMs / 1000)));
     const buf = ctx.createBuffer(1, length, ctx.sampleRate);
     const ch = buf.getChannelData(0);
-    // create a short noise "tick" at start (~6ms), then silence
     const tickLen = Math.min(length, Math.floor(ctx.sampleRate * 0.006));
     for (let i = 0; i < tickLen; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / tickLen) * 0.25;
-    // quick bandpass-like feel by adding a decaying 1.6kHz burst
-    const freq = 1600; const twoPiF = 2 * Math.PI * freq / ctx.sampleRate;
+    const freq = 1600; const twoPiF = (2 * Math.PI * freq) / ctx.sampleRate;
     for (let i = 0; i < tickLen; i++) ch[i] += Math.sin(twoPiF * i) * (1 - i / tickLen) * 0.15;
-    // rest is zeros (silence)
     return buf;
   }
 
-  const startTypeLoop = (periodMs = 70) => {
+  const startTypeLoop = (periodMs = 70, volume = 0.06) => {
     if (!enabled) return;
     const ctx = ctxRef.current; if (!ctx || ctx.state !== "running") return;
-    if (loopNodeRef.current) return; // already running
+    if (loopNodeRef.current) return;
     const src = ctx.createBufferSource();
     src.buffer = makeTickBuffer(ctx, periodMs);
     src.loop = true;
     const g = ctx.createGain();
-    g.gain.setValueAtTime(0.025, ctx.currentTime); // soft level
+    g.gain.setValueAtTime(volume, ctx.currentTime); // louder than baseline
     src.connect(g); g.connect(ctx.destination);
     src.start();
     loopNodeRef.current = src;
   };
   const stopTypeLoop = () => {
     const node = loopNodeRef.current;
-    if (node) {
-      try { node.stop(); } catch {}
-      try { node.disconnect(); } catch {}
-      loopNodeRef.current = null;
-    }
+    if (node) { try { node.stop(); node.disconnect(); } catch {} }
+    loopNodeRef.current = null;
   };
 
   return { ready, enable, blip, click, select, reveal, success, thud, startTypeLoop, stopTypeLoop };
 }
 
-/** Typewriter with start/finish hooks */
-function Typewriter({
-  text, speed = 18, blip, onStart, onDone
-}: { text: string; speed?: number; blip?: () => void; onStart?: () => void; onDone?: () => void; }) {
+// =========================
+// Typewriter component
+// =========================
+function Typewriter({ text, speed = 18, blip, onStart, onDone }:{ text: string; speed?: number; blip?: () => void; onStart?: () => void; onDone?: () => void; }) {
   const [i, setI] = useState(0);
   useEffect(() => { setI(0); }, [text]);
   useEffect(() => {
@@ -301,12 +331,10 @@ function Typewriter({
   return <span>{text.slice(0, i)}</span>;
 }
 
-// ---------- Start Screen ----------
-function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
-  onStart: () => void;
-  onCharacterSelect: (character: string) => void;
-  selectedCharacter: string;
-}) {
+// =========================
+// Start Screen
+// =========================
+function StartScreen({ onStart, onCharacterSelect, selectedCharacter }:{ onStart: () => void; onCharacterSelect: (c: string) => void; selectedCharacter: string; }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#FFF4DF]">
       <div className="mx-auto max-w-4xl p-2">
@@ -314,36 +342,26 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
           <div className="text-center">
             <div className="mb-6 pixel-frame-amber bg-[#FFECC8] text-left p-4">
               <p className="mb-3 text-lg leading-relaxed text-amber-900">
-                Welcome, banker! Meet <strong className="font-black">4 animal borrowers</strong>. Each asks to borrow now and promises how they’ll pay you back in <strong>2 years</strong>.
+                Welcome, banker! Meet <strong className="font-black">4 animal borrowers</strong>. Each asks to borrow a principal now and promises how they’ll pay you back in <strong>2 years</strong>.
               </p>
               <p className="text-base leading-relaxed text-amber-900">
-                • Offers are <strong>APR</strong> (ask compounding) or a <strong>one-time lump sum</strong><br/>
-                • Ask about inflation for real view<br/>
-                • Pick the <strong>highest effective annual rate (EPR)</strong>
+                • Offers are either <strong>APR</strong> (ask about compounding) or a <strong>one-time lump sum</strong><br/>
+                • Ask about inflation if you want to think in real terms<br/>
+                • Choose the borrower with the <strong>highest effective annual rate (EPR)</strong>
               </p>
             </div>
-
             <div className="mb-5">
               <h3 className="mb-2 text-xl text-amber-900 font-ms">Choose Your Character</h3>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 {PLAYER_IMAGES.map((char) => (
-                  <button
-                    key={char.name}
-                    onClick={() => onCharacterSelect(char.name)}
-                    className={`rounded-[2px] p-2 transition-transform ${selectedCharacter === char.name ? "ring-2 ring-amber-600" : ""} hover:scale-105`}
-                  >
+                  <button key={char.name} onClick={() => onCharacterSelect(char.name)} className={`rounded-[2px] p-2 transition-transform ${selectedCharacter === char.name ? "ring-2 ring-amber-600" : ""} hover:scale-105`}>
                     <Image src={char.image} alt={char.name} width={140} height={140} className="mx-auto rounded-[2px] drop-shadow-xl" />
                     <div className="mt-2 text-sm font-ms text-amber-900">{char.name}</div>
                   </button>
                 ))}
               </div>
             </div>
-
-            <button
-              onClick={onStart}
-              disabled={!selectedCharacter}
-              className="rounded-[2px] bg-amber-600 px-6 py-3 text-xl font-ms text-white shadow-lg hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <button onClick={onStart} disabled={!selectedCharacter} className="rounded-[2px] bg-amber-600 px-6 py-3 text-xl font-ms text-white shadow-lg hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed">
               Start Your Banking Adventure!
             </button>
           </div>
@@ -353,7 +371,23 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
   );
 }
 
-// ---------- Main Component ----------
+// =========================
+// Phone width hook (<=768px)
+// =========================
+function useIsPhone() {
+  const [isPhone, setIsPhone] = useState(false);
+  useEffect(() => {
+    const check = () => setIsPhone(window.matchMedia("(max-width: 768px)").matches);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isPhone;
+}
+
+// =========================
+// Main Component
+// =========================
 export default function BankBossChapter5() {
   const [gameStarted, setGameStarted] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState("");
@@ -367,15 +401,7 @@ export default function BankBossChapter5() {
   const [alertMsg, setAlertMsg] = useState<string | null>(null);
 
   const audio = useAudio(soundOn);
-
-  // iOS detection (incl. iPadOS desktop UA)
-  const isIOS = useMemo(() => {
-    if (typeof navigator === "undefined" || typeof document === "undefined") return false;
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.userAgent.includes("Mac") && "ontouchend" in document);
-  }, []);
-
-  const YOU = `${selectedCharacter || "You"}`;
+  const isPhone = useIsPhone();
 
   const round = useMemo(() => {
     const prev = Math.random; let s = seed + 1;
@@ -392,18 +418,18 @@ export default function BankBossChapter5() {
     const ear = toEAR({ kind: L.kind, rate: L.rate, m: L.m, years: L.term, lump: L.lump });
     const rReal = real(ear, L.infl);
     let repay: number;
-    if (L.kind === "LUMP") repay = L.principal * (L.lump || 1);
+    if (L.kind === "LUMP") { repay = L.principal * (L.lump || 1); }
     else { const pmt = pmtFromPV(L.rate || 0, L.m || 1, L.term, L.principal); const n = (L.m || 1) * L.term; repay = pmt * n; }
     const paybackRatio = repay / L.principal;
     return { L, ear, rReal, repay, paybackRatio };
   });
   const best = [...outcomes].sort((a, b) => b.paybackRatio - a.paybackRatio)[0];
 
-  const reset = () => {
+  function reset() {
     setSelectedId(null); setAcceptedId(null); setRevealed(false); setLog([]);
     setTalkedIds(new Set()); setSeed((x) => x + 1);
     audio.stopTypeLoop();
-  };
+  }
 
   if (!gameStarted) {
     return (
@@ -415,10 +441,102 @@ export default function BankBossChapter5() {
     );
   }
 
-  // Motion props: avoid translate/scale on iOS to prevent scroll freezing of descendants
-  const motionProps = isIOS
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.25 } }
-    : { initial: { y: 60, opacity: 0, scaleY: 0.98 }, animate: { y: 0, opacity: 1, scaleY: 1 }, exit: { y: 60, opacity: 0, scaleY: 0.98 }, transition: { duration: 0.35, ease: "easeOut" } };
+  // Shared dialogue inner renderer (used by phone inline & desktop overlay)
+  const renderDialogueInner = () => {
+    if (!selected) return null;
+    const isPlayerSpeaking = !log.length || log[log.length - 1].who !== selected.label;
+    const currentSpeaker = isPlayerSpeaking ? (selectedCharacter || "You") : selected.label;
+
+    const twCommon = {
+      blip: audio.blip,
+      onStart: () => {
+        const isAnimal = log.length > 0 && log[log.length - 1].who === selected.label;
+        if (isAnimal) audio.startTypeLoop(70, 0.06); // continuous & slightly louder
+      },
+      onDone: () => { audio.stopTypeLoop(); }
+    };
+
+    return (
+      <>
+        <div className="flex gap-0">
+          {isPlayerSpeaking ? (
+            <>
+              <div className="relative w-[200px] h-[200px] shrink-0 m-3 bg-[#FFF4DF] pixel-inner-amber">
+                <Image src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"} alt={selectedCharacter || "Player"} fill className="object-contain rounded-lg" />
+              </div>
+              <div className="flex-1 p-3">
+                <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">{currentSpeaker}</div>
+                <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
+                  {log.length > 0 && (
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <Typewriter text={log[log.length - 1].text} {...twCommon} />
+                      </div>
+                      {log[log.length - 1].who === (selectedCharacter || "You") && (
+                        <button
+                          onClick={() => {
+                            const last = log[log.length - 1];
+                            const answer = last.text.toLowerCase().includes("compound")
+                              ? (() => {
+                                  const m = selected.m || 1;
+                                  const rate = selected.rate || 0;
+                                  if (m === 1) {
+                                    return `${selected.label}: My APR is ${pct(rate, 1)} compounded annually. I make level payments of ${money(pmtFromPV(rate, m, selected.term, selected.principal))} each year.`;
+                                  } else {
+                                    const periodRate = rate / m;
+                                    const pmt = pmtFromPV(rate, m, selected.term, selected.principal);
+                                    return `${selected.label}: My nominal APR is ${pct(rate, 1)}, compounded ${m}× per year. The per-${periodLabel(m)} rate is ${pct(periodRate, 3)}. I make level payments of ${money(pmt)} each ${periodLabel(m)}.`;
+                                  }
+                                })()
+                              : selected.inflStory;
+                            audio.click();
+                            setLog((L) => [...L, { who: selected.label, text: answer }]);
+                          }}
+                          className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700"
+                        >
+                          Next →
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex-1 p-3">
+                <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">{currentSpeaker}</div>
+                <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
+                  {log.length > 0 && (
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <Typewriter text={log[log.length - 1].text} {...twCommon} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="relative w-[200px] h-[200px] shrink-0 m-3 bg-[#FFF4DF] pixel-inner-amber">
+                <Image src={selected.image} alt={selected.label} fill className="object-contain rounded-lg" />
+              </div>
+            </>
+          )}
+        </div>
+
+        {(log.length === 0 || (log[log.length - 1].who === selected.label)) && (
+          <div className="p-3 pt-0">
+            <div className="mt-2 grid grid-cols-1 gap-2">
+              {selected.kind === "APR" && (
+                <button onClick={() => { audio.click(); setLog((L) => [...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: Could you tell me your compounding schedule?` }]); }} className="pixel-btn-amber">Ask about compounding</button>
+              )}
+              <button onClick={() => { audio.click(); setLog((L) => [...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: What's your view on inflation right now?` }]); }} className="pixel-btn-amber">Ask about inflation</button>
+              <button onClick={() => { audio.click(); setSelectedId(null); setLog([]); audio.stopTypeLoop(); }} className="pixel-btn-amber">That&apos;s all my questions</button>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
 
   return (
     <div
@@ -427,16 +545,14 @@ export default function BankBossChapter5() {
         backgroundImage: "url('/images/bank.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        // ensure page itself can scroll
-        touchAction: "pan-y"
+        touchAction: "pan-y", // ensure page scrolling on iOS
       }}
     >
-      {/* Main content with large bottom padding so page can scroll under the sticky dialog */}
-      <div className="relative z-10 mx-auto max-w-6xl p-6 pb-[60svh]">
+      <div className={`relative z-10 mx-auto max-w-6xl p-6 ${isPhone ? "pb-6" : "pb-[60svh]"}`}>
         <div className="pixel-frame-amber bg-[#FFF8EA] p-3">
           <p className="mt-1 max-w-4xl text-[19px] text-amber-900">
-            Chat with <span className="font-ms font-bold">each borrower</span>. All loans are for <strong>2 years</strong> and are either <strong>APR quotes</strong> (ask compounding) or a <strong>one-time lump sum</strong> at maturity.
-            Pick the friend with the <span className="font-ms font-bold">highest effective annual rate (EPR)</span>.
+            Chat with <span className="font-ms font-bold">each borrower</span>. All loans are for <strong>2 years</strong> and are either <strong>APR quotes</strong> (you ask about compounding) or a <strong>one-time lump sum</strong> at maturity.
+            Compare and pick the friend with the <span className="font-ms font-bold">highest effective annual rate (EPR)</span>.
           </p>
         </div>
 
@@ -459,27 +575,15 @@ export default function BankBossChapter5() {
                     <div className="text-sm text-amber-900">Wants to borrow: <strong>{money(L.principal)}</strong></div>
                     <div className="text-sm text-amber-900 mt-0.5">
                       Term <strong>{L.term}y</strong> • {L.kind === "LUMP"
-                        ? <>repay <strong>{money(L.principal*(L.lump||1))}</strong> at maturity</>
-                        : <><strong>{pct(L.rate || 0,1)}</strong> {L.kind}{L.kind === "APR" && L.m ? `, comp ${L.m}×/yr` : ""}</>}
+                        ? <>repay <strong>{money(L.principal * (L.lump || 1))}</strong> at maturity</>
+                        : <><strong>{pct(L.rate || 0, 1)}</strong> {L.kind}{L.kind === "APR" && L.m ? `, comp ${L.m}×/yr` : ""}</>}
                     </div>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center gap-2">
-                  <button
-                    onClick={() => { audio.click(); setSelectedId(L.id); setTalkedIds(prev => { const next = new Set(prev); next.add(L.id); return next; }); }}
-                    disabled={locked}
-                    className="pixel-btn-amber"
-                  >
-                    Talk
-                  </button>
-                  <button
-                    onClick={() => { audio.select(); setAcceptedId(L.id); }}
-                    disabled={!!acceptedId && acceptedId!==L.id}
-                    className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700"
-                  >
-                    Choose borrower
-                  </button>
-                  {acceptedId===L.id && <span className="text-sm font-ms text-emerald-700">Selected</span>}
+                  <button onClick={() => { audio.click(); setSelectedId(L.id); setTalkedIds(prev => { const next = new Set(prev); next.add(L.id); return next; }); }} disabled={locked} className="pixel-btn-amber">Talk</button>
+                  <button onClick={() => { audio.select(); setAcceptedId(L.id); }} disabled={!!acceptedId && acceptedId !== L.id} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">Choose borrower</button>
+                  {acceptedId === L.id && <span className="text-sm font-ms text-emerald-700">Selected</span>}
                 </div>
               </div>
             );
@@ -487,25 +591,17 @@ export default function BankBossChapter5() {
         </div>
 
         {/* Controls */}
-        <div className="sticky bottom-4 mt-6">
+        <div className="mt-6">
           <div className="pixel-frame-amber bg-[#FFF8EA] p-3 flex flex-wrap items-center gap-3">
             {!revealed ? (
               <>
                 <div className="text-[18px] text-amber-900">
-                  Talk to borrowers, then tap <span className="font-ms">Reveal</span>. <span className="font-ms">Repeat</span> gets new offers.
+                  Talk to borrowers, then tap <span className="font-ms">Reveal</span> to compare. <span className="font-ms">Repeat</span> gets new offers.
                 </div>
                 <div className="ml-auto flex gap-2">
-                  <button
-                    onClick={() => {
-                      if (talkedIds.size < round.lenders.length) { audio.thud(); setAlertMsg("Please talk to each borrower before you reveal the comparison."); return; }
-                      audio.reveal(); setRevealed(true);
-                    }}
-                    className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-40"
-                  >
-                    Reveal
-                  </button>
+                  <button onClick={() => { if (talkedIds.size < round.lenders.length) { audio.thud(); setAlertMsg("Please talk to each borrower before you reveal the comparison."); return; } audio.reveal(); setRevealed(true); }} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">Reveal</button>
                   <button onClick={reset} className="pixel-btn-amber bg-amber-700 text-white hover:bg-amber-800">Repeat</button>
-                  <button onClick={() => setSoundOn(s=>!s)} className="pixel-btn-amber">{soundOn?"Sound off":"Sound on"}</button>
+                  <button onClick={() => setSoundOn(s => !s)} className="pixel-btn-amber">{soundOn ? "Sound off" : "Sound on"}</button>
                 </div>
               </>
             ) : (
@@ -528,9 +624,7 @@ export default function BankBossChapter5() {
                 </div>
                 <div className="mt-4 pixel-frame-amber bg-[#FFECC8] p-3 text-[18px] font-ms text-amber-900">
                   <div>Best pick: {best.L.label} with the highest EAR of {pct(best.ear, 2)}.</div>
-                  <div className="mt-2 text-sm text-amber-800">
-                    Remember: For APR offers, EAR = (1 + APR/m)^m - 1, where m is compounding frequency per year.
-                  </div>
+                  <div className="mt-2 text-sm text-amber-800">Remember: For APR offers, EAR = (1 + APR/m)^m - 1, where m is compounding frequency per year.</div>
                 </div>
                 <div className="mt-4 flex justify-end">
                   <button onClick={reset} className="pixel-btn-amber bg-amber-700 text-white hover:bg-amber-800">Play again</button>
@@ -554,151 +648,31 @@ export default function BankBossChapter5() {
         </div>
       )}
 
-      {/* Bottom Dialogue — sticky on iOS, fixed elsewhere; INNER is the scroll host and is NOT transformed on iOS */}
-      <AnimatePresence initial={false}>
-        {selected && (
-          <motion.div
-            key={selected.id}
-            {...motionProps}
-            className={`${isIOS ? "sticky bottom-0" : "fixed inset-x-0 bottom-0"} z-30 mx-auto max-w-6xl p-4`}
-            style={{ touchAction: "pan-y" }}
-          >
-            <div
-              className="pixel-frame-amber bg-[#FFF4DF] p-0 text-amber-900"
-              style={{
-                maxHeight: "56svh",           // viewport-safe
-                overflowY: "auto",
-                WebkitOverflowScrolling: "touch",
-                touchAction: "pan-y",
-                paddingBottom: "max(8px, env(safe-area-inset-bottom))",
-              }}
-            >
-              {(() => {
-                const isPlayerSpeaking = !log.length || log[log.length-1].who !== selected.label;
-                const currentSpeaker = isPlayerSpeaking ? (selectedCharacter || "You") : selected.label;
-
-                const twCommon = {
-                  blip: audio.blip,
-                  onStart: () => {
-                    const isAnimal = log.length > 0 && log[log.length-1].who === selected.label;
-                    if (isAnimal) audio.startTypeLoop(70); // continuous soft ticks while animal speaks
-                  },
-                  onDone: () => { audio.stopTypeLoop(); }
-                };
-
-                return (
-                  <div className="flex gap-0">
-                    {isPlayerSpeaking ? (
-                      <>
-                        <div className="relative w-[200px] h-[200px] shrink-0 m-3 bg-[#FFF4DF] pixel-inner-amber">
-                          <Image
-                            src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
-                            alt={selectedCharacter || "Player"}
-                            fill
-                            className="object-contain rounded-lg"
-                          />
-                        </div>
-                        <div className="flex-1 p-3">
-                          <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">
-                            {currentSpeaker}
-                          </div>
-                          <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
-                            {log.length > 0 && (
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1">
-                                  <Typewriter text={log[log.length-1].text} {...twCommon} />
-                                </div>
-                                {log[log.length-1].who === (selectedCharacter || "You") && (
-                                  <button
-                                    onClick={() => {
-                                      const last = log[log.length-1];
-                                      const answer = last.text.toLowerCase().includes("compound")
-                                        ? (() => {
-                                            const m = selected.m || 1;
-                                            const rate = selected.rate || 0;
-                                            if (m === 1) {
-                                              return `${selected.label}: My APR is ${pct(rate, 1)} compounded annually. I make level payments of ${money(pmtFromPV(rate, m, selected.term, selected.principal))} each year.`;
-                                            } else {
-                                              const periodRate = rate / m;
-                                              const pmt = pmtFromPV(rate, m, selected.term, selected.principal);
-                                              return `${selected.label}: My nominal APR is ${pct(rate, 1)}, compounded ${m}× per year. The per-${periodLabel(m)} rate is ${pct(periodRate, 3)}. I make level payments of ${money(pmt)} each ${periodLabel(m)}.`;
-                                            }
-                                          })()
-                                        : selected.inflStory;
-                                      audio.click();
-                                      setLog((L) => [...L, { who: selected.label, text: answer }]);
-                                    }}
-                                    className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700"
-                                  >
-                                    Next →
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex-1 p-3">
-                          <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">
-                            {currentSpeaker}
-                          </div>
-                          <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
-                            {log.length > 0 && (
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1">
-                                  <Typewriter text={log[log.length-1].text} {...twCommon} />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="relative w-[200px] h-[200px] shrink-0 m-3 bg-[#FFF4DF] pixel-inner-amber">
-                          <Image src={selected.image} alt={selected.label} fill className="object-contain rounded-lg" />
-                        </div>
-                      </>
-                    )}
-                  </div>
-                );
-              })()}
-
-              {/* Choices */}
-              {(log.length === 0 || (log[log.length-1].who === selected.label)) && (
-                <div className="p-3 pt-0">
-                  <div className="mt-2 grid grid-cols-1 gap-2">
-                    {selected.kind === "APR" && (
-                      <button
-                        onClick={() => { audio.click(); setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: Could you tell me your compounding schedule?` }]); }}
-                        className="pixel-btn-amber"
-                      >
-                        Ask about compounding
-                      </button>
-                    )}
-                    <button
-                      onClick={() => { audio.click(); setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: What's your view on inflation right now?` }]); }}
-                      className="pixel-btn-amber"
-                    >
-                      Ask about inflation
-                    </button>
-                    <button
-                      onClick={() => { audio.click(); setSelectedId(null); setLog([]); audio.stopTypeLoop(); }}
-                      className="pixel-btn-amber"
-                    >
-                      That's all my questions
-                    </button>
-                  </div>
-                </div>
-              )}
+      {/* Dialogue: inline on phones; overlay on larger screens */}
+      {selected && (
+        isPhone ? (
+          <div className="mx-auto max-w-6xl mt-4">
+            <div className="pixel-frame-amber bg-[#FFF4DF] p-0 text-amber-900" style={{ overflow: "visible", WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}>
+              {renderDialogueInner()}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        ) : (
+          <AnimatePresence initial={false}>
+            <motion.div key={selected.id} initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} transition={{ duration: 0.35, ease: "easeOut" }} className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-6xl p-4" style={{ touchAction: "pan-y" }}>
+              <div className="pixel-frame-amber bg-[#FFF4DF] p-0 text-amber-900" style={{ maxHeight: "56svh", overflowY: "auto", WebkitOverflowScrolling: "touch", touchAction: "pan-y", paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
+                {renderDialogueInner()}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        )
+      )}
     </div>
   );
 }
 
-// ---------- Tiny runtime tests ----------
+// =========================
+// Tiny runtime tests
+// =========================
 if (typeof window !== "undefined") {
   const apr = toEAR({ kind: "APR", rate: 0.12, m: 12 });
   const ear = (1 + 0.12 / 12) ** 12 - 1;
