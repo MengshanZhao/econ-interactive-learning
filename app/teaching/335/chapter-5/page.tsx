@@ -491,12 +491,11 @@ export default function BankBossChapter5() {
 
   return (
     <div
-      className="relative min-h-screen text-slate-800 font-serif"
+      className="relative min-h-[100dvh] text-slate-800 font-serif"
       style={{
         backgroundImage: "url('/images/bank.jpg')",
         backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed"
+        backgroundPosition: "center"
       }}
     >
       <div className="relative z-10 mx-auto max-w-6xl p-6 pb-72">
@@ -592,7 +591,7 @@ export default function BankBossChapter5() {
                     Reveal
                   </button>
                   <button onClick={reset} className="pixel-btn-amber bg-amber-700 text-white hover:bg-amber-800">Repeat</button>
-                  <button onClick={() => setSoundOn(s=>!s)} className="pixel-btn-amber">{soundOn?"Sound on":"Sound off"}</button>
+                  <button onClick={() => setSoundOn(s=>!s)} className="pixel-btn-amber">{soundOn?"Sound off":"Sound on"}</button>
                 </div>
               </>
             ) : (
@@ -618,6 +617,9 @@ export default function BankBossChapter5() {
                   <div className="mt-2 text-sm text-amber-800">
                     Remember: For APR offers, EAR = (1 + APR/m)^m - 1, where m is compounding frequency per year.
                   </div>
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <button onClick={reset} className="pixel-btn-amber bg-amber-700 text-white hover:bg-amber-800">Play again</button>
                 </div>
               </div>
             )}
@@ -679,7 +681,7 @@ export default function BankBossChapter5() {
                     {log.length > 0 && (
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                                  <Typewriter text={log[log.length-1].text} blip={audio.blip} />
+                                  <Typewriter text={log[log.length-1].text} />
                         </div>
                         {/* Only show Next when YOU just asked */}
                         {log[log.length-1].who === (selectedCharacter || "You") && (
@@ -722,7 +724,7 @@ export default function BankBossChapter5() {
                             {log.length > 0 && (
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
-                                  <Typewriter text={log[log.length-1].text} blip={audio.blip} />
+                                  <Typewriter text={log[log.length-1].text} />
                                 </div>
                               </div>
                             )}
