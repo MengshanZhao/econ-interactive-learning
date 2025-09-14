@@ -5,23 +5,9 @@ import Image from "next/image";
 
 /**
  * Bank Boss RPG — Chapter 5 (Amber/Cream theme)
- * - Borrowers ask YOU for a principal today; pick the one with the HIGHEST TOTAL PAY-BACK RATIO.
- * - ~100-word, plain/cute stories; all $ amounts.
- * - Inflation < 10%; effective returns ≤ 15%; no zeros.
- * - Typewriter with gentle key-click (SOUND ON by default). + continuous loop while ANIMAL speaks.
- * - Dialogue flow: after YOU ask, only "Next →" appears.
- * - Large SQUARE headshot + ornate amber frame (square corners).
- * - Fonts: description/cards use old serif; dialogue uses VT323 (body) + MedievalSharp (name).
- * - “That’s all my questions” closes the dialogue.
- * - Reveal is blocked until you’ve talked to ALL borrowers at least once.
- * - iOS scrolling fixed: sticky + scrollable dialog, safe-area padding, svh units.
+ * - iOS scroll fix: sticky dialog, no transforms on the scroll container, svh units, touch-action: pan-y
+ * - Continuous typing loop while ANIMAL text renders (buffer loop, not setInterval).
  */
-
-// =========================
-// Plain-language stories + soft sounds
-// Randomized each time the game opens.
-// (No APR/EAR anywhere; no calculations shown.)
-// =========================
 
 // ---------- Small helpers ----------
 function money(n: number) { return `$${Math.round(n).toLocaleString()}`; }
@@ -41,12 +27,10 @@ function toEAR(opts: { kind: "APR" | "EAR" | "LUMP"; rate?: number; m?: number; 
 }
 const real = (i: number, pi: number) => (1 + i) / (1 + pi) - 1;
 
-// Level-payment loan helpers for 2-year terms
 function pmtFromPV(apr: number, m: number, years: number, pv: number) {
-  const i = apr / m; // per-period rate
-  const n = m * years; // total periods
+  const i = apr / m, n = m * years;
   const denom = 1 - Math.pow(1 + i, -n);
-  if (denom === 0 || i === 0) return pv / n; // fallback for zero rate
+  if (denom === 0 || i === 0) return pv / n;
   return pv * i / denom;
 }
 function periodLabel(m: number) {
@@ -63,7 +47,6 @@ const ANIMAL_IMAGES = [
   { name: "Leopard", image: "/images/leopard.png" },
   { name: "Sheep", image: "/images/sheep.png" }
 ];
-
 const PLAYER_IMAGES = [
   { name: "Wizard", image: "/images/wizard.png" },
   { name: "Lizard", image: "/images/lizard.png" },
@@ -71,211 +54,132 @@ const PLAYER_IMAGES = [
   { name: "Pirate", image: "/images/pirate.png" }
 ];
 
-// ---------- ~100-word, plain/cute borrower stories (no APR/EAR, no math shown) ----------
+// ---------- ~100-word stories ----------
 function storyBakery(name: string, tYears: number, P: number) {
   return `${name}: I'm fixing up a tiny bakery near the old square. The room smells like warm butter even before sunrise. With ${money(P)}, I'll repair the oven, paint the shelves cream, and hang a hand-lettered sign. Mornings, I'll bake simple loaves and cinnamon knots; afternoons, I'll box leftovers for neighbors. I keep a small notebook with dates, sales, and a list of repairs. I'll send you a short note each month so you know how it's going. I can repay a little at a time, steady and polite, for ${tYears} years. If you ever visit, your bread is on the house.`;
 }
-
 function storyTea(name: string, tYears: number, P: number) {
   return `${name}: I want to open a cozy tea corner by the river path. The plan is simple: woven mats, low stools, a shelf of jars that click when opened. With ${money(P)}, I'll buy kettles, cups, and a small sign shaped like a teapot. Travelers stop, breathe, and talk; I listen and keep careful notes. I'll repay you gently over ${tYears} years, the same way steam rises—quiet and regular. On market days I'll add sweet buns and lemon slices. If storms come, I'll close early and wipe everything dry. You'll always know how we're doing, because I'll write you every month.`;
 }
-
 function storyFerry(name: string, tYears: number, P: number) {
   return `${name}: I'm outfitting a sturdy little ferry for the lake. When the road gets muddy, boats keep life moving. With ${money(P)}, I'll patch the planks, oil the lines, and paint the hull a cheerful blue. My cousin knows the weather; I trust his nose for wind. We'll carry grain in the morning and folks at dusk. I track trips with pencil marks on a board—nothing fancy, always honest. I'll repay you bit by bit over ${tYears} years. If the waves grow bossy, we wait, then try again. You'll get updates that read like the lake: clear, calm, and steady.`;
 }
-
 function storyVines(name: string, tYears: number, P: number) {
   return `${name}: The vines outside the walls had a kind spring—lots of shy little grapes. With ${money(P)}, I'll buy a hand press, a few barrels, and a mule with good manners. The work is slow and kind: wash, press, wait, taste, label. I keep my ledger clean and my cellar cooler than a secret. I'll repay you on a simple rhythm for ${tYears} years: small payments, on time, no surprises. If a barrel misbehaves, I'll fix it before I brag. You'll get short letters with smudges of purple and news about harvest days. When the corks pop, you're invited first.`;
 }
-
 function storySchool(name: string, tYears: number, P: number) {
   return `${name}: I'm renting a sunny room to run an after-school class. With ${money(P)}, I'll buy chalk, slates, storybooks, and a sturdy clock that actually ticks. We'll practice sums, read short adventures, and celebrate tiny wins with stickers. I keep attendance on a board and tuck the coins into a tin with a polite rattle. I'll repay you slowly and surely across ${tYears} years. Each month you'll get a friendly note—what we learned, which shelf wobbled, and when I fixed it. The goal is simple: keep the lights warm, the pencils sharp, and the promises even sharper.`;
 }
-
 function storyWorkshop(name: string, tYears: number, P: number) {
   return `${name}: I'm opening a little fix-it workshop where fussy things become patient again. Hinges that squeak, lamps that blink, scales that lie—bring them in. With ${money(P)}, I'll stock screws, wires, glue that smells like school, and a pegboard that makes me look organized. I write neat tickets and return parts I don't use. I'll repay you in steady, regular pieces for ${tYears} years. On slow days, I sweep; on busy days, I whistle. If a job takes two tries, I own it and finish it right. You'll get monthly updates, short and clear, with a smudge of honest grease.`;
 }
-
 function storyMill(name: string, tYears: number, P: number) {
   return `${name}: The mill by the falls can hum again if I shore up the beams and calm the gears. With ${money(P)}, I'll buy belts, wedges, and paint the color of fresh oats. Farmers like early starts; I'll meet them with a thermos and a smile. The work is loud but friendly; the ledger is quiet and square. I'll repay you over ${tYears} years, same amount each time, the way wheels turn—round and reliable. When the river runs high, we pause and sip tea; when it settles, we grind and grin. I'll send you simple notes that smell faintly of flour.`;
 }
-
 function storyBookshop(name: string, tYears: number, P: number) {
   return `${name}: I'm starting a tiny bookshop with a bell that rings like a giggle. With ${money(P)}, I'll buy shelves, a plant that forgives me, and stories that fit into pockets. Kids will trade jokes for bookmarks; grownups will trade quiet for a chair. I stamp dates with confident thumps and keep a jar for lost buttons. I'll repay you evenly for ${tYears} years—nothing tricky, just tidy envelopes. If a rainy day slows us, I'll host read-alouds and cocoa. You'll get monthly postcards with doodles in the margins and a line about what made someone smile that week.`;
 }
-
 function storyLump(name: string, tYears: number, P: number, k: number) {
   const repay = Math.round(P * k);
   return `${name}: I like simple promises. I borrow ${money(P)} from you today and in ${tYears} years I repay ${money(repay)} in one clean payment. No coupons or fiddly bits between. If you want the compounding math, we can write it down, but the headline is clear: you get back ${money(repay)} at maturity. Simple to remember, simple to check.`;
 }
+const OPENERS_PLAIN = [storyBakery, storyTea, storyFerry, storyVines, storySchool, storyWorkshop, storyMill, storyBookshop];
 
-const OPENERS_PLAIN = [
-  storyBakery,
-  storyTea,
-  storyFerry,
-  storyVines,
-  storySchool,
-  storyWorkshop,
-  storyMill,
-  storyBookshop,
-];
-
-// =========================
-// Cute Animal Kingdom Inflation Lines
-// =========================
+// ---------- Inflation ----------
 const pct1 = (x: number) => `${x.toFixed(1)}%`;
-
-function randomInflationNumber() {
-  const v = rnd(-1, 5);
-  return Math.round(v * 10) / 10; // one decimal
-}
-
-/** Six themed inflation stories (2–4 sentences). */
+const randomInflationNumber = () => Math.round(rnd(-1, 5) * 10) / 10;
 function makeInflationLine(name: string) {
   const pi = randomInflationNumber();
   const pistr = pct1(pi);
-
   const variants: ((n: string) => string)[] = [
-    // 1. Recession / low inflation
     (n) => `${n}: The new iron factory upstream pours smoke, the river fish drift belly-up, and markets look sad. Shops whisper of a slowdown, so inflation drifts low, around ${pistr}. I budget tight and keep your coins safe in a dry jar.`,
-
-    // 2. Calm / small rise
     (n) => `${n}: Squirrels store extra nuts, owls hoot about steady harvests. Prices nibble upward just a bit, near ${pistr}. It feels calm; I save a handful of grain so your payments stay smooth.`,
-
-    // 3. Middle / playful
     (n) => `${n}: Foxes opened a sweet stand and everyone queues for candy. Treats make coins jingle faster, so inflation prances around ${pistr}. I keep my purse knotted; your envelopes arrive tidy and on time.`,
-
-    // 4. High / stormy
     (n) => `${n}: Storms drowned the carrot fields and rabbits must buy turnips instead. Food feels dearer, roughly ${pistr}. I stretch recipes and cut frills before I ever touch your repayment.`,
-
-    // 5. Supply hiccups / mixed
     (n) => `${n}: The beavers' dam broke, barges stalled, and grain sacks sulked on the shore. Prices wander upward, about ${pistr}. I keep extra flour tucked away so your payback doesn't wander too.`,
-
-    // 6. Negative / cheerful dip
     (n) => `${n}: A bumper berry crop makes baskets overflow. Stalls lower their chalk marks, even dipping to ${pistr}. I refill the pantry while it's cheap and keep your payments cheerful and exact.`,
   ];
-
   const pick = variants[Math.floor(Math.random() * variants.length)];
   return { text: pick(name), pi };
 }
-
-// ---------- Random story factory (call this on each game load) ----------
 function makeRandomPlainStory(name: string) {
-  const tYears = 2; // all loans last 2 years in this chapter
-  // fresh principal each time you open the game
-  const principal = Math.round(rnd(50_000, 250_000) / 1000) * 1000; // rounded to $1,000
-  const opener = choice(OPENERS_PLAIN);
-  const story = opener(name, tYears, principal);
-  const inflationData = makeInflationLine(name);
-  return { story, principal, termYears: tYears, flavor: inflationData.text, inflationRate: inflationData.pi }; // use flavor after a "What's the price scene like?" question
+  const tYears = 2;
+  const principal = Math.round(rnd(50_000, 250_000) / 1000) * 1000;
+  const story = choice(OPENERS_PLAIN)(name, tYears, principal);
+  const infl = makeInflationLine(name);
+  return { story, principal, termYears: tYears, flavor: infl.text, inflationRate: infl.pi };
 }
 
 // ---------- Types ----------
 interface Lender {
-  id: string;
-  label: string;
-  image: string;
-  term: number;             // years 1–30
-  kind: "APR" | "EAR" | "LUMP";
-  rate?: number;
-  m?: number;
-  lump?: number;            // payoff multiple at maturity (for LUMP)
-  principal: number;        // BORROWED from you today
-  infl: number;             // inflation expectation
-  open: string;             // ~100 words
-  inflStory: string;
+  id: string; label: string; image: string;
+  term: number; kind: "APR" | "EAR" | "LUMP";
+  rate?: number; m?: number; lump?: number;
+  principal: number; infl: number; open: string; inflStory: string;
 }
 interface Round { lenders: Lender[]; }
 
-// ---------- Random offer generator with sensible caps ----------
+// ---------- Lenders ----------
 function makeLender(i: number): Lender {
-  const animalData = ANIMAL_IMAGES[i % ANIMAL_IMAGES.length];
-  const label = `${animalData.name}`;
-  const term = 2; // All offers are 2-year loans
-
-  // Borrow amounts in sensible round dollars
+  const animal = ANIMAL_IMAGES[i % ANIMAL_IMAGES.length];
+  const label = animal.name;
+  const term = 2;
   let principal = Math.round(rnd(50_000, 250_000, 0) / 1000) * 1000;
 
-  // Offer type: only APR or LUMP (no direct EAR quotes)
   let kind: "APR" | "EAR" | "LUMP" = Math.random() < 0.6 ? "APR" : "LUMP";
-
-  let rate: number | undefined;
-  let m: number | undefined;
-  let lump: number | undefined;
+  let rate: number | undefined; let m: number | undefined; let lump: number | undefined;
 
   if (kind === "APR") {
     m = [1, 2, 4, 12][Math.floor(Math.random() * 4)];
-    for (let tries = 0; tries < 8; tries++) {
-      const apr = rnd(0.03, 0.14, 4);          // 3%–14% APR
+    for (let t = 0; t < 8; t++) {
+      const apr = rnd(0.03, 0.14, 4);
       const ear = (1 + apr / m) ** m - 1;
       if (ear <= 0.15) { rate = apr; break; }
     }
     if (rate == null) rate = 0.12;
-  } else { // LUMP: choose k so implied EAR ≤ 15% (and ≥ ~3%), k > 1
+  } else {
     const maxK = (1 + 0.15) ** term;
     const minK = (1 + 0.03) ** term;
     const k = rnd(Math.min(minK, maxK * 0.9), maxK, 3);
     lump = Math.max(1.05, Math.min(k, maxK));
   }
 
-  const ear = toEAR({ kind, rate, m, years: term, lump });
-  const rStr = pct(Math.min(ear, 0.15), 1);
-
-  // Use plain stories for both APR and LUMP offers
-  let open: string;
-  let inflStory: string;
-  let infl: number;
-
+  let open: string, inflStory: string, infl: number;
   if (kind === "LUMP") {
     open = storyLump(label, term, principal, lump!);
-    const inflData = makeInflationLine(label);
-    inflStory = inflData.text;
-    infl = inflData.pi / 100; // convert percentage to decimal
+    const d = makeInflationLine(label);
+    inflStory = d.text; infl = d.pi / 100;
   } else {
-    const storyData = makeRandomPlainStory(label);
-    open = storyData.story;
-    // Override the random principal with our calculated one for consistency
-    principal = storyData.principal;
-    inflStory = storyData.flavor;
-    infl = storyData.inflationRate / 100; // convert percentage to decimal
+    const d = makeRandomPlainStory(label);
+    open = d.story; principal = d.principal; inflStory = d.flavor; infl = d.inflationRate / 100;
   }
 
-  return { id: `L${i}_${Math.random().toString(36).slice(2,8)}`, label, image: animalData.image, term, kind, rate, m, lump, principal, infl, open, inflStory };
+  return { id: `L${i}_${Math.random().toString(36).slice(2,8)}`, label, image: animal.image, term, kind, rate, m, lump, principal, infl, open, inflStory };
 }
-
 function makeRound(): Round { return { lenders: Array.from({ length: 4 }, (_, i) => makeLender(i)) }; }
 
 // =========================
-// SOUNDS — gesture-unlocked Web Audio (works on Chrome/Safari/Firefox)
+// Audio with continuous typing loop (buffer looping)
 // =========================
-
 type Ctx = AudioContext | (AudioContext & { resume?: () => Promise<void> });
-
 function makeCtx(): Ctx | null {
   if (typeof window === "undefined") return null;
   const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
   return AC ? new AC() : null;
 }
 
-/** Hook that returns UI sounds + a blip for the typewriter and a continuous typing loop for animal speech. */
 function useAudio(enabled: boolean = true) {
   const ctxRef = useRef<Ctx | null>(null);
   const [ready, setReady] = useState(false);
-  const loopRef = useRef<number | null>(null);
+  const loopNodeRef = useRef<AudioBufferSourceNode | null>(null);
 
-  // Create context lazily
-  useEffect(() => {
-    if (!enabled) return;
-    if (!ctxRef.current) ctxRef.current = makeCtx();
-  }, [enabled]);
+  useEffect(() => { if (enabled && !ctxRef.current) ctxRef.current = makeCtx(); }, [enabled]);
 
-  // One-time unlock on first user gesture
   useEffect(() => {
     if (!enabled) return;
     const tryUnlock = async () => {
       if (!ctxRef.current) ctxRef.current = makeCtx();
-      const ctx = ctxRef.current;
-      if (!ctx) return;
+      const ctx = ctxRef.current; if (!ctx) return;
       // @ts-ignore
       if (ctx.state === "suspended" && ctx.resume) await ctx.resume();
       setReady(ctx.state === "running");
@@ -295,40 +199,33 @@ function useAudio(enabled: boolean = true) {
     };
   }, [enabled]);
 
-  /** Manually enable from a button, e.g. onClick={() => enable()} */
   const enable = async () => {
     if (!enabled) return;
     if (!ctxRef.current) ctxRef.current = makeCtx();
-    const ctx = ctxRef.current;
-    if (!ctx) return;
+    const ctx = ctxRef.current; if (!ctx) return;
     // @ts-ignore
     if (ctx.state === "suspended" && ctx.resume) await ctx.resume();
     setReady(ctx.state === "running");
   };
 
-  // Core tone
   function tone(freq: number, dur = 0.12, type: OscillatorType = "sine", gainPeak = 0.04) {
     if (!enabled) return;
-    const ctx = ctxRef.current;
-    if (!ctx || ctx.state !== "running") return;
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
+    const ctx = ctxRef.current; if (!ctx || ctx.state !== "running") return;
+    const o = ctx.createOscillator(); const g = ctx.createGain();
     o.type = type;
     o.frequency.setValueAtTime(freq, ctx.currentTime);
     g.gain.setValueAtTime(0, ctx.currentTime);
     g.gain.linearRampToValueAtTime(gainPeak, ctx.currentTime + 0.01);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
     o.connect(g); g.connect(ctx.destination);
-    o.start();
-    o.stop(ctx.currentTime + dur + 0.02);
+    o.start(); o.stop(ctx.currentTime + dur + 0.02);
     o.onended = () => { o.disconnect(); g.disconnect(); };
   }
 
-  // Soft typewriter blip (noise through bandpass)
+  // Per-char blip
   const blip = () => {
     if (!enabled) return;
-    const ctx = ctxRef.current;
-    if (!ctx || ctx.state !== "running") return;
+    const ctx = ctxRef.current; if (!ctx || ctx.state !== "running") return;
     const noise = ctx.createBuffer(1, 256, ctx.sampleRate);
     const data = noise.getChannelData(0);
     for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.22;
@@ -339,8 +236,7 @@ function useAudio(enabled: boolean = true) {
     g.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 0.006);
     g.gain.exponentialRampToValueAtTime(0.003, ctx.currentTime + 0.06);
     src.connect(bp); bp.connect(g); g.connect(ctx.destination);
-    src.start();
-    src.stop(ctx.currentTime + 0.08);
+    src.start(); src.stop(ctx.currentTime + 0.08);
     src.onended = () => { src.disconnect(); bp.disconnect(); g.disconnect(); };
   };
 
@@ -350,35 +246,50 @@ function useAudio(enabled: boolean = true) {
   const success = () => { tone(540, 0.10, "triangle", 0.035); setTimeout(()=>tone(760, 0.12, "triangle", 0.035), 100); };
   const thud   = () => tone(120, 0.12, "sawtooth", 0.025);
 
-  // Continuous gentle typing loop (reuses blip)
-  const startWriterLoop = (intervalMs = 60) => {
-    if (loopRef.current != null) return;
-    loopRef.current = window.setInterval(() => blip(), intervalMs);
+  // ---- Continuous typing loop via looping AudioBuffer (smoother on iOS than setInterval)
+  function makeTickBuffer(ctx: AudioContext, periodMs = 70) {
+    const length = Math.max(1, Math.floor(ctx.sampleRate * (periodMs / 1000)));
+    const buf = ctx.createBuffer(1, length, ctx.sampleRate);
+    const ch = buf.getChannelData(0);
+    // create a short noise "tick" at start (~6ms), then silence
+    const tickLen = Math.min(length, Math.floor(ctx.sampleRate * 0.006));
+    for (let i = 0; i < tickLen; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / tickLen) * 0.25;
+    // quick bandpass-like feel by adding a decaying 1.6kHz burst
+    const freq = 1600; const twoPiF = 2 * Math.PI * freq / ctx.sampleRate;
+    for (let i = 0; i < tickLen; i++) ch[i] += Math.sin(twoPiF * i) * (1 - i / tickLen) * 0.15;
+    // rest is zeros (silence)
+    return buf;
+  }
+
+  const startTypeLoop = (periodMs = 70) => {
+    if (!enabled) return;
+    const ctx = ctxRef.current; if (!ctx || ctx.state !== "running") return;
+    if (loopNodeRef.current) return; // already running
+    const src = ctx.createBufferSource();
+    src.buffer = makeTickBuffer(ctx, periodMs);
+    src.loop = true;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.025, ctx.currentTime); // soft level
+    src.connect(g); g.connect(ctx.destination);
+    src.start();
+    loopNodeRef.current = src;
   };
-  const stopWriterLoop = () => {
-    if (loopRef.current != null) {
-      window.clearInterval(loopRef.current);
-      loopRef.current = null;
+  const stopTypeLoop = () => {
+    const node = loopNodeRef.current;
+    if (node) {
+      try { node.stop(); } catch {}
+      try { node.disconnect(); } catch {}
+      loopNodeRef.current = null;
     }
   };
 
-  return { ready, enable, blip, click, select, reveal, success, thud, startWriterLoop, stopWriterLoop };
+  return { ready, enable, blip, click, select, reveal, success, thud, startTypeLoop, stopTypeLoop };
 }
 
-/** Typewriter that can announce start/finish for sound control */
+/** Typewriter with start/finish hooks */
 function Typewriter({
-  text,
-  speed = 18,
-  blip,
-  onStart,
-  onDone
-}: {
-  text: string;
-  speed?: number;
-  blip?: () => void;
-  onStart?: () => void;
-  onDone?: () => void;
-}) {
+  text, speed = 18, blip, onStart, onDone
+}: { text: string; speed?: number; blip?: () => void; onStart?: () => void; onDone?: () => void; }) {
   const [i, setI] = useState(0);
   useEffect(() => { setI(0); }, [text]);
   useEffect(() => {
@@ -403,12 +314,12 @@ function StartScreen({ onStart, onCharacterSelect, selectedCharacter }: {
           <div className="text-center">
             <div className="mb-6 pixel-frame-amber bg-[#FFECC8] text-left p-4">
               <p className="mb-3 text-lg leading-relaxed text-amber-900">
-                Welcome, banker! Meet <strong className="font-black">4 animal borrowers</strong>. Each asks to borrow a principal now and promises how they’ll pay you back in <strong>2 years</strong>.
+                Welcome, banker! Meet <strong className="font-black">4 animal borrowers</strong>. Each asks to borrow now and promises how they’ll pay you back in <strong>2 years</strong>.
               </p>
               <p className="text-base leading-relaxed text-amber-900">
-                • Offers are either <strong>APR</strong> (ask about compounding) or a <strong>one-time lump sum</strong><br/>
-                • Ask about inflation if you want to think in real terms<br/>
-                • Choose the borrower with the <strong>highest effective annual rate (EPR)</strong>
+                • Offers are <strong>APR</strong> (ask compounding) or a <strong>one-time lump sum</strong><br/>
+                • Ask about inflation for real view<br/>
+                • Pick the <strong>highest effective annual rate (EPR)</strong>
               </p>
             </div>
 
@@ -451,13 +362,13 @@ export default function BankBossChapter5() {
   const [acceptedId, setAcceptedId] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [log, setLog] = useState<Array<{ who: string; text: string }>>([]);
-  const [soundOn, setSoundOn] = useState(true); // SOUND DEFAULT ON
-  const [talkedIds, setTalkedIds] = useState<Set<string>>(new Set()); // track conversations
-  const [alertMsg, setAlertMsg] = useState<string | null>(null);      // simple modal
+  const [soundOn, setSoundOn] = useState(true);
+  const [talkedIds, setTalkedIds] = useState<Set<string>>(new Set());
+  const [alertMsg, setAlertMsg] = useState<string | null>(null);
 
   const audio = useAudio(soundOn);
 
-  // iOS detection (including iPadOS desktop mode)
+  // iOS detection (incl. iPadOS desktop UA)
   const isIOS = useMemo(() => {
     if (typeof navigator === "undefined" || typeof document === "undefined") return false;
     return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -475,45 +386,39 @@ export default function BankBossChapter5() {
 
   const selected = round.lenders.find((x) => x.id === selectedId) || null;
 
-  useEffect(() => {
-    if (selected) setLog([{ who: selected.label, text: selected.open }]);
-  }, [selectedId]);
+  useEffect(() => { if (selected) setLog([{ who: selected.label, text: selected.open }]); }, [selectedId]);
 
   const outcomes = round.lenders.map((L) => {
     const ear = toEAR({ kind: L.kind, rate: L.rate, m: L.m, years: L.term, lump: L.lump });
     const rReal = real(ear, L.infl);
     let repay: number;
-    if (L.kind === "LUMP") {
-      repay = L.principal * (L.lump || 1);
-    } else {
-      // APR with level payments: total of all payments over the term
-      const pmt = pmtFromPV(L.rate || 0, L.m || 1, L.term, L.principal);
-      const n = (L.m || 1) * L.term;
-      repay = pmt * n;
-    }
+    if (L.kind === "LUMP") repay = L.principal * (L.lump || 1);
+    else { const pmt = pmtFromPV(L.rate || 0, L.m || 1, L.term, L.principal); const n = (L.m || 1) * L.term; repay = pmt * n; }
     const paybackRatio = repay / L.principal;
     return { L, ear, rReal, repay, paybackRatio };
   });
   const best = [...outcomes].sort((a, b) => b.paybackRatio - a.paybackRatio)[0];
 
-  function reset() {
+  const reset = () => {
     setSelectedId(null); setAcceptedId(null); setRevealed(false); setLog([]);
     setTalkedIds(new Set()); setSeed((x) => x + 1);
-  }
+    audio.stopTypeLoop();
+  };
 
   if (!gameStarted) {
     return (
       <StartScreen
-        onStart={async () => {
-          await audio.enable();
-          audio.click();
-          setGameStarted(true);
-        }}
+        onStart={async () => { await audio.enable(); audio.click(); setGameStarted(true); }}
         onCharacterSelect={setSelectedCharacter}
         selectedCharacter={selectedCharacter}
       />
     );
   }
+
+  // Motion props: avoid translate/scale on iOS to prevent scroll freezing of descendants
+  const motionProps = isIOS
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.25 } }
+    : { initial: { y: 60, opacity: 0, scaleY: 0.98 }, animate: { y: 0, opacity: 1, scaleY: 1 }, exit: { y: 60, opacity: 0, scaleY: 0.98 }, transition: { duration: 0.35, ease: "easeOut" } };
 
   return (
     <div
@@ -521,34 +426,29 @@ export default function BankBossChapter5() {
       style={{
         backgroundImage: "url('/images/bank.jpg')",
         backgroundSize: "cover",
-        backgroundPosition: "center"
+        backgroundPosition: "center",
+        // ensure page itself can scroll
+        touchAction: "pan-y"
       }}
     >
-      <div className="relative z-10 mx-auto max-w-6xl p-6 pb-[52svh]">
-        {/* Description uses old serif font */}
+      {/* Main content with large bottom padding so page can scroll under the sticky dialog */}
+      <div className="relative z-10 mx-auto max-w-6xl p-6 pb-[60svh]">
         <div className="pixel-frame-amber bg-[#FFF8EA] p-3">
           <p className="mt-1 max-w-4xl text-[19px] text-amber-900">
-            Chat with <span className="font-ms font-bold">each borrower</span>. All loans are for <strong>2 years</strong> and are either <strong>APR quotes</strong> (you ask about compounding) or a <strong>one-time lump sum</strong> at maturity.
-            Compare and pick the friend with the <span className="font-ms font-bold">highest effective annual rate (EPR)</span>.
+            Chat with <span className="font-ms font-bold">each borrower</span>. All loans are for <strong>2 years</strong> and are either <strong>APR quotes</strong> (ask compounding) or a <strong>one-time lump sum</strong> at maturity.
+            Pick the friend with the <span className="font-ms font-bold">highest effective annual rate (EPR)</span>.
           </p>
         </div>
 
-        {/* Cards (old serif font) */}
+        {/* Cards */}
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {round.lenders.map((L) => {
             const name = L.label;
             const locked = !!acceptedId && acceptedId !== L.id;
             return (
               <div key={L.id} className={`relative pixel-frame-amber bg-[#FFF8EA] p-3 transition ${selectedId === L.id ? "ring-4 ring-amber-300" : "hover:shadow-xl"} ${locked ? "opacity-40" : ""}`}>
-                {/* Deselect X button */}
                 {acceptedId === L.id && (
-                  <button
-                    onClick={() => setAcceptedId(null)}
-                    className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 flex items-center justify-center"
-                    title="Deselect this borrower"
-                  >
-                    ×
-                  </button>
+                  <button onClick={() => setAcceptedId(null)} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 flex items-center justify-center" title="Deselect this borrower">×</button>
                 )}
                 <div className="flex items-start gap-3">
                   <div className="relative h-20 w-20 overflow-hidden rounded-[2px] bg-[#FFF4DF] shadow-inner">
@@ -566,21 +466,14 @@ export default function BankBossChapter5() {
                 </div>
                 <div className="mt-3 flex items-center gap-2">
                   <button
-                    onClick={() => {
-                      audio.click();
-                      setSelectedId(L.id);
-                      setTalkedIds(prev => { const next = new Set(prev); next.add(L.id); return next; });
-                    }}
+                    onClick={() => { audio.click(); setSelectedId(L.id); setTalkedIds(prev => { const next = new Set(prev); next.add(L.id); return next; }); }}
                     disabled={locked}
                     className="pixel-btn-amber"
                   >
                     Talk
                   </button>
                   <button
-                    onClick={() => {
-                      audio.select();
-                      setAcceptedId(L.id);
-                    }}
+                    onClick={() => { audio.select(); setAcceptedId(L.id); }}
                     disabled={!!acceptedId && acceptedId!==L.id}
                     className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700"
                   >
@@ -599,18 +492,13 @@ export default function BankBossChapter5() {
             {!revealed ? (
               <>
                 <div className="text-[18px] text-amber-900">
-                  Talk to borrowers, then tap <span className="font-ms">Reveal</span> to compare. <span className="font-ms">Repeat</span> gets new offers.
+                  Talk to borrowers, then tap <span className="font-ms">Reveal</span>. <span className="font-ms">Repeat</span> gets new offers.
                 </div>
                 <div className="ml-auto flex gap-2">
                   <button
                     onClick={() => {
-                      if (talkedIds.size < round.lenders.length) {
-                        audio.thud();
-                        setAlertMsg("Please talk to each borrower before you reveal the comparison.");
-                        return;
-                      }
-                      audio.reveal();
-                      setRevealed(true);
+                      if (talkedIds.size < round.lenders.length) { audio.thud(); setAlertMsg("Please talk to each borrower before you reveal the comparison."); return; }
+                      audio.reveal(); setRevealed(true);
                     }}
                     className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-40"
                   >
@@ -660,54 +548,48 @@ export default function BankBossChapter5() {
             <div className="text-amber-900 text-lg font-ms mb-3">Heads up</div>
             <p className="text-amber-900 mb-4">{alertMsg}</p>
             <div className="flex justify-end">
-              <button onClick={() => setAlertMsg(null)} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">
-                OK
-              </button>
+              <button onClick={() => setAlertMsg(null)} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">OK</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Bottom Dialogue — CRPG style with parchment background */}
+      {/* Bottom Dialogue — sticky on iOS, fixed elsewhere; INNER is the scroll host and is NOT transformed on iOS */}
       <AnimatePresence initial={false}>
         {selected && (
-          <motion.div 
-            key={selected.id} 
-            initial={{ y: 60, opacity: 0, scaleY: 0.8 }} 
-            animate={{ y: 0, opacity: 1, scaleY: 1 }} 
-            exit={{ y: 60, opacity: 0, scaleY: 0.8 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className={`${isIOS ? "sticky bottom-0" : "fixed inset-x-0 bottom-0"} z-30 mx-auto max-w-6xl p-4 pointer-events-none`}
+          <motion.div
+            key={selected.id}
+            {...motionProps}
+            className={`${isIOS ? "sticky bottom-0" : "fixed inset-x-0 bottom-0"} z-30 mx-auto max-w-6xl p-4`}
+            style={{ touchAction: "pan-y" }}
           >
             <div
-              className="pixel-frame-amber bg-[#FFF4DF] p-0 text-amber-900 pointer-events-auto max-h=[45svh] max-h-[45svh] overflow-y-auto [overscroll-behavior:contain]"
+              className="pixel-frame-amber bg-[#FFF4DF] p-0 text-amber-900"
               style={{
+                maxHeight: "56svh",           // viewport-safe
+                overflowY: "auto",
                 WebkitOverflowScrolling: "touch",
+                touchAction: "pan-y",
                 paddingBottom: "max(8px, env(safe-area-inset-bottom))",
-                borderRadius: 0
               }}
             >
               {(() => {
                 const isPlayerSpeaking = !log.length || log[log.length-1].who !== selected.label;
                 const currentSpeaker = isPlayerSpeaking ? (selectedCharacter || "You") : selected.label;
 
-                const typewriterCommon = {
+                const twCommon = {
                   blip: audio.blip,
                   onStart: () => {
                     const isAnimal = log.length > 0 && log[log.length-1].who === selected.label;
-                    if (isAnimal) audio.startWriterLoop(60); // gentle continuous ticks while animal speaks
+                    if (isAnimal) audio.startTypeLoop(70); // continuous soft ticks while animal speaks
                   },
-                  onDone: () => {
-                    audio.stopWriterLoop();
-                  }
+                  onDone: () => { audio.stopTypeLoop(); }
                 };
 
                 return (
                   <div className="flex gap-0">
-                    {/* Headshot - left for player, right for animal */}
                     {isPlayerSpeaking ? (
                       <>
-                        {/* Player headshot on left */}
                         <div className="relative w-[200px] h-[200px] shrink-0 m-3 bg-[#FFF4DF] pixel-inner-amber">
                           <Image
                             src={PLAYER_IMAGES.find(p => p.name === selectedCharacter)?.image || "/images/wizard.png"}
@@ -716,7 +598,6 @@ export default function BankBossChapter5() {
                             className="object-contain rounded-lg"
                           />
                         </div>
-                        {/* Text box */}
                         <div className="flex-1 p-3">
                           <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">
                             {currentSpeaker}
@@ -725,9 +606,8 @@ export default function BankBossChapter5() {
                             {log.length > 0 && (
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
-                                  <Typewriter text={log[log.length-1].text} {...typewriterCommon} />
+                                  <Typewriter text={log[log.length-1].text} {...twCommon} />
                                 </div>
-                                {/* Only show Next when YOU just asked */}
                                 {log[log.length-1].who === (selectedCharacter || "You") && (
                                   <button
                                     onClick={() => {
@@ -760,7 +640,6 @@ export default function BankBossChapter5() {
                       </>
                     ) : (
                       <>
-                        {/* Text box */}
                         <div className="flex-1 p-3">
                           <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">
                             {currentSpeaker}
@@ -769,20 +648,14 @@ export default function BankBossChapter5() {
                             {log.length > 0 && (
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
-                                  <Typewriter text={log[log.length-1].text} {...typewriterCommon} />
+                                  <Typewriter text={log[log.length-1].text} {...twCommon} />
                                 </div>
                               </div>
                             )}
                           </div>
                         </div>
-                        {/* Animal headshot on right */}
                         <div className="relative w-[200px] h-[200px] shrink-0 m-3 bg-[#FFF4DF] pixel-inner-amber">
-                          <Image 
-                            src={selected.image} 
-                            alt={selected.label} 
-                            fill 
-                            className="object-contain rounded-lg" 
-                          />
+                          <Image src={selected.image} alt={selected.label} fill className="object-contain rounded-lg" />
                         </div>
                       </>
                     )}
@@ -790,37 +663,26 @@ export default function BankBossChapter5() {
                 );
               })()}
 
-              {/* Choices: appear only after animal speaks OR at start */}
+              {/* Choices */}
               {(log.length === 0 || (log[log.length-1].who === selected.label)) && (
                 <div className="p-3 pt-0">
                   <div className="mt-2 grid grid-cols-1 gap-2">
                     {selected.kind === "APR" && (
                       <button
-                        onClick={() => {
-                          audio.click();
-                          setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: Could you tell me your compounding schedule?` }]);
-                        }}
+                        onClick={() => { audio.click(); setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: Could you tell me your compounding schedule?` }]); }}
                         className="pixel-btn-amber"
                       >
                         Ask about compounding
                       </button>
                     )}
                     <button
-                      onClick={() => {
-                        audio.click();
-                        setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: What's your view on inflation right now?` }]);
-                      }}
+                      onClick={() => { audio.click(); setLog((L)=>[...L, { who: (selectedCharacter || "You"), text: `${selectedCharacter || "You"}: What's your view on inflation right now?` }]); }}
                       className="pixel-btn-amber"
                     >
                       Ask about inflation
                     </button>
                     <button
-                      onClick={() => { 
-                        audio.click();
-                        setSelectedId(null); 
-                        setLog([]); 
-                        audio.stopWriterLoop();
-                      }}
+                      onClick={() => { audio.click(); setSelectedId(null); setLog([]); audio.stopTypeLoop(); }}
                       className="pixel-btn-amber"
                     >
                       That's all my questions
