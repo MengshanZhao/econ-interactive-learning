@@ -66,7 +66,14 @@ export default function BondMemoryPage() {
   // Cursor effect when wand is selected
   useEffect(() => {
     if (wand) {
-      document.body.style.cursor = `url(/images/${wand === 'A' ? 'wand1.png' : 'wand2.png'}), auto`;
+      // Create a rotated wand cursor
+      const wandImage = wand === 'A' ? 'wand1.png' : 'wand2.png';
+      const cursorStyle = `
+        url(/images/${wandImage}) 16 16, 
+        auto
+      `;
+      document.body.style.cursor = cursorStyle;
+      document.body.style.cursor = `url(/images/${wandImage}) 16 16, auto`;
     } else {
       document.body.style.cursor = 'auto';
     }
@@ -172,6 +179,11 @@ export default function BondMemoryPage() {
     setSlotValues(prev => ({ ...prev, [key]: chip.value })); setCollected(prev => prev.filter(c => Math.abs(c.value - chip.value) > 1e-9));
   }
   function onDragOverSlot(e: React.DragEvent<HTMLDivElement>) { e.preventDefault(); }
+  
+  // Function to return chip to collected area when removed from slot
+  function returnChipToCollected(value: number) {
+    setCollected(prev => [...prev, { value }]);
+  }
 
   // Finish check only
   const allPlaced = requiredKeys.every(k => slotValues[k as keyof typeof slotValues] !== undefined);
@@ -185,8 +197,27 @@ export default function BondMemoryPage() {
 
   // ---------- UI helpers ----------
   const SlotBox: React.FC<{ k: ChipKey; value?: number }> = ({ k, value }) => (
-    <div onDrop={(e)=>onDropSlot(e,k)} onDragOver={onDragOverSlot} className="inline-flex min-w-[64px] justify-center items-center px-2 py-1 rounded-lg border bg-white/80">
-      {value !== undefined ? (<span className="font-medium text-sm">{k==='y'? (value as number).toFixed(4) : k==='CPN'? (value as number).toFixed(2) : String(value)}</span>) : (<span className="text-stone-400 text-xs">drop</span>)}
+    <div onDrop={(e)=>onDropSlot(e,k)} onDragOver={onDragOverSlot} className="inline-flex min-w-[64px] justify-center items-center px-2 py-1 rounded-lg border bg-white/80 relative">
+      {value !== undefined ? (
+        <div className="flex items-center gap-1">
+          <span className="font-medium text-sm">{k==='y'? (value as number).toFixed(4) : k==='CPN'? (value as number).toFixed(2) : String(value)}</span>
+          <button 
+            onClick={() => {
+              const currentValue = slotValues[k as keyof typeof slotValues];
+              if (currentValue !== undefined) {
+                returnChipToCollected(currentValue as number);
+              }
+              setSlotValues(prev => ({ ...prev, [k]: undefined }));
+            }}
+            className="text-red-500 hover:text-red-700 text-xs font-bold ml-1"
+            title="Remove this value"
+          >
+            ×
+          </button>
+        </div>
+      ) : (
+        <span className="text-stone-400 text-xs">drop</span>
+      )}
     </div>
   );
 
@@ -260,7 +291,6 @@ export default function BondMemoryPage() {
 
         <div className="flex gap-3">
           <button className="px-4 py-2 rounded-xl border bg-emerald-200 hover:bg-emerald-300" onClick={() => setScene('INTRO')}>Begin →</button>
-          <button className="px-4 py-2 rounded-xl border" onClick={resetAll}>New Random Setup</button>
         </div>
       </div>
     );
