@@ -151,18 +151,37 @@ body {
   color: #23242a;
 }
 
-/* Wand cursor styles for Bond Memory game */
-.cursor-wand-a {
-  cursor: url("/images/wand1@2x.png") 32 32, url("/images/wand1.png") 16 16, auto;
-}
-.cursor-wand-b {
-  cursor: url("/images/wand2@2x.png") 32 32, url("/images/wand2.png") 16 16, auto;
+/* Scope for the game area so everything inside inherits the wand cursor */
+.wand-scope {
+  cursor: auto; /* default; switched by React */
 }
 
-/* Optional: don't force custom cursors on touch devices */
+/* Force children to inherit so buttons/links don't override */
+.wand-scope, 
+.wand-scope * {
+  cursor: inherit !important;
+}
+
+/* Wand A/B classes with fallbacks and hotspots.
+   Adjust the hotspot numbers to the wand tip. */
+.wand-a {
+  cursor: url("/images/wand1.png") 16 16, auto !important;
+}
+.wand-b {
+  cursor: url("/images/wand2.png") 16 16, auto !important;
+}
+
+/* Optional: disable on coarse pointers (phones/tablets) */
+/* Comment this out while testing if you're on an iPad */
 @media (pointer: coarse) {
-  .cursor-wand-a,
-  .cursor-wand-b {
-    cursor: auto;
+  .wand-a,
+  .wand-b {
+    cursor: auto !important;
   }
+}
+
+.wand-scope button,
+.wand-scope a,
+.wand-scope [role="button"] {
+  cursor: inherit !important;
 }

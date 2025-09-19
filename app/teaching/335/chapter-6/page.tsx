@@ -63,7 +63,7 @@ export default function BondMemoryPage() {
   // Wand A = ZERO, Wand B = COUPON (just switches formula; no judgement)
   const [wand, setWand] = useState<null | "A" | "B">(null);
 
-  const boardRef = useRef<HTMLDivElement>(null);
+  const boardRef = useRef<HT6MLDivElement>(null);
 
   // Required keys depend on wand
   const requiredKeys = useMemo(() => (wand === "B" ? (['CPN','FV','N','y'] as const) : (['FV','N','y'] as const)), [wand]);
@@ -387,15 +387,13 @@ export default function BondMemoryPage() {
     );
   }
 
-  const cursorClass =
-    wand === "A" ? "cursor-wand-a" :
-    wand === "B" ? "cursor-wand-b" :
-    "";
+  const scopeClass = "wand-scope";
+  const wandClass = wand === "A" ? "wand-a" : wand === "B" ? "wand-b" : "";
 
   return (
     <main 
       ref={boardRef} 
-      className={`min-h-[100vh] w-full flex items-center justify-center p-6 ${cursorClass}`}
+      className={`min-h-[100vh] w-full flex items-center justify-center p-6 ${scopeClass} ${wandClass}`}
       style={{ 
         backgroundImage: 'url(/images/forest.png)', 
         backgroundSize: 'cover', 
