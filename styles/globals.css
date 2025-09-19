@@ -150,3 +150,19 @@ body {
   box-shadow: 0 0 24px 2px #bfc3c9cc, 0 1.5px 0 0 #fff inset;
   color: #23242a;
 }
+
+/* Wand cursor styles for Bond Memory game */
+.cursor-wand-a {
+  cursor: url("/images/wand1@2x.png") 32 32, url("/images/wand1.png") 16 16, auto;
+}
+.cursor-wand-b {
+  cursor: url("/images/wand2@2x.png") 32 32, url("/images/wand2.png") 16 16, auto;
+}
+
+/* Optional: don't force custom cursors on touch devices */
+@media (pointer: coarse) {
+  .cursor-wand-a,
+  .cursor-wand-b {
+    cursor: auto;
+  }
+}

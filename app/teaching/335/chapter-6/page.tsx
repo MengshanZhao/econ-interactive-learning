@@ -63,27 +63,6 @@ export default function BondMemoryPage() {
   // Wand A = ZERO, Wand B = COUPON (just switches formula; no judgement)
   const [wand, setWand] = useState<null | "A" | "B">(null);
 
-  // Cursor effect when wand is selected
-  useEffect(() => {
-    if (wand) {
-      // Create a rotated wand cursor
-      const wandImage = wand === 'A' ? 'wand1.png' : 'wand2.png';
-      const cursorStyle = `
-        url(/images/${wandImage}) 16 16, 
-        auto
-      `;
-      document.body.style.cursor = cursorStyle;
-      document.body.style.cursor = `url(/images/${wandImage}) 16 16, auto`;
-    } else {
-      document.body.style.cursor = 'auto';
-    }
-    
-    // Cleanup on unmount
-    return () => {
-      document.body.style.cursor = 'auto';
-    };
-  }, [wand]);
-
   const boardRef = useRef<HTMLDivElement>(null);
 
   // Required keys depend on wand
@@ -408,8 +387,22 @@ export default function BondMemoryPage() {
     );
   }
 
+  const cursorClass =
+    wand === "A" ? "cursor-wand-a" :
+    wand === "B" ? "cursor-wand-b" :
+    "";
+
   return (
-    <main ref={boardRef} className="min-h-[100vh] w-full flex items-center justify-center p-6" style={{ backgroundImage: 'url(/images/forest.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <main 
+      ref={boardRef} 
+      className={`min-h-[100vh] w-full flex items-center justify-center p-6 ${cursorClass}`}
+      style={{ 
+        backgroundImage: 'url(/images/forest.png)', 
+        backgroundSize: 'cover', 
+        backgroundPosition: 'center', 
+        backgroundRepeat: 'no-repeat' 
+      }}
+    >
       <div className="w-[1120px] max-w-full rounded-3xl shadow-2xl border border-white/60 bg-white/75 backdrop-blur p-6">
         {scene === 'TEACH' && <Teach />}
         {scene === 'INTRO' && <Intro />}
