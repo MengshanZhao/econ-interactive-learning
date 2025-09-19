@@ -66,7 +66,7 @@ export default function BondMemoryPage() {
   // Cursor effect when wand is selected
   useEffect(() => {
     if (wand) {
-      document.body.style.cursor = `url(/images/${wand === 'A' ? 'wand1.webp' : 'wand2.png'}), auto`;
+      document.body.style.cursor = `url(/images/${wand === 'A' ? 'wand1.png' : 'wand2.png'}), auto`;
     } else {
       document.body.style.cursor = 'auto';
     }
@@ -208,7 +208,7 @@ export default function BondMemoryPage() {
         <h1 className="text-2xl font-semibold">Bond Pricing — Quick Guide</h1>
         <div className="grid lg:grid-cols-2 gap-4">
           <div className="rounded-2xl border border-indigo-200 bg-white/70 p-4 shadow-sm">
-            <h3 className="font-medium mb-2 flex items-center gap-2">Wand A — Zero‑Coupon <img src="/images/wand1.webp" alt="Wand A" className="w-5 h-5" /></h3>
+            <h3 className="font-medium mb-2 flex items-center gap-2">Wand A — Zero‑Coupon <img src="/images/wand1.png" alt="Wand A" className="w-5 h-5" /></h3>
             <ul className="text-sm text-stone-800 list-disc pl-5 space-y-1">
               <li>No coupons. One payment at maturity (FV).</li>
               <li>Discount that payment back to today.</li>
@@ -231,21 +231,31 @@ export default function BondMemoryPage() {
         {/* Numeric timeline demo (short horizon) */}
         <div className="rounded-2xl border bg-white/70 p-4 shadow-sm">
           <div className="font-medium mb-2 text-stone-800">Timeline demo (semiannual, {demo.years} years): CPN = {demo.CPN}, FV = {demo.FV}</div>
-          <div className="grid grid-cols-5 gap-2 items-end">
-            {[...Array(ticks)].map((_,i)=> (
-              <div key={i} className="flex flex-col items-center">
-                <div className="h-16 w-0.5 bg-stone-300"/>
-                <div className="mt-1 text-xs">{demo.CPN}</div>
-                <div className="text-[10px] text-stone-500">t{i+1}</div>
+          
+          {/* Horizontal timeline with connecting line */}
+          <div className="relative">
+            {/* Horizontal line representing time */}
+            <div className="absolute top-8 left-0 right-0 h-0.5 bg-stone-400"></div>
+            
+            <div className="flex justify-between items-center relative">
+              {[...Array(ticks)].map((_,i)=> (
+                <div key={i} className="flex flex-col items-center relative">
+                  {/* Vertical line from timeline */}
+                  <div className="h-8 w-0.5 bg-stone-300 mb-2"/>
+                  <div className="text-xs font-medium">{demo.CPN}</div>
+                  <div className="text-[10px] text-stone-500">t{i+1}</div>
+                </div>
+              ))}
+              <div className="flex flex-col items-center relative">
+                {/* Vertical line from timeline */}
+                <div className="h-10 w-0.5 bg-stone-400 mb-2"/>
+                <div className="text-xs font-semibold">{demo.CPN} + FV</div>
+                <div className="text-[10px] text-stone-500">maturity</div>
               </div>
-            ))}
-            <div className="flex flex-col items-center">
-              <div className="h-20 w-0.5 bg-stone-400"/>
-              <div className="mt-1 text-xs font-semibold">{demo.CPN} + FV</div>
-              <div className="text-[10px] text-stone-500">maturity</div>
             </div>
           </div>
-          <div className="mt-2 text-xs text-stone-600">Each tick is one period. Here m=2 (semiannual), so N = m×years = {ticks} periods.</div>
+          
+          <div className="mt-4 text-xs text-stone-600">Each tick is one period. Here m=2 (semiannual), so N = m×years = {ticks} periods.</div>
         </div>
 
         <div className="flex gap-3">
@@ -266,7 +276,7 @@ export default function BondMemoryPage() {
         <div className="flex items-center gap-3 flex-wrap">
           <span className="text-sm text-stone-700">Pick formula mode:</span>
           <button className={`px-3 py-2 rounded-xl border text-sm transition flex items-center gap-2 ${wand === 'A' ? 'bg-indigo-200 border-indigo-400' : 'bg-white/90 border-stone-300 hover:bg-indigo-50'}`} onClick={() => setWand('A')} title="Zero-coupon">
-            <img src="/images/wand1.webp" alt="Wand A" className="w-5 h-5" />
+            <img src="/images/wand1.png" alt="Wand A" className="w-5 h-5" />
             Wand A (Zero‑coupon)
           </button>
           <button className={`px-3 py-2 rounded-xl border text-sm transition flex items-center gap-2 ${wand === 'B' ? 'bg-amber-200 border-amber-400' : 'bg-white/90 border-stone-300 hover:bg-amber-50'}`} onClick={() => setWand('B')} title="Coupon bond">
@@ -369,7 +379,7 @@ export default function BondMemoryPage() {
   }
 
   return (
-    <main ref={boardRef} className="min-h-[100vh] w-full flex items-center justify-center p-6" style={{ backgroundImage: 'url(/images/forest.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <main ref={boardRef} className="min-h-[100vh] w-full flex items-center justify-center p-6" style={{ backgroundImage: 'url(/images/forest.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       <div className="w-[1120px] max-w-full rounded-3xl shadow-2xl border border-white/60 bg-white/75 backdrop-blur p-6">
         {scene === 'TEACH' && <Teach />}
         {scene === 'INTRO' && <Intro />}
