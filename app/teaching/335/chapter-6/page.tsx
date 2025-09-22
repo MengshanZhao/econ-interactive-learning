@@ -118,6 +118,9 @@ export default function BondMemoryPage() {
     if (scene !== 'PLAY' || !wand) return;
     const reqVals: number[] = (requiredKeys as readonly ChipKey[]).map(k => requiredMap[k]);
     
+    // Debug logging
+    console.log('Wand:', wand, 'Required keys:', requiredKeys, 'Required values:', reqVals);
+    
     // Create distractors with better precision for small values
     const distractorSeeds: number[] = []; 
     const near = (v: number) => { 
@@ -139,6 +142,7 @@ export default function BondMemoryPage() {
     }
     
     const shuffled = pairs.sort(() => Math.random() - 0.5);
+    console.log('Generated cards:', shuffled);
     setCards(shuffled.map((v,i)=>({ id:`c${i}-${Math.random().toString(36).slice(2,6)}`, value:v, faceUp:false, matched:false })));
     setOpenId(null); setLockBoard(false); setCollected([]); setSlotValues({});
     setMessage("Flip two cards. If they match, they stay. Drag collected numbers into the formula.");
@@ -179,12 +183,23 @@ export default function BondMemoryPage() {
   }
 
   // Drag & Drop chips → slots (no correctness hint on drop; validate on Finish)
-  function onDragStartChip(e: React.DragEvent<HTMLDivElement>, chip: Chip) { e.dataTransfer.setData('application/x-bond-chip', JSON.stringify(chip)); }
-  function onDropSlot(e: React.DragEvent<HTMLDivElement>, key: ChipKey) {
-    const raw = e.dataTransfer.getData('application/x-bond-chip'); if (!raw) return; const chip: Chip = JSON.parse(raw);
-    setSlotValues(prev => ({ ...prev, [key]: chip.value })); setCollected(prev => prev.filter(c => Math.abs(c.value - chip.value) > 1e-9));
+  function onDragStartChip(e: React.DragEvent<HTMLDivElement>, chip: Chip) { 
+    console.log('Drag start:', chip);
+    e.dataTransfer.setData('application/x-bond-chip', JSON.stringify(chip)); 
   }
-  function onDragOverSlot(e: React.DragEvent<HTMLDivElement>) { e.preventDefault(); }
+  function onDropSlot(e: React.DragEvent<HTMLDivElement>, key: ChipKey) {
+    console.log('Drop on slot:', key);
+    const raw = e.dataTransfer.getData('application/x-bond-chip'); 
+    if (!raw) return; 
+    const chip: Chip = JSON.parse(raw);
+    console.log('Dropped chip:', chip);
+    setSlotValues(prev => ({ ...prev, [key]: chip.value })); 
+    setCollected(prev => prev.filter(c => Math.abs(c.value - chip.value) > 1e-9));
+  }
+  function onDragOverSlot(e: React.DragEvent<HTMLDivElement>) { 
+    console.log('Drag over slot');
+    e.preventDefault(); 
+  }
   
   // Function to return chip to collected area when removed from slot
   function returnChipToCollected(value: number) {
@@ -194,6 +209,7 @@ export default function BondMemoryPage() {
   // Finish check only
   const allPlaced = requiredKeys.every(k => slotValues[k as keyof typeof slotValues] !== undefined);
   function onDone(){
+    console.log('Finish button clicked, wand:', wand, 'allPlaced:', allPlaced);
     if (!allPlaced) { setMessage('Place all required numbers into the formula first.'); return; }
     
     // Check each slot individually and provide specific feedback
