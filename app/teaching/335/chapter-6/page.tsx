@@ -37,7 +37,7 @@ function roundN(x: number) { return Math.abs(x) > 100 ? x.toFixed(0) : Math.abs(
 function makeQuestion(): Question {
   const faces = [100, 500, 1000];
   const face = randFrom(faces);
-  const hasCoupon = Math.random() < 0.8;
+  const hasCoupon = Math.random() < 0.667; // 2/3 coupon, 1/3 zero-coupon
   const couponRate = hasCoupon ? randFrom([0.0125, 0.0175, 0.02, 0.03, 0.04]) : 0;
   const ytm = randFrom([0.03, 0.04, 0.05, 0.06, 0.08]);
   const years = randFrom([2, 3]); // keep small for easy mental picture
