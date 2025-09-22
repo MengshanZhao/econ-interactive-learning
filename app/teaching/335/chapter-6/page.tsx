@@ -84,6 +84,9 @@ export default function BondMemoryPage() {
   const [slotValues, setSlotValues] = useState<Partial<Record<ChipKey, number>>>({});
   const [message, setMessage] = useState<string>("");
 
+  // Check if device supports cursor (not touch devices)
+  const supportsCursor = typeof window !== 'undefined' && !('ontouchstart' in window);
+
   // Simple confetti
   function burstConfetti(n = 18) {
     const host = boardRef.current || document.body; const rect = host.getBoundingClientRect();
@@ -486,9 +489,6 @@ export default function BondMemoryPage() {
 
   const scopeClass = "wand-scope";
   const wandClass = wand === "A" ? "wand-a" : wand === "B" ? "wand-b" : "";
-  
-  // Check if device supports cursor (not touch devices)
-  const supportsCursor = typeof window !== 'undefined' && !('ontouchstart' in window);
   const wandCursor = supportsCursor && wand ? (wand === "A" ? "url('/images/wand1.png'), auto" : "url('/images/wand2.png'), auto") : "default";
 
   return (

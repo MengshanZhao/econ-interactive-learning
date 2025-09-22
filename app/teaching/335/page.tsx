@@ -87,17 +87,17 @@ export default function ECONS335Page() {
                   </li>
                   <li>
                     <Link href="/teaching/335/chapter-4" className="text-[color:hsl(var(--primary))] hover:underline">
-                      Chapter 4: TVM Rocket — Cash Flow PV
+                      Chapter 4: TVM Rocket: Cash Flow PV
                     </Link>
                   </li>
                   <li>
                     <Link href="/teaching/335/chapter-5" className="text-[color:hsl(var(--primary))] hover:underline">
-                      Chapter 5: Bank Boss — Animal Borrowers
+                      Chapter 5: Bank Boss: Animal Borrowers
                     </Link>
                   </li>
                   <li>
                     <Link href="/teaching/335/chapter-6" className="text-[color:hsl(var(--primary))] hover:underline">
-                      Chapter 6: Bond Memory — Pricing Game
+                      Chapter 6: Bond Price: A Memory Game
                     </Link>
                   </li>
                 </ol>
