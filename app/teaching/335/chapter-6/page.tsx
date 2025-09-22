@@ -444,9 +444,9 @@ export default function BondMemoryPage() {
             <div className="font-semibold mb-1">Round Example</div>
             <div>FV = <b>{fmtMoney(q.face)}</b></div>
             <div>Years = <b>{q.years}</b></div>
-            <div>YTM (annual) = <b>{(q.ytm*100).toFixed(1)}%</b></div>
+            <div>Yield to Maturity (annual) = <b>{(q.ytm*100).toFixed(1)}%</b></div>
             <div>m = <b>{q.m}</b> ({q.m===1?'annual':q.m===2?'semiannual':q.m===4?'quarterly':'monthly'})</div>
-            {wand === 'B' && <div>Coupon rate = <b>{(q.couponRate*100).toFixed(1)}%</b> → per‑period CPN = {(params.CPN).toFixed(2)}</div>}
+            {q.couponRate > 0 && <div>Coupon rate = <b>{(q.couponRate*100).toFixed(1)}%</b> → per‑period CPN = {(params.CPN).toFixed(2)}</div>}
             <div className="mt-1 text-stone-600">Per‑period: y = {(params.y).toFixed(4)}, N = {params.N}</div>
           </div>
         </div>
