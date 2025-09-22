@@ -181,7 +181,7 @@ export default function BondMemoryPage() {
       onDragOver={onDragOverSlot} 
       className="inline-flex min-w-[64px] justify-center items-center px-2 py-1 rounded-lg border bg-white/80 relative"
       style={{ 
-        cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "default"
+        cursor: supportsCursor ? (wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "default") : "default"
       }}
     >
       {value !== undefined ? (
@@ -198,7 +198,7 @@ export default function BondMemoryPage() {
             className="text-red-500 hover:text-red-700 text-xs font-bold ml-1"
             title="Remove this value"
             style={{ 
-              cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer"
+              cursor: supportsCursor ? (wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer") : "pointer"
             }}
           >
             ×
@@ -371,7 +371,7 @@ export default function BondMemoryPage() {
                 onDragStart={(e) => onDragStartChip(e, ch)} 
                 className="inline-flex items-center gap-2 px-2 py-1 rounded-xl border bg-amber-100 border-amber-300 shadow-sm"
                 style={{ 
-                  cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "grab"
+                  cursor: supportsCursor ? (wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "grab") : "grab"
                 }}
               >
                 <span className="text-sm">{roundN(ch.value)}</span>
@@ -388,7 +388,7 @@ export default function BondMemoryPage() {
               onClick={() => onFlip(card.id)} 
               className={`relative h-24 rounded-2xl border transition shadow-sm ${card.matched ? 'bg-emerald-50 border-emerald-300' : card.faceUp ? 'bg-amber-50 border-amber-300' : 'bg-white/60 hover:bg-white/80 border-stone-300'}`}
               style={{ 
-                cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer"
+                cursor: supportsCursor ? (wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer") : "pointer"
               }}
             >
               {card.faceUp || card.matched ? (
@@ -407,7 +407,7 @@ export default function BondMemoryPage() {
               className="px-3 py-2 rounded-xl border" 
               onClick={() => setScene('INTRO')}
               style={{ 
-                cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer"
+                cursor: supportsCursor ? (wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer") : "pointer"
               }}
             >Back</button>
             <button 
@@ -415,14 +415,14 @@ export default function BondMemoryPage() {
               onClick={onDone} 
               disabled={!wand}
               style={{ 
-                cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer"
+                cursor: supportsCursor ? (wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer") : "pointer"
               }}
             >Finish</button>
             <button 
               className="px-3 py-2 rounded-xl border" 
               onClick={() => { setQ(makeQuestion()); setWand(null); setScene('INTRO'); }}
               style={{ 
-                cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer"
+                cursor: supportsCursor ? (wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer") : "pointer"
               }}
             >New Round</button>
           </div>
@@ -433,6 +433,10 @@ export default function BondMemoryPage() {
 
   const scopeClass = "wand-scope";
   const wandClass = wand === "A" ? "wand-a" : wand === "B" ? "wand-b" : "";
+  
+  // Check if device supports cursor (not touch devices)
+  const supportsCursor = typeof window !== 'undefined' && !('ontouchstart' in window);
+  const wandCursor = supportsCursor && wand ? (wand === "A" ? "url('/images/wand1.png'), auto" : "url('/images/wand2.png'), auto") : "default";
 
   return (
     <main 
@@ -443,7 +447,7 @@ export default function BondMemoryPage() {
         backgroundSize: 'cover', 
         backgroundPosition: 'center', 
         backgroundRepeat: 'no-repeat',
-        cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "default"
+        cursor: wandCursor
       }}
     >
       <div className="w-[1120px] max-w-full rounded-3xl shadow-2xl border border-white/60 bg-white/75 backdrop-blur p-6">
