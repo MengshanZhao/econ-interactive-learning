@@ -69,6 +69,7 @@ export default function BondMemoryPage() {
 
   // Wand A = ZERO, Wand B = COUPON (just switches formula; no judgement)
   const [wand, setWand] = useState<null | "A" | "B">(null);
+  const [wandWarning, setWandWarning] = useState<string>("");
 
   const boardRef = useRef<HT6MLDivElement>(null);
 
@@ -118,8 +119,6 @@ export default function BondMemoryPage() {
     if (scene !== 'PLAY' || !wand) return;
     const reqVals: number[] = (requiredKeys as readonly ChipKey[]).map(k => requiredMap[k]);
     
-    // Debug logging
-    console.log('Wand:', wand, 'Required keys:', requiredKeys, 'Required values:', reqVals);
     
     // Create distractors with better precision for small values
     const distractorSeeds: number[] = []; 
@@ -142,13 +141,28 @@ export default function BondMemoryPage() {
     }
     
     const shuffled = pairs.sort(() => Math.random() - 0.5);
-    console.log('Generated cards:', shuffled);
     setCards(shuffled.map((v,i)=>({ id:`c${i}-${Math.random().toString(36).slice(2,6)}`, value:v, faceUp:false, matched:false })));
     setOpenId(null); setLockBoard(false); setCollected([]); setSlotValues({});
     setMessage("Flip two cards. If they match, they stay. Drag collected numbers into the formula.");
   }, [scene, wand, q, requiredKeys, requiredMap]);
 
-  function resetAll(){ setQ(makeQuestion()); setWand(null); setScene('TEACH'); }
+  function resetAll(){ setQ(makeQuestion()); setWand(null); setWandWarning(""); setScene('TEACH'); }
+
+  // Validate wand choice against bond type
+  function validateWandChoice(selectedWand: "A" | "B") {
+    const isCouponBond = q.couponRate > 0;
+    const isCorrectChoice = (selectedWand === "A" && !isCouponBond) || (selectedWand === "B" && isCouponBond);
+    
+    if (!isCorrectChoice) {
+      const bondType = isCouponBond ? "coupon" : "zero-coupon";
+      const correctWand = isCouponBond ? "Wand B (Coupon)" : "Wand A (Zero-coupon)";
+      setWandWarning(`⚠️ Wrong wand! This is a ${bondType} bond. You should use ${correctWand}.`);
+      return false;
+    } else {
+      setWandWarning("");
+      return true;
+    }
+  }
 
   // PURE memory logic with single open card & board lock during flip-back
   function onFlip(cardId: string){
@@ -184,20 +198,16 @@ export default function BondMemoryPage() {
 
   // Drag & Drop chips → slots (no correctness hint on drop; validate on Finish)
   function onDragStartChip(e: React.DragEvent<HTMLDivElement>, chip: Chip) { 
-    console.log('Drag start:', chip);
     e.dataTransfer.setData('application/x-bond-chip', JSON.stringify(chip)); 
   }
   function onDropSlot(e: React.DragEvent<HTMLDivElement>, key: ChipKey) {
-    console.log('Drop on slot:', key);
     const raw = e.dataTransfer.getData('application/x-bond-chip'); 
     if (!raw) return; 
     const chip: Chip = JSON.parse(raw);
-    console.log('Dropped chip:', chip);
     setSlotValues(prev => ({ ...prev, [key]: chip.value })); 
     setCollected(prev => prev.filter(c => Math.abs(c.value - chip.value) > 1e-9));
   }
   function onDragOverSlot(e: React.DragEvent<HTMLDivElement>) { 
-    console.log('Drag over slot');
     e.preventDefault(); 
   }
   
@@ -209,7 +219,12 @@ export default function BondMemoryPage() {
   // Finish check only
   const allPlaced = requiredKeys.every(k => slotValues[k as keyof typeof slotValues] !== undefined);
   function onDone(){
-    console.log('Finish button clicked, wand:', wand, 'allPlaced:', allPlaced);
+    // Check if wrong wand was used
+    if (wand && !validateWandChoice(wand)) {
+      setMessage('You chose the wrong formula for this bond type. Please go back and select the correct wand.');
+      return;
+    }
+    
     if (!allPlaced) { setMessage('Place all required numbers into the formula first.'); return; }
     
     // Check each slot individually and provide specific feedback
@@ -366,17 +381,22 @@ export default function BondMemoryPage() {
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <span className="text-sm text-stone-700">Pick formula mode:</span>
-          <button className={`px-3 py-2 rounded-xl border text-sm transition flex items-center gap-2 ${wand === 'A' ? 'bg-indigo-200 border-indigo-400' : 'bg-white/90 border-stone-300 hover:bg-indigo-50'}`} onClick={() => setWand('A')} title="Zero-coupon">
+          <button className={`px-3 py-2 rounded-xl border text-sm transition flex items-center gap-2 ${wand === 'A' ? 'bg-indigo-200 border-indigo-400' : 'bg-white/90 border-stone-300 hover:bg-indigo-50'}`} onClick={() => { setWand('A'); validateWandChoice('A'); }} title="Zero-coupon">
             <img src="/images/wand1.png" alt="Wand A" className="w-5 h-5" />
             Wand A (Zero‑coupon)
           </button>
-          <button className={`px-3 py-2 rounded-xl border text-sm transition flex items-center gap-2 ${wand === 'B' ? 'bg-amber-200 border-amber-400' : 'bg-white/90 border-stone-300 hover:bg-amber-50'}`} onClick={() => setWand('B')} title="Coupon bond">
+          <button className={`px-3 py-2 rounded-xl border text-sm transition flex items-center gap-2 ${wand === 'B' ? 'bg-amber-200 border-amber-400' : 'bg-white/90 border-stone-300 hover:bg-amber-50'}`} onClick={() => { setWand('B'); validateWandChoice('B'); }} title="Coupon bond">
             <img src="/images/wand2.png" alt="Wand B" className="w-5 h-5" />
             Wand B (Coupon)
           </button>
           <button className="px-4 py-2 rounded-xl border bg-emerald-200 hover:bg-emerald-300 disabled:opacity-50" disabled={!wand} onClick={() => setScene('PLAY')}>Start Game →</button>
-          <button className="px-4 py-2 rounded-xl border" onClick={() => { setQ(makeQuestion()); setWand(null); }}>New Example</button>
+          <button className="px-4 py-2 rounded-xl border" onClick={() => { setQ(makeQuestion()); setWand(null); setWandWarning(""); }}>New Example</button>
         </div>
+        {wandWarning && (
+          <div className="mt-2 p-3 rounded-xl border border-red-200 bg-red-50 text-red-800 text-sm">
+            {wandWarning}
+          </div>
+        )}
       </div>
     );
   }
