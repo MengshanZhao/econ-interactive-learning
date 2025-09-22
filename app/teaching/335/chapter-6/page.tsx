@@ -398,7 +398,8 @@ export default function BondMemoryPage() {
         backgroundImage: 'url(/images/forest.png)', 
         backgroundSize: 'cover', 
         backgroundPosition: 'center', 
-        backgroundRepeat: 'no-repeat' 
+        backgroundRepeat: 'no-repeat',
+        cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "default"
       }}
     >
       <div className="w-[1120px] max-w-full rounded-3xl shadow-2xl border border-white/60 bg-white/75 backdrop-blur p-6">
