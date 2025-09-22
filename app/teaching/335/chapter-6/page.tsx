@@ -168,10 +168,39 @@ export default function BondMemoryPage() {
   const allPlaced = requiredKeys.every(k => slotValues[k as keyof typeof slotValues] !== undefined);
   function onDone(){
     if (!allPlaced) { setMessage('Place all required numbers into the formula first.'); return; }
-    const ok = (requiredKeys as readonly ChipKey[]).every(k => Math.abs((slotValues[k as keyof typeof slotValues] as number) - requiredMap[k]) < 1e-9);
-    const price = wand === 'B' ? params.P_coupon : params.P_zero;
-    setMessage(ok ? `Correct! Bond price = ${fmtMoney(price)}` : 'Not quite yet — review your slots, then try Finish again.');
-    if (ok) burstConfetti(28);
+    
+    // Check each slot individually and provide specific feedback
+    const errors: string[] = [];
+    const correctValues: string[] = [];
+    
+    (requiredKeys as readonly ChipKey[]).forEach(k => {
+      const userValue = slotValues[k as keyof typeof slotValues] as number;
+      const correctValue = requiredMap[k];
+      const isCorrect = Math.abs(userValue - correctValue) < 1e-9;
+      
+      if (!isCorrect) {
+        const keyName = k === 'CPN' ? 'Coupon Payment (CPN)' : 
+                       k === 'FV' ? 'Face Value (FV)' : 
+                       k === 'N' ? 'Number of Periods (N)' : 
+                       k === 'y' ? 'Per-period Yield to Maturity (y)' : k;
+        errors.push(`${keyName}: You have ${roundN(userValue)}, but it should be ${roundN(correctValue)}`);
+      } else {
+        const keyName = k === 'CPN' ? 'Coupon Payment (CPN)' : 
+                       k === 'FV' ? 'Face Value (FV)' : 
+                       k === 'N' ? 'Number of Periods (N)' : 
+                       k === 'y' ? 'Per-period Yield to Maturity (y)' : k;
+        correctValues.push(keyName);
+      }
+    });
+    
+    if (errors.length === 0) {
+      const price = wand === 'B' ? params.P_coupon : params.P_zero;
+      setMessage(`Correct! Bond price = ${fmtMoney(price)}`);
+      burstConfetti(28);
+    } else {
+      const errorText = errors.join('; ');
+      setMessage(`Not quite right. Check these values: ${errorText}. Try again!`);
+    }
   }
 
   // ---------- UI helpers ----------
