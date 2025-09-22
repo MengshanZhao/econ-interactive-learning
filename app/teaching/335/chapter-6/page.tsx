@@ -176,7 +176,14 @@ export default function BondMemoryPage() {
 
   // ---------- UI helpers ----------
   const SlotBox: React.FC<{ k: ChipKey; value?: number }> = ({ k, value }) => (
-    <div onDrop={(e)=>onDropSlot(e,k)} onDragOver={onDragOverSlot} className="inline-flex min-w-[64px] justify-center items-center px-2 py-1 rounded-lg border bg-white/80 relative">
+    <div 
+      onDrop={(e)=>onDropSlot(e,k)} 
+      onDragOver={onDragOverSlot} 
+      className="inline-flex min-w-[64px] justify-center items-center px-2 py-1 rounded-lg border bg-white/80 relative"
+      style={{ 
+        cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "default"
+      }}
+    >
       {value !== undefined ? (
         <div className="flex items-center gap-1">
           <span className="font-medium text-sm">{k==='y'? (value as number).toFixed(4) : k==='CPN'? (value as number).toFixed(2) : String(value)}</span>
@@ -190,6 +197,9 @@ export default function BondMemoryPage() {
             }}
             className="text-red-500 hover:text-red-700 text-xs font-bold ml-1"
             title="Remove this value"
+            style={{ 
+              cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer"
+            }}
           >
             ×
           </button>
@@ -355,7 +365,15 @@ export default function BondMemoryPage() {
           <div className="flex gap-2 flex-wrap">
             {collected.length === 0 && <div className="text-xs text-stone-500">(none yet)</div>}
             {collected.map((ch, i) => (
-              <div key={i} draggable onDragStart={(e) => onDragStartChip(e, ch)} className="cursor-grab active:cursor-grabbing inline-flex items-center gap-2 px-2 py-1 rounded-xl border bg-amber-100 border-amber-300 shadow-sm">
+              <div 
+                key={i} 
+                draggable 
+                onDragStart={(e) => onDragStartChip(e, ch)} 
+                className="inline-flex items-center gap-2 px-2 py-1 rounded-xl border bg-amber-100 border-amber-300 shadow-sm"
+                style={{ 
+                  cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "grab"
+                }}
+              >
                 <span className="text-sm">{roundN(ch.value)}</span>
               </div>
             ))}
@@ -365,7 +383,14 @@ export default function BondMemoryPage() {
         {/* 4×4 grid of EXACT PAIRS */}
         <div className="grid grid-cols-4 gap-3 mt-2">
           {cards.map((card) => (
-            <button key={card.id} onClick={() => onFlip(card.id)} className={`relative h-24 rounded-2xl border transition shadow-sm ${card.matched ? 'bg-emerald-50 border-emerald-300' : card.faceUp ? 'bg-amber-50 border-amber-300' : 'bg-white/60 hover:bg-white/80 border-stone-300'}`}>
+            <button 
+              key={card.id} 
+              onClick={() => onFlip(card.id)} 
+              className={`relative h-24 rounded-2xl border transition shadow-sm ${card.matched ? 'bg-emerald-50 border-emerald-300' : card.faceUp ? 'bg-amber-50 border-amber-300' : 'bg-white/60 hover:bg-white/80 border-stone-300'}`}
+              style={{ 
+                cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer"
+              }}
+            >
               {card.faceUp || card.matched ? (
                 <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-stone-800">{roundN(card.value)}</div>
               ) : (
@@ -378,9 +403,28 @@ export default function BondMemoryPage() {
         <div className="flex items-center justify-between mt-3">
           <div className="text-sm text-stone-700 min-h-[22px]">{message}</div>
           <div className="flex gap-2">
-            <button className="px-3 py-2 rounded-xl border" onClick={() => setScene('INTRO')}>Back</button>
-            <button className="px-3 py-2 rounded-xl border bg-emerald-200 hover:bg-emerald-300" onClick={onDone} disabled={!wand}>Finish</button>
-            <button className="px-3 py-2 rounded-xl border" onClick={() => { setQ(makeQuestion()); setWand(null); setScene('INTRO'); }}>New Round</button>
+            <button 
+              className="px-3 py-2 rounded-xl border" 
+              onClick={() => setScene('INTRO')}
+              style={{ 
+                cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer"
+              }}
+            >Back</button>
+            <button 
+              className="px-3 py-2 rounded-xl border bg-emerald-200 hover:bg-emerald-300" 
+              onClick={onDone} 
+              disabled={!wand}
+              style={{ 
+                cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer"
+              }}
+            >Finish</button>
+            <button 
+              className="px-3 py-2 rounded-xl border" 
+              onClick={() => { setQ(makeQuestion()); setWand(null); setScene('INTRO'); }}
+              style={{ 
+                cursor: wand === "A" ? "url('/images/wand1.png'), auto" : wand === "B" ? "url('/images/wand2.png'), auto" : "pointer"
+              }}
+            >New Round</button>
           </div>
         </div>
       </div>
