@@ -32,7 +32,14 @@ type Chip = { value: number };
 
 function randFrom<T>(arr: T[]) { return arr[Math.floor(Math.random() * arr.length)]; }
 function fmtMoney(x: number) { return `$${x.toFixed(2)}`; }
-function roundN(x: number) { return Math.abs(x) > 100 ? x.toFixed(0) : Math.abs(x) > 10 ? x.toFixed(2) : x.toFixed(4); }
+function roundN(x: number) { 
+  // For very small numbers, keep more precision but round long decimals
+  if (Math.abs(x) > 100) return x.toFixed(0);
+  if (Math.abs(x) > 10) return x.toFixed(2);
+  if (Math.abs(x) > 1) return x.toFixed(3);
+  // For small decimals like 0.025, keep as is, but round very long decimals
+  return x.toFixed(4);
+}
 
 function makeQuestion(): Question {
   const faces = [100, 500, 1000];
@@ -107,10 +114,27 @@ export default function BondMemoryPage() {
   useEffect(() => {
     if (scene !== 'PLAY' || !wand) return;
     const reqVals: number[] = (requiredKeys as readonly ChipKey[]).map(k => requiredMap[k]);
-    const distractorSeeds: number[] = []; const near = (v: number) => { const mag = Math.abs(v) > 100 ? 1 : Math.abs(v) > 10 ? 0.5 : 0.01; return [v+mag, v-mag]; };
+    
+    // Create distractors with better precision for small values
+    const distractorSeeds: number[] = []; 
+    const near = (v: number) => { 
+      const mag = Math.abs(v) > 100 ? 1 : Math.abs(v) > 10 ? 0.5 : Math.abs(v) > 1 ? 0.1 : 0.005; 
+      return [v+mag, v-mag]; 
+    };
     reqVals.forEach(v => distractorSeeds.push(...near(v)));
-    const pairs: number[] = []; reqVals.forEach(v => pairs.push(v,v));
-    let i=0; while(pairs.length<16){ const val=distractorSeeds[i%distractorSeeds.length]; pairs.push(val,val); i++; }
+    
+    // Ensure ALL required values are included as exact pairs
+    const pairs: number[] = []; 
+    reqVals.forEach(v => pairs.push(v, v)); // Each required value appears exactly twice
+    
+    // Fill remaining slots with distractors
+    let i = 0; 
+    while(pairs.length < 16) { 
+      const val = distractorSeeds[i % distractorSeeds.length]; 
+      pairs.push(val, val); 
+      i++; 
+    }
+    
     const shuffled = pairs.sort(() => Math.random() - 0.5);
     setCards(shuffled.map((v,i)=>({ id:`c${i}-${Math.random().toString(36).slice(2,6)}`, value:v, faceUp:false, matched:false })));
     setOpenId(null); setLockBoard(false); setCollected([]); setSlotValues({});
