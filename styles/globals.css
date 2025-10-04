@@ -185,3 +185,42 @@ body {
 .wand-scope [role="button"] {
   cursor: inherit !important;
 }
+
+/* Pixel styling for Chapter 5 & 7 games */
+.pixel-frame-amber {
+  border: 3px solid #d97706;
+  border-radius: 0;
+  box-shadow: 3px 3px 0 #92400e, 6px 6px 0 #78350f;
+}
+
+.pixel-inner-amber {
+  border: 2px solid #f59e0b;
+  border-radius: 0;
+  box-shadow: inset 2px 2px 0 #fbbf24, inset -2px -2px 0 #d97706;
+}
+
+.pixel-btn-amber {
+  border: 2px solid #d97706;
+  border-radius: 0;
+  box-shadow: 2px 2px 0 #92400e;
+  transition: all 0.1s ease;
+}
+
+.pixel-btn-amber:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #92400e;
+}
+
+.pixel-btn-amber:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+/* Font classes for Chapter 5 & 7 games */
+.font-ms {
+  font-family: 'MS Sans Serif', 'Comic Sans MS', cursive;
+}
+
+.font-vt323 {
+  font-family: 'VT323', 'Courier New', monospace;
+}
