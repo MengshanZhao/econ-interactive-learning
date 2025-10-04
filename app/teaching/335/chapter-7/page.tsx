@@ -598,9 +598,9 @@ export default function DDM_RPG_Chat() {
         touchAction: "pan-y",
       }}
     >
-      {/* Year wipe overlay with message */}
+      {/* Year wipe overlay with message - only show if not using page transition */}
       <AnimatePresence initial={false} mode="wait">
-        {showOverlay && prevYear !== null && (
+        {showOverlay && prevYear !== null && !showPageTransition && (
           <motion.div
             key={`wipe-${wipeCycle}`}
             initial={{ opacity: 0 }}
@@ -626,26 +626,26 @@ export default function DDM_RPG_Chat() {
         )}
       </AnimatePresence>
 
-      {/* Simple year transition animation after boss concludes */}
+      {/* Flip book year transition animation - only one per year */}
       <AnimatePresence>
         {showPageTransition && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.3 }}
             className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
           >
             <motion.div
-              initial={{ rotateY: -90, opacity: 0 }}
+              initial={{ rotateY: -180, opacity: 0 }}
               animate={{ rotateY: 0, opacity: 1 }}
-              exit={{ rotateY: 90, opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeInOut" }}
-              className="bg-amber-700/90 text-white px-6 py-4 rounded-lg shadow-2xl text-center"
+              exit={{ rotateY: 180, opacity: 0 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+              className="bg-amber-700/95 text-white px-8 py-6 rounded-lg shadow-2xl text-center"
               style={{ transformStyle: "preserve-3d" }}
             >
-              <div className="text-3xl font-bold mb-2 font-vt323">One year passes...</div>
-              <div className="text-lg opacity-90">Year {year} → {year + 1}</div>
+              <div className="text-4xl font-bold mb-3 font-vt323">One year later...</div>
+              <div className="text-xl opacity-90">Year {year} → {year + 1}</div>
             </motion.div>
           </motion.div>
         )}
