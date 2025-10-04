@@ -542,11 +542,6 @@ export default function DDM_RPG_Chat() {
       {/* Player offer section - show when offerOpen is true */}
       {offerOpen && !decision.status && (
         <div className="border-t bg-[#FFF4DF] p-4">
-          {chat.length > 2 && (
-            <div className="px-0 pb-2 text-xs text-amber-700 mb-2">
-              <button onClick={() => setShowHistory(true)} className="underline hover:no-underline">View earlier messages ({chat.length - 2} older)</button>
-            </div>
-          )}
           <div className="flex items-start gap-3">
             <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
               <Image src={PLAYER_IMAGE.image} alt={PLAYER_IMAGE.name} fill className="object-contain rounded-lg" />
@@ -556,6 +551,11 @@ export default function DDM_RPG_Chat() {
               <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
                 I am ready to pay you:
               </div>
+              {chat.length > 2 && (
+                <div className="px-4 pb-2 text-xs text-amber-700 mt-2">
+                  <button onClick={() => setShowHistory(true)} className="underline hover:no-underline">View earlier messages ({chat.length - 2} older)</button>
+                </div>
+              )}
               <div className="mt-4 space-y-2">
                 <div className="flex gap-2 items-center">
                   <input 
@@ -626,42 +626,27 @@ export default function DDM_RPG_Chat() {
         )}
       </AnimatePresence>
 
-      {/* Page transition animation after boss concludes */}
+      {/* Simple year transition animation after boss concludes */}
       <AnimatePresence>
         {showPageTransition && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ 
-              background: "linear-gradient(45deg, #d97706, #92400e, #78350f, #d97706)",
-              backgroundSize: "400% 400%",
-              animation: "gradientShift 2s ease-in-out"
-            }}
+            transition={{ duration: 0.6 }}
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
           >
-            <div className="text-center">
-              <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 1.5, opacity: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-6xl font-bold text-white mb-4"
-                style={{ fontFamily: "monospace" }}
-              >
-                Year {year} → {year + 1}
-              </motion.div>
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -20, opacity: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-2xl text-white font-semibold"
-              >
-                One year passes...
-              </motion.div>
-            </div>
+            <motion.div
+              initial={{ rotateY: -90, opacity: 0 }}
+              animate={{ rotateY: 0, opacity: 1 }}
+              exit={{ rotateY: 90, opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              className="bg-amber-700/90 text-white px-6 py-4 rounded-lg shadow-2xl text-center"
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              <div className="text-3xl font-bold mb-2 font-vt323">One year passes...</div>
+              <div className="text-lg opacity-90">Year {year} → {year + 1}</div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
