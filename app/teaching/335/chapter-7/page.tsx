@@ -633,46 +633,31 @@ useEffect(() => {
         )}
       </AnimatePresence>
 
-      {/* Single full-page blur+flip animation (book-like) */}
+      {/* Year transition - left-to-right blur sweep with centered text */}
       <AnimatePresence>
         {showPageTransition && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.5 }}
             className="fixed inset-0 z-50 pointer-events-none"
-            style={{ perspective: "1400px" }}
           >
-            {/* Flipping page that overlays entire screen */}
+            {/* Blur sweep overlay */}
             <motion.div
-              initial={{ rotateY: 0, filter: "blur(0px) brightness(0.95)" }}
-              animate={{ rotateY: 180, filter: ["blur(2px) brightness(0.9)", "blur(4px) brightness(0.85)", "blur(0px) brightness(1)"] }}
-              exit={{ rotateY: 360, filter: "blur(0px) brightness(1)" }}
-              transition={{ duration: 2.4, ease: "easeInOut" }}
+              initial={{ clipPath: "inset(0 100% 0 0)" }}
+              animate={{ clipPath: "inset(0 0 0 0)" }}
+              transition={{ duration: 2, ease: "easeInOut" }}
               className="absolute inset-0"
-              style={{ transformStyle: "preserve-3d", background: "rgba(255, 248, 234, 0.6)" }}
+              style={{ 
+                backdropFilter: "blur(8px)",
+                background: "rgba(255, 248, 234, 0.4)"
+              }}
             >
-              {/* Front face */}
-              <div
-                className="absolute inset-0 flex items-center justify-center"
-                style={{ backfaceVisibility: "hidden", transform: "rotateY(0deg)" }}
-              >
-                <div className="text-center select-none">
-                  <div className="text-6xl font-bold mb-2 font-vt323 text-amber-900">
-                    <Typewriter text="One year later..." speed={28} />
-                  </div>
-                </div>
-              </div>
-              {/* Back face */}
-              <div
-                className="absolute inset-0 flex items-center justify-center"
-                style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-              >
-                <div className="text-center select-none">
-                  <div className="text-6xl font-bold mb-2 font-vt323 text-amber-900">
-                    <Typewriter text="One year later..." speed={28} />
-                  </div>
+              {/* Centered text */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center select-none text-7xl font-bold font-vt323 text-amber-900">
+                  <Typewriter text="One year later..." speed={50} />
                 </div>
               </div>
             </motion.div>
@@ -791,11 +776,11 @@ useEffect(() => {
               <button onClick={() => { 
                 setBossDlg(null); 
                 setShowPageTransition(true);
-                // Delay loading next year's dialogue until after transition completes
+                // Wait for blur sweep and typewriter to complete before loading next year
                 setTimeout(() => {
                   nextYear();
                   setShowPageTransition(false);
-                }, 2600);
+                }, 2800); // 500ms fade in + 2000ms sweep + 300ms buffer
               }} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">Okay</button>
             </div>
           </div>
