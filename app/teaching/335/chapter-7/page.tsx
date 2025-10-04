@@ -440,10 +440,9 @@ useEffect(() => {
                       const p = decision.price || 0; const diff = p - fair;
                       verdict = diff > 0 ? `Boss: Overpaid by ${money(diff)}. Calculation:` : `Boss: Nice margin ${money(Math.abs(diff))}. Calculation:`;
                     }
-                      const f = bossFormulaText(offer);
-                      const text = `${verdict}\n\n${f.txt}\nFair P₀ ≈ ${money(fair)}.`;
-                      setBossDlg({ face: "Boss", text });
-                    nextYear();
+                    const f = bossFormulaText(offer);
+                    const text = `${verdict}\n\n${f.txt}\nFair P₀ ≈ ${money(fair)}.`;
+                    setBossDlg({ face: "Boss", text });
                   }}
                   className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700 w-full font-vt323"
                 >
@@ -633,32 +632,54 @@ useEffect(() => {
         )}
       </AnimatePresence>
 
-      {/* Year transition - left-to-right blur sweep with centered text */}
+      {/* Year transition with pixel-based blur and centered text */}
       <AnimatePresence>
         {showPageTransition && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
             className="fixed inset-0 z-50 pointer-events-none"
           >
-            {/* Blur sweep overlay */}
-            <motion.div
-              initial={{ clipPath: "inset(0 100% 0 0)" }}
-              animate={{ clipPath: "inset(0 0 0 0)" }}
-              transition={{ duration: 2, ease: "easeInOut" }}
-              className="absolute inset-0"
+            {/* Pixel blur effect using CSS grid */}
+            <div className="absolute inset-0 grid"
               style={{ 
-                backdropFilter: "blur(8px)",
-                background: "rgba(255, 248, 234, 0.4)"
+                gridTemplateColumns: "repeat(32, 1fr)",
+                background: "rgba(255, 248, 234, 0.2)"
               }}
             >
-              {/* Centered text */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center select-none text-7xl font-bold font-vt323 text-amber-900">
-                  <Typewriter text="One year later..." speed={50} />
-                </div>
+              {Array.from({ length: 32 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ filter: "blur(0px)" }}
+                  animate={{ filter: "blur(12px)" }}
+                  transition={{ 
+                    duration: 2,
+                    delay: i * 0.06, // Stagger the blur from left to right
+                    ease: "easeInOut"
+                  }}
+                  className="h-full bg-[#FFF8EA]/40"
+                  style={{ backdropFilter: "blur(4px)" }}
+                />
+              ))}
+            </div>
+
+            {/* Centered text appears after initial blur starts */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              className="absolute inset-0 flex items-center justify-center"
+            >
+              <div className="text-center select-none text-7xl font-bold font-vt323 text-amber-900 drop-shadow-lg">
+                <Typewriter text="One year later..." speed={60} onDone={() => {
+                  // Only advance year after typewriter completes
+                  setTimeout(() => {
+                    nextYear();
+                    setShowPageTransition(false);
+                  }, 500);
+                }} />
               </div>
             </motion.div>
           </motion.div>
@@ -776,11 +797,6 @@ useEffect(() => {
               <button onClick={() => { 
                 setBossDlg(null); 
                 setShowPageTransition(true);
-                // Wait for blur sweep and typewriter to complete before loading next year
-                setTimeout(() => {
-                  nextYear();
-                  setShowPageTransition(false);
-                }, 2800); // 500ms fade in + 2000ms sweep + 300ms buffer
               }} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">Okay</button>
             </div>
           </div>
