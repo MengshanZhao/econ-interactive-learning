@@ -220,6 +220,9 @@ export default function DDM_RPG_Chat() {
 
   // boss modal
   const [bossDlg, setBossDlg] = useState<null | { face: string; text: string }>(null);
+  
+  // page transition animation
+  const [showPageTransition, setShowPageTransition] = useState(false);
 
   const isPhone = useIsPhone();
 
@@ -539,6 +542,11 @@ export default function DDM_RPG_Chat() {
       {/* Player offer section - show when offerOpen is true */}
       {offerOpen && !decision.status && (
         <div className="border-t bg-[#FFF4DF] p-4">
+          {chat.length > 2 && (
+            <div className="px-0 pb-2 text-xs text-amber-700 mb-2">
+              <button onClick={() => setShowHistory(true)} className="underline hover:no-underline">View earlier messages ({chat.length - 2} older)</button>
+            </div>
+          )}
           <div className="flex items-start gap-3">
             <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
               <Image src={PLAYER_IMAGE.image} alt={PLAYER_IMAGE.name} fill className="object-contain rounded-lg" />
@@ -614,6 +622,46 @@ export default function DDM_RPG_Chat() {
               <div className="rounded bg-amber-700/80 text-white px-3 py-1 shadow">One year passes…</div>
             </div>
             <div className="absolute top-3 right-4 rounded bg-amber-700 text-white px-3 py-1 shadow">Year {prevYear} → {year}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Page transition animation after boss concludes */}
+      <AnimatePresence>
+        {showPageTransition && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ 
+              background: "linear-gradient(45deg, #d97706, #92400e, #78350f, #d97706)",
+              backgroundSize: "400% 400%",
+              animation: "gradientShift 2s ease-in-out"
+            }}
+          >
+            <div className="text-center">
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 1.5, opacity: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-6xl font-bold text-white mb-4"
+                style={{ fontFamily: "monospace" }}
+              >
+                Year {year} → {year + 1}
+              </motion.div>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="text-2xl text-white font-semibold"
+              >
+                One year passes...
+              </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -726,7 +774,15 @@ export default function DDM_RPG_Chat() {
               </div>
             </div>
             <div className="flex justify-end mt-4">
-              <button onClick={() => { setBossDlg(null); }} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">Okay</button>
+              <button onClick={() => { 
+                setBossDlg(null); 
+                setShowPageTransition(true);
+                // Trigger the year transition after a short delay
+                setTimeout(() => {
+                  nextYear();
+                  setShowPageTransition(false);
+                }, 1500);
+              }} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">Okay</button>
             </div>
           </div>
         </div>
