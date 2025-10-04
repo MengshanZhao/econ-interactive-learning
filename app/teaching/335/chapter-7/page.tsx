@@ -598,9 +598,9 @@ export default function DDM_RPG_Chat() {
         touchAction: "pan-y",
       }}
     >
-      {/* Year wipe overlay with message - only show if not using page transition */}
+      {/* Year wipe overlay disabled for Chapter 7 (using full-page flip instead) */}
       <AnimatePresence initial={false} mode="wait">
-        {showOverlay && prevYear !== null && !showPageTransition && (
+        {false && showOverlay && prevYear !== null && !showPageTransition && (
           <motion.div
             key={`wipe-${wipeCycle}`}
             initial={{ opacity: 0 }}
@@ -626,22 +626,44 @@ export default function DDM_RPG_Chat() {
         )}
       </AnimatePresence>
 
+<<<<<<< HEAD
+      {/* Single full-page flip animation (elegant book page) */}
+=======
       {/* Single page flip animation - entire game page flips like a book */}
+>>>>>>> 8999d05412bd45e2fbff6c2beb0c6aa86d50a653
       <AnimatePresence>
         {showPageTransition && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+<<<<<<< HEAD
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 pointer-events-none"
+            style={{ perspective: "1400px" }}
+=======
             transition={{ duration: 2.5, ease: "easeInOut" }}
             className="fixed inset-0 z-50"
             style={{ 
               perspective: "1000px",
               transformStyle: "preserve-3d"
             }}
+>>>>>>> 8999d05412bd45e2fbff6c2beb0c6aa86d50a653
           >
+<<<<<<< HEAD
+            {/* Flipping page that overlays entire screen */}
+=======
             {/* The entire page flip effect */}
+>>>>>>> 8999d05412bd45e2fbff6c2beb0c6aa86d50a653
             <motion.div
+<<<<<<< HEAD
+              initial={{ rotateY: 0, filter: "brightness(0.9)" }}
+              animate={{ rotateY: 180, filter: "brightness(1)" }}
+              exit={{ rotateY: 360, filter: "brightness(1)" }}
+              transition={{ duration: 2.2, ease: "easeInOut" }}
+              className="absolute inset-0"
+              style={{ transformStyle: "preserve-3d", backdropFilter: "blur(4px)" }}
+=======
               initial={{ rotateY: 0 }}
               animate={{ rotateY: 180 }}
               exit={{ rotateY: 360 }}
@@ -652,7 +674,30 @@ export default function DDM_RPG_Chat() {
                 background: "linear-gradient(135deg, #d97706, #92400e, #78350f, #92400e, #d97706)",
                 backgroundSize: "400% 400%"
               }}
+>>>>>>> 8999d05412bd45e2fbff6c2beb0c6aa86d50a653
             >
+<<<<<<< HEAD
+              {/* Front face */}
+              <div
+                className="absolute inset-0 flex items-center justify-center bg-[#FFF8EA]/70"
+                style={{ backfaceVisibility: "hidden", transform: "rotateY(0deg)" }}
+              >
+                <div className="text-center select-none">
+                  <div className="text-5xl font-bold mb-3 font-vt323 text-amber-900">One year later...</div>
+                  <div className="text-2xl text-amber-900/90 font-vt323">Year {year} → {year + 1}</div>
+                </div>
+              </div>
+              {/* Back face */}
+              <div
+                className="absolute inset-0 flex items-center justify-center bg-[#FFF8EA]/70"
+                style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+              >
+                <div className="text-center select-none">
+                  <div className="text-5xl font-bold mb-3 font-vt323 text-amber-900">One year later...</div>
+                  <div className="text-2xl text-amber-900/90 font-vt323">Year {year} → {year + 1}</div>
+                </div>
+              </div>
+=======
               {/* Front face - shows during first half of flip */}
               <div 
                 className="absolute inset-0 flex items-center justify-center"
@@ -698,6 +743,7 @@ export default function DDM_RPG_Chat() {
                   </div>
                 </motion.div>
               </div>
+>>>>>>> 8999d05412bd45e2fbff6c2beb0c6aa86d50a653
             </motion.div>
           </motion.div>
         )}
