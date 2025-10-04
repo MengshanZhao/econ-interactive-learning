@@ -626,26 +626,78 @@ export default function DDM_RPG_Chat() {
         )}
       </AnimatePresence>
 
-      {/* Flip book year transition animation - only one per year */}
+      {/* Single page flip animation - entire game page flips like a book */}
       <AnimatePresence>
         {showPageTransition && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+            transition={{ duration: 2.5, ease: "easeInOut" }}
+            className="fixed inset-0 z-50"
+            style={{ 
+              perspective: "1000px",
+              transformStyle: "preserve-3d"
+            }}
           >
+            {/* The entire page flip effect */}
             <motion.div
-              initial={{ rotateY: -180, opacity: 0 }}
-              animate={{ rotateY: 0, opacity: 1 }}
-              exit={{ rotateY: 180, opacity: 0 }}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
-              className="bg-amber-700/95 text-white px-8 py-6 rounded-lg shadow-2xl text-center"
-              style={{ transformStyle: "preserve-3d" }}
+              initial={{ rotateY: 0 }}
+              animate={{ rotateY: 180 }}
+              exit={{ rotateY: 360 }}
+              transition={{ duration: 2.5, ease: "easeInOut" }}
+              className="absolute inset-0"
+              style={{ 
+                transformStyle: "preserve-3d",
+                background: "linear-gradient(135deg, #d97706, #92400e, #78350f, #92400e, #d97706)",
+                backgroundSize: "400% 400%"
+              }}
             >
-              <div className="text-4xl font-bold mb-3 font-vt323">One year later...</div>
-              <div className="text-xl opacity-90">Year {year} → {year + 1}</div>
+              {/* Front face - shows during first half of flip */}
+              <div 
+                className="absolute inset-0 flex items-center justify-center"
+                style={{ 
+                  backfaceVisibility: "hidden",
+                  transform: "rotateY(0deg)"
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 1, scale: 1 }}
+                  animate={{ opacity: 0.7, scale: 0.95 }}
+                  transition={{ duration: 1.25, ease: "easeInOut" }}
+                  className="text-center"
+                >
+                  <div className="text-5xl font-bold text-white mb-4 font-vt323" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.5)" }}>
+                    One year later...
+                  </div>
+                  <div className="text-2xl text-white/90" style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.5)" }}>
+                    Year {year} → {year + 1}
+                  </div>
+                </motion.div>
+              </div>
+              
+              {/* Back face - shows during second half of flip */}
+              <div 
+                className="absolute inset-0 flex items-center justify-center"
+                style={{ 
+                  backfaceVisibility: "hidden",
+                  transform: "rotateY(180deg)"
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1.25, ease: "easeInOut", delay: 1.25 }}
+                  className="text-center"
+                >
+                  <div className="text-5xl font-bold text-white mb-4 font-vt323" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.5)" }}>
+                    One year later...
+                  </div>
+                  <div className="text-2xl text-white/90" style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.5)" }}>
+                    Year {year} → {year + 1}
+                  </div>
+                </motion.div>
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -762,11 +814,11 @@ export default function DDM_RPG_Chat() {
               <button onClick={() => { 
                 setBossDlg(null); 
                 setShowPageTransition(true);
-                // Trigger the year transition after a short delay
+                // Trigger the year transition after the full page flip animation
                 setTimeout(() => {
                   nextYear();
                   setShowPageTransition(false);
-                }, 1500);
+                }, 3000); // Give full 3 seconds for elegant page flip
               }} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">Okay</button>
             </div>
           </div>
