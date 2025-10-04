@@ -152,10 +152,10 @@ const Teach: React.FC<{ onNext: () => void }> = ({ onNext }) => (
         </Frame>
         <Frame className="p-5 space-y-3">
           <h2 className="font-semibold">Type 2 — Two-Stage Growth</h2>
-          <div>• First <b>N ≤ 2</b> years: fixed dividend while earnings grow fast.</div>
+          <div>• First <b>N </b> years: fixed dividend while earnings grow fast.</div>
           <div>• Then: pay percentage of earnings with slower long-term growth.</div>
-          <div>• <b>Finite calculation</b>: Sum early dividends + PV of later growing stream</div>
-          <div>• <b>Infinite version</b>: Would add terminal value at year N+1</div>
+          <div>• <b>Calculation</b>: Sum early dividends + PV of later growing stream</div>
+  
           <div className="text-sm text-amber-700">This game uses finite horizon calculations.</div>
         </Frame>
       </div>
@@ -368,50 +368,55 @@ export default function DDM_RPG_Chat() {
   // ---- GAME ----
   const dialogueInner = (
     <div className="p-0 text-amber-900">
-      {/* Compact chat — only show owner's latest answer */}
-      <div ref={chatBoxRef} className="px-4 pt-4 pb-2 text-[18px]" style={{ maxHeight: "34svh", overflowY: "auto" }}>
-        {(() => {
-          // Only show the latest owner response, skip user questions
-          const ownerMessages = chat.filter(m => m.who === "Owner");
-          const latestOwner = ownerMessages[ownerMessages.length - 1];
-          
-          if (latestOwner) {
-            return (
-              <div className="mb-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-1">
-                    <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">Owner</div>
-                    <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
-                      <Typewriter text={latestOwner.text} onDone={() => { /* noop */ }} />
+      {/* Only show owner's answer when not making an offer */}
+      {!offerOpen && (
+        <>
+          <div ref={chatBoxRef} className="px-4 pt-4 pb-2 text-[18px]" style={{ maxHeight: "34svh", overflowY: "auto" }}>
+            {(() => {
+              // Only show the latest owner response, skip user questions
+              const ownerMessages = chat.filter(m => m.who === "Owner");
+              const latestOwner = ownerMessages[ownerMessages.length - 1];
+              
+              if (latestOwner) {
+                return (
+                  <div className="mb-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1">
+                        <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">Owner</div>
+                        <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
+                          <Typewriter text={latestOwner.text} onDone={() => { /* noop */ }} />
+                        </div>
+                      </div>
+                      <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
+                        {offer && (
+                          <Image 
+                            src={SELLER_IMAGES.find(c => c.name === offer.animal)?.image || "/images/dog.png"} 
+                            alt={offer.animal} 
+                            fill 
+                            className="object-contain rounded-lg" 
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
-                    {offer && (
-                      <Image 
-                        src={SELLER_IMAGES.find(c => c.name === offer.animal)?.image || "/images/dog.png"} 
-                        alt={offer.animal} 
-                        fill 
-                        className="object-contain rounded-lg" 
-                      />
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          }
-          return null;
-        })()}
-      </div>
-      {chat.length > 2 && (
-        <div className="px-4 pb-2 text-xs text-amber-700">
-          <button onClick={() => setShowHistory(true)} className="underline hover:no-underline">View earlier messages ({chat.length - 2} older)</button>
-        </div>
+                );
+              }
+              return null;
+            })()}
+          </div>
+          {chat.length > 2 && (
+            <div className="px-4 pb-2 text-xs text-amber-700">
+              <button onClick={() => setShowHistory(true)} className="underline hover:no-underline">View earlier messages ({chat.length - 2} older)</button>
+            </div>
+          )}
+        </>
       )}
 
-      {/* Options list */}
-      <div className="border-t bg-[#FFF4DF] p-4 text-[18px]">
-        {offer && (
-          <div>
+      {/* Options list - only show when not making an offer */}
+      {!offerOpen && (
+        <div className="border-t bg-[#FFF4DF] p-4 text-[18px]">
+          {offer && (
+            <div>
             {decision.status ? (
               <div className="space-y-2">
                 <button
@@ -526,9 +531,10 @@ export default function DDM_RPG_Chat() {
                 </div>
               </>
             )}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Player offer section - show when offerOpen is true */}
       {offerOpen && !decision.status && (
