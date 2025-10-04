@@ -51,19 +51,15 @@ interface Holding { name: string; paid: number; path: number[]; buyYear: number;
 
 type Scene = "TEACH" | "HOWTO" | "GAME";
 
-// Use the same character images from chapter-5
-const CHARACTER_IMAGES = [
+// Character assignments: 4 animals for sellers, dwarf for player, pirate for boss
+const SELLER_IMAGES = [
   { name: "Dog", image: "/images/dog.png" },
   { name: "Fox", image: "/images/fox.png" },
   { name: "Leopard", image: "/images/leopard.png" },
-  { name: "Sheep", image: "/images/sheep.png" },
-  { name: "Wizard", image: "/images/wizard.png" },
-  { name: "Lizard", image: "/images/lizard.png" },
-  { name: "Dwarf", image: "/images/dwarf.png" },
-  { name: "Pirate", image: "/images/pirate.png" }
+  { name: "Sheep", image: "/images/sheep.png" }
 ];
-const USER_EMOJI = "🧑‍💼"; // your headshot in chat
-const BOSS_EMOJI = "🧙"; // boss in transition evaluation
+const PLAYER_IMAGE = { name: "Dwarf", image: "/images/dwarf.png" };
+const BOSS_IMAGE = { name: "Pirate", image: "/images/pirate.png" };
 
 // =============== math helpers ===============
 const pv = (cash: number[], rE: number) => cash.reduce((acc, c, t) => acc + c / Math.pow(1 + rE, t + 1), 0);
@@ -239,7 +235,7 @@ export default function DDM_RPG_Chat() {
   // ---- generate an offer ----
   const makeOffer = (y: number): Offer => {
     const remainingYears = 10 - y;
-    const character = choice(CHARACTER_IMAGES);
+    const character = choice(SELLER_IMAGES);
     const rE = randint(7, 12) / 100;
     const type: Offer["type"] = Math.random() < 0.5 ? "CONSTANT" : "TWO_STAGE";
 
@@ -367,12 +363,12 @@ export default function DDM_RPG_Chat() {
             <div key={`recent-${i}`} className="mb-4">
               {m.who === "You" ? (
                 <div className="flex items-start gap-3">
-                  <div className="relative w-16 h-16 shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
-                    <div className="text-3xl select-none flex items-center justify-center h-full" aria-hidden>{USER_EMOJI}</div>
+                  <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
+                    <Image src={PLAYER_IMAGE.image} alt={PLAYER_IMAGE.name} fill className="object-contain rounded-lg" />
                   </div>
                   <div className="flex-1">
                     <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">You</div>
-                    <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[80px] text-[20px] leading-7 font-vt323">
+                    <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
                       {m.text}
                     </div>
                   </div>
@@ -381,7 +377,7 @@ export default function DDM_RPG_Chat() {
                 <div className="flex items-start gap-3">
                   <div className="flex-1">
                     <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">Owner</div>
-                    <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[80px] text-[20px] leading-7 font-vt323">
+                    <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
                       {i === recent.length - 1 && m.who === "Owner" ? (
                         <Typewriter text={m.text} onDone={() => { /* noop */ }} />
                       ) : (
@@ -389,10 +385,10 @@ export default function DDM_RPG_Chat() {
                       )}
                     </div>
                   </div>
-                  <div className="relative w-16 h-16 shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
+                  <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
                     {offer && (
                       <Image 
-                        src={CHARACTER_IMAGES.find(c => c.name === offer.animal)?.image || "/images/dog.png"} 
+                        src={SELLER_IMAGES.find(c => c.name === offer.animal)?.image || "/images/dog.png"} 
                         alt={offer.animal} 
                         fill 
                         className="object-contain rounded-lg" 
@@ -423,16 +419,16 @@ export default function DDM_RPG_Chat() {
                     const fair = pvHidden(offer);
                     let verdict = "";
                     if (decision.status === "passed") {
-                      verdict = `${BOSS_EMOJI} Boss: You passed. Here's the closed-form calculation:`;
+                      verdict = `Boss: You passed. Here's the closed-form calculation:`;
                     } else if (decision.status === "declined") {
-                      verdict = `${BOSS_EMOJI} Boss: Your ${money(decision.price || 0)} offer was too low. Calculation:`;
+                      verdict = `Boss: Your ${money(decision.price || 0)} offer was too low. Calculation:`;
                     } else if (decision.status === "accepted") {
                       const p = decision.price || 0; const diff = p - fair;
-                      verdict = diff > 0 ? `${BOSS_EMOJI} Boss: Overpaid by ${money(diff)}. Calculation:` : `${BOSS_EMOJI} Boss: Nice margin ${money(Math.abs(diff))}. Calculation:`;
+                      verdict = diff > 0 ? `Boss: Overpaid by ${money(diff)}. Calculation:` : `Boss: Nice margin ${money(Math.abs(diff))}. Calculation:`;
                     }
-                    const f = bossFormulaText(offer);
-                    const text = `${verdict}\n\n${f.txt}\nFair P₀ ≈ ${money(fair)}.`;
-                    setBossDlg({ face: BOSS_EMOJI, text });
+                      const f = bossFormulaText(offer);
+                      const text = `${verdict}\n\n${f.txt}\nFair P₀ ≈ ${money(fair)}.`;
+                      setBossDlg({ face: "Boss", text });
                     nextYear();
                   }}
                   className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700 w-full"
@@ -443,42 +439,120 @@ export default function DDM_RPG_Chat() {
             ) : (
               <>
                 <div className="text-sm text-amber-800 mb-2">Ask one:</div>
-                <div className="grid grid-cols-1 gap-2">
-                  {unlocked.has("ask-type") && (
-                    <button onClick={doAskType} className="pixel-btn-amber">Is it constant or changing?</button>
-                  )}
-                  {unlocked.has("ask-first") && (
-                    <button onClick={doAskFirst} className="pixel-btn-amber">What's next year's dividend?</button>
-                  )}
-                  {unlocked.has("ask-growth") && (
-                    <button onClick={doAskGrowth} className="pixel-btn-amber">How fast do you grow?</button>
-                  )}
-                  {offer.type === "TWO_STAGE" && unlocked.has("ask-afterN") && (
-                    <button onClick={doAskAfterN} className="pixel-btn-amber">After the sprint?</button>
-                  )}
-                  {unlocked.has("ask-re") && (
-                    <button onClick={doAskRE} className="pixel-btn-amber">What rₑ should I use?</button>
-                  )}
-                  {unlocked.has("ask-length") && (
-                    <button onClick={doAskLength} className="pixel-btn-amber">How long will I have the stock?</button>
-                  )}
-                  {unlocked.has("ask-recap") && (
-                    <button onClick={doAskRecap} className="pixel-btn-amber">Quick recap</button>
-                  )}
-                  {unlocked.has("offer") && (
-                    <div>
-                      <button onClick={openOfferUI} className="pixel-btn-amber bg-emerald-600 text-white hover:bg-emerald-700 w-full">I'm ready to make an offer</button>
-                      {offerOpen && !decision.status && (
-                        <div className="mt-2 space-y-2">
-                          <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
-                            <input type="number" min={1} step={1} value={offerBid} onChange={(e)=>setOfferBid(e.target.value)} className="pixel-inner-amber p-3 text-[18px] placeholder:italic placeholder:text-amber-700/60" placeholder="enter your offer here" />
-                            <button onClick={submitOffer} className="pixel-btn-amber bg-emerald-600 text-white hover:bg-emerald-700 text-[16px]">Submit offer</button>
-                          </div>
-                          <button onClick={() => { setOfferOpen(false); setOfferBid(""); doPass(); }} className="pixel-btn-amber w-full">Pass</button>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                <div className="text-right">
+                  <ol className="list-decimal list-inside space-y-1 text-sm">
+                    {unlocked.has("ask-type") && (
+                      <li>
+                        <span 
+                          onClick={doAskType} 
+                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                        >
+                          Is it constant or changing?
+                        </span>
+                      </li>
+                    )}
+                    {unlocked.has("ask-first") && (
+                      <li>
+                        <span 
+                          onClick={doAskFirst} 
+                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                        >
+                          What's next year's dividend?
+                        </span>
+                      </li>
+                    )}
+                    {unlocked.has("ask-growth") && (
+                      <li>
+                        <span 
+                          onClick={doAskGrowth} 
+                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                        >
+                          How fast do you grow?
+                        </span>
+                      </li>
+                    )}
+                    {offer.type === "TWO_STAGE" && unlocked.has("ask-afterN") && (
+                      <li>
+                        <span 
+                          onClick={doAskAfterN} 
+                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                        >
+                          After the sprint?
+                        </span>
+                      </li>
+                    )}
+                    {unlocked.has("ask-re") && (
+                      <li>
+                        <span 
+                          onClick={doAskRE} 
+                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                        >
+                          What rₑ should I use?
+                        </span>
+                      </li>
+                    )}
+                    {unlocked.has("ask-length") && (
+                      <li>
+                        <span 
+                          onClick={doAskLength} 
+                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                        >
+                          How long will I have the stock?
+                        </span>
+                      </li>
+                    )}
+                    {unlocked.has("ask-recap") && (
+                      <li>
+                        <span 
+                          onClick={doAskRecap} 
+                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                        >
+                          Quick recap
+                        </span>
+                      </li>
+                    )}
+                    {unlocked.has("offer") && (
+                      <li>
+                        <span 
+                          onClick={openOfferUI} 
+                          className="cursor-pointer hover:text-emerald-700 transition-colors font-semibold"
+                        >
+                          I'm ready to make an offer
+                        </span>
+                        {offerOpen && !decision.status && (
+                          <ol className="list-decimal list-inside ml-4 mt-1 space-y-1">
+                            <li>
+                              <div className="inline-flex gap-2 items-center">
+                                <input 
+                                  type="number" 
+                                  min={1} 
+                                  step={1} 
+                                  value={offerBid} 
+                                  onChange={(e)=>setOfferBid(e.target.value)} 
+                                  className="pixel-inner-amber p-2 text-sm w-24 placeholder:italic placeholder:text-amber-700/60" 
+                                  placeholder="amount" 
+                                />
+                                <span 
+                                  onClick={submitOffer} 
+                                  className="cursor-pointer hover:text-emerald-700 transition-colors text-sm"
+                                >
+                                  Submit
+                                </span>
+                              </div>
+                            </li>
+                            <li>
+                              <span 
+                                onClick={() => { setOfferOpen(false); setOfferBid(""); doPass(); }} 
+                                className="cursor-pointer hover:text-amber-700 transition-colors"
+                              >
+                                Pass
+                              </span>
+                            </li>
+                          </ol>
+                        )}
+                      </li>
+                    )}
+                  </ol>
                 </div>
               </>
             )}
@@ -549,10 +623,10 @@ export default function DDM_RPG_Chat() {
       <div className={`relative z-10 mx-auto max-w-6xl p-6 ${isPhone ? "pb-6" : "pb-[60svh]"}`}>
         <Frame className="p-4">
           <div className="flex items-start gap-4">
-            <div className="relative w-24 h-24 shrink-0 bg-[#FFF4DF] rounded-lg overflow-hidden">
+            <div className="relative w-20 h-20 shrink-0 bg-[#FFF4DF] rounded-lg overflow-hidden">
               {offer && (
                 <Image 
-                  src={CHARACTER_IMAGES.find(c => c.name === offer.animal)?.image || "/images/dog.png"} 
+                  src={SELLER_IMAGES.find(c => c.name === offer.animal)?.image || "/images/dog.png"} 
                   alt={offer.animal} 
                   fill 
                   className="object-contain rounded-lg" 
@@ -625,14 +699,16 @@ export default function DDM_RPG_Chat() {
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/30">
           <div className="rounded-2xl border border-amber-300 bg-[#FFF8EA] p-4 max-w-xl mx-4">
             <div className="flex items-start gap-3">
-              <div className="text-4xl">{bossDlg.face}</div>
+              <div className="relative w-16 h-16 shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
+                <Image src={BOSS_IMAGE.image} alt={BOSS_IMAGE.name} fill className="object-contain rounded-lg" />
+              </div>
               <div className="flex-1">
                 <div className="text-amber-900 text-lg font-semibold mb-1">Boss</div>
                 <p className="text-amber-900 whitespace-pre-line">{bossDlg.text}</p>
               </div>
             </div>
             <div className="flex justify-end mt-4">
-              <button onClick={() => { setBossDlg(null); }} className="rounded bg-amber-600 text-white px-4 py-2 hover:bg-amber-700">Okay</button>
+              <button onClick={() => { setBossDlg(null); }} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">Okay</button>
             </div>
           </div>
         </div>
