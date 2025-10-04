@@ -431,21 +431,21 @@ export default function DDM_RPG_Chat() {
                       setBossDlg({ face: "Boss", text });
                     nextYear();
                   }}
-                  className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700 w-full"
+                  className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700 w-full font-vt323"
                 >
                   Ready for the next year
                 </button>
               </div>
             ) : (
               <>
-                <div className="text-sm text-amber-800 mb-2">Ask one:</div>
-                <div className="text-right">
-                  <ol className="list-decimal list-inside space-y-1 text-sm">
+                <div className="text-sm text-amber-800 mb-2 font-ms">Ask one:</div>
+                <div className="text-left">
+                  <ol className="list-decimal list-inside space-y-1 text-sm font-vt323">
                     {unlocked.has("ask-type") && (
                       <li>
                         <span 
                           onClick={doAskType} 
-                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                          className="cursor-pointer hover:text-amber-700 transition-colors font-vt323"
                         >
                           Is it constant or changing?
                         </span>
@@ -455,7 +455,7 @@ export default function DDM_RPG_Chat() {
                       <li>
                         <span 
                           onClick={doAskFirst} 
-                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                          className="cursor-pointer hover:text-amber-700 transition-colors font-vt323"
                         >
                           What's next year's dividend?
                         </span>
@@ -465,7 +465,7 @@ export default function DDM_RPG_Chat() {
                       <li>
                         <span 
                           onClick={doAskGrowth} 
-                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                          className="cursor-pointer hover:text-amber-700 transition-colors font-vt323"
                         >
                           How fast do you grow?
                         </span>
@@ -475,7 +475,7 @@ export default function DDM_RPG_Chat() {
                       <li>
                         <span 
                           onClick={doAskAfterN} 
-                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                          className="cursor-pointer hover:text-amber-700 transition-colors font-vt323"
                         >
                           After the sprint?
                         </span>
@@ -485,7 +485,7 @@ export default function DDM_RPG_Chat() {
                       <li>
                         <span 
                           onClick={doAskRE} 
-                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                          className="cursor-pointer hover:text-amber-700 transition-colors font-vt323"
                         >
                           What rₑ should I use?
                         </span>
@@ -495,7 +495,7 @@ export default function DDM_RPG_Chat() {
                       <li>
                         <span 
                           onClick={doAskLength} 
-                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                          className="cursor-pointer hover:text-amber-700 transition-colors font-vt323"
                         >
                           How long will I have the stock?
                         </span>
@@ -505,7 +505,7 @@ export default function DDM_RPG_Chat() {
                       <li>
                         <span 
                           onClick={doAskRecap} 
-                          className="cursor-pointer hover:text-amber-700 transition-colors"
+                          className="cursor-pointer hover:text-amber-700 transition-colors font-vt323"
                         >
                           Quick recap
                         </span>
@@ -515,12 +515,12 @@ export default function DDM_RPG_Chat() {
                       <li>
                         <span 
                           onClick={openOfferUI} 
-                          className="cursor-pointer hover:text-emerald-700 transition-colors font-semibold"
+                          className="cursor-pointer hover:text-emerald-700 transition-colors font-vt323 font-semibold"
                         >
                           I'm ready to make an offer
                         </span>
                         {offerOpen && !decision.status && (
-                          <ol className="list-decimal list-inside ml-4 mt-1 space-y-1">
+                          <ol className="list-decimal list-inside ml-4 mt-1 space-y-1 text-sm font-vt323">
                             <li>
                               <div className="inline-flex gap-2 items-center">
                                 <input 
@@ -529,12 +529,12 @@ export default function DDM_RPG_Chat() {
                                   step={1} 
                                   value={offerBid} 
                                   onChange={(e)=>setOfferBid(e.target.value)} 
-                                  className="pixel-inner-amber p-2 text-sm w-24 placeholder:italic placeholder:text-amber-700/60" 
+                                  className="pixel-inner-amber p-2 text-sm w-24 placeholder:italic placeholder:text-amber-700/60 font-vt323" 
                                   placeholder="amount" 
                                 />
                                 <span 
                                   onClick={submitOffer} 
-                                  className="cursor-pointer hover:text-emerald-700 transition-colors text-sm"
+                                  className="cursor-pointer hover:text-emerald-700 transition-colors text-sm font-vt323"
                                 >
                                   Submit
                                 </span>
@@ -543,7 +543,7 @@ export default function DDM_RPG_Chat() {
                             <li>
                               <span 
                                 onClick={() => { setOfferOpen(false); setOfferBid(""); doPass(); }} 
-                                className="cursor-pointer hover:text-amber-700 transition-colors"
+                                className="cursor-pointer hover:text-amber-700 transition-colors font-vt323"
                               >
                                 Pass
                               </span>
