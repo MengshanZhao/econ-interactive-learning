@@ -143,16 +143,29 @@ const Teach: React.FC<{ onNext: () => void }> = ({ onNext }) => (
     <div className="max-w-4xl w-full rounded-2xl shadow-xl p-6 space-y-5 bg-[#FFF8EA]">
       <h1 className="text-3xl md:text-4xl font-bold">Two Ways to Value Dividends</h1>
       <div className="grid md:grid-cols-2 gap-4 text-lg">
-        <Frame className="p-5 space-y-2">
-          <h2 className="font-semibold">Type 1 — Constant dividend</h2>
-          <div>• Same cash dividend each year (may grow steadily).</div>
-          <div>• Discount at <b>r<sub>E</sub></b> until Year 10 in this game.</div>
+        <Frame className="p-5 space-y-3">
+          <h2 className="font-semibold">Type 1 — Constant Growth</h2>
+          <div>• Same dividend pattern each year with steady growth rate <b>g</b>.</div>
+          <div>• <b>Finite horizon</b> (T years): P₀ = (D₁/(rₑ-g)) × (1-((1+g)/(1+rₑ))^T)</div>
+          <div>• <b>Infinite horizon</b>: P₀ = D₁/(rₑ-g) (if g &lt; rₑ)</div>
+          <div className="text-sm text-amber-700">This game uses finite horizon calculations.</div>
         </Frame>
-        <Frame className="p-5 space-y-2">
-          <h2 className="font-semibold">Type 2 — Bumpy then steady</h2>
-          <div>• First <b>N ≤ 2</b> year(s): simple fixed dividend while earnings sprint.</div>
-          <div>• Then: pay a percent of earnings; growth slows to a long-run rate.</div>
+        <Frame className="p-5 space-y-3">
+          <h2 className="font-semibold">Type 2 — Two-Stage Growth</h2>
+          <div>• First <b>N ≤ 2</b> years: fixed dividend while earnings grow fast.</div>
+          <div>• Then: pay percentage of earnings with slower long-term growth.</div>
+          <div>• <b>Finite calculation</b>: Sum early dividends + PV of later growing stream</div>
+          <div>• <b>Infinite version</b>: Would add terminal value at year N+1</div>
+          <div className="text-sm text-amber-700">This game uses finite horizon calculations.</div>
         </Frame>
+      </div>
+      <div className="bg-amber-100 p-4 rounded-lg">
+        <h3 className="font-semibold mb-2">Key Difference: Finite vs Infinite</h3>
+        <div className="text-sm space-y-1">
+          <div>• <b>Finite</b>: Calculate PV for exact number of years (T)</div>
+          <div>• <b>Infinite</b>: Assume dividends continue forever (terminal value)</div>
+          <div>• This game uses <b>finite calculations</b> for more realistic scenarios</div>
+        </div>
       </div>
       <div className="text-right">
         <button onClick={onNext} className="rounded bg-amber-600 px-6 py-3 text-2xl text-white shadow-lg hover:bg-amber-700">How the Game Works →</button>
@@ -355,34 +368,21 @@ export default function DDM_RPG_Chat() {
   // ---- GAME ----
   const dialogueInner = (
     <div className="p-0 text-amber-900">
-      {/* Compact chat — only latest Q/A */}
+      {/* Compact chat — only show owner's latest answer */}
       <div ref={chatBoxRef} className="px-4 pt-4 pb-2 text-[18px]" style={{ maxHeight: "34svh", overflowY: "auto" }}>
         {(() => {
-          const recent = chat.length <= 2 ? chat : chat.slice(-2);
-          return recent.map((m, i) => (
-            <div key={`recent-${i}`} className="mb-4">
-              {m.who === "You" ? (
-                <div className="flex items-start gap-3">
-                  <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
-                    <Image src={PLAYER_IMAGE.image} alt={PLAYER_IMAGE.name} fill className="object-contain rounded-lg" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">You</div>
-                    <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
-                      {m.text}
-                    </div>
-                  </div>
-                </div>
-              ) : (
+          // Only show the latest owner response, skip user questions
+          const ownerMessages = chat.filter(m => m.who === "Owner");
+          const latestOwner = ownerMessages[ownerMessages.length - 1];
+          
+          if (latestOwner) {
+            return (
+              <div className="mb-4">
                 <div className="flex items-start gap-3">
                   <div className="flex-1">
                     <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">Owner</div>
                     <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
-                      {i === recent.length - 1 && m.who === "Owner" ? (
-                        <Typewriter text={m.text} onDone={() => { /* noop */ }} />
-                      ) : (
-                        <span>{m.text}</span>
-                      )}
+                      <Typewriter text={latestOwner.text} onDone={() => { /* noop */ }} />
                     </div>
                   </div>
                   <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
@@ -396,9 +396,10 @@ export default function DDM_RPG_Chat() {
                     )}
                   </div>
                 </div>
-              )}
-            </div>
-          ));
+              </div>
+            );
+          }
+          return null;
         })()}
       </div>
       {chat.length > 2 && (
@@ -519,37 +520,6 @@ export default function DDM_RPG_Chat() {
                         >
                           I'm ready to make an offer
                         </span>
-                        {offerOpen && !decision.status && (
-                          <ol className="list-decimal list-inside ml-4 mt-1 space-y-1 text-sm font-vt323">
-                            <li>
-                              <div className="inline-flex gap-2 items-center">
-                                <input 
-                                  type="number" 
-                                  min={1} 
-                                  step={1} 
-                                  value={offerBid} 
-                                  onChange={(e)=>setOfferBid(e.target.value)} 
-                                  className="pixel-inner-amber p-2 text-sm w-24 placeholder:italic placeholder:text-amber-700/60 font-vt323" 
-                                  placeholder="amount" 
-                                />
-                                <span 
-                                  onClick={submitOffer} 
-                                  className="cursor-pointer hover:text-emerald-700 transition-colors text-sm font-vt323"
-                                >
-                                  Submit
-                                </span>
-                              </div>
-                            </li>
-                            <li>
-                              <span 
-                                onClick={() => { setOfferOpen(false); setOfferBid(""); doPass(); }} 
-                                className="cursor-pointer hover:text-amber-700 transition-colors font-vt323"
-                              >
-                                Pass
-                              </span>
-                            </li>
-                          </ol>
-                        )}
                       </li>
                     )}
                   </ol>
@@ -559,6 +529,48 @@ export default function DDM_RPG_Chat() {
           </div>
         )}
       </div>
+
+      {/* Player offer section - show when offerOpen is true */}
+      {offerOpen && !decision.status && (
+        <div className="border-t bg-[#FFF4DF] p-4">
+          <div className="flex items-start gap-3">
+            <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
+              <Image src={PLAYER_IMAGE.image} alt={PLAYER_IMAGE.name} fill className="object-contain rounded-lg" />
+            </div>
+            <div className="flex-1">
+              <div className="inline-block mb-2 px-3 py-1 pixel-frame-amber bg-[#FFECC8] text-amber-900 font-ms text-[18px]">You</div>
+              <div className="pixel-inner-amber bg-[#FFF8EA] p-4 min-h-[120px] text-[20px] leading-7 font-vt323">
+                I am ready to pay you:
+              </div>
+              <div className="mt-4 space-y-2">
+                <div className="flex gap-2 items-center">
+                  <input 
+                    type="number" 
+                    min={1} 
+                    step={1} 
+                    value={offerBid} 
+                    onChange={(e)=>setOfferBid(e.target.value)} 
+                    className="pixel-inner-amber p-3 text-[18px] w-32 placeholder:italic placeholder:text-amber-700/60 font-vt323" 
+                    placeholder="amount" 
+                  />
+                  <button 
+                    onClick={submitOffer} 
+                    className="pixel-btn-amber bg-emerald-600 text-white hover:bg-emerald-700 px-4 py-3 font-vt323"
+                  >
+                    Submit
+                  </button>
+                </div>
+                <button 
+                  onClick={() => { setOfferOpen(false); setOfferBid(""); doPass(); }} 
+                  className="pixel-btn-amber w-full font-vt323"
+                >
+                  Pass this one
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
