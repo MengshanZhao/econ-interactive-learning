@@ -282,17 +282,17 @@ export default function DDM_RPG_Chat() {
   };
 
   // ---- load offer ----
-  useEffect(() => {
-    if (scene !== "GAME") return;
-    const id = setTimeout(() => {
-      const o = makeOffer(year);
-      setOffer(o);
-      setChat([{ who: "Owner", text: o.opener }]);
-      setDecision({ status: null });
-      setOfferOpen(false); setOfferBid("");
-    }, 0);
-    return () => clearTimeout(id);
-  }, [scene, year]);
+useEffect(() => {
+  if (scene !== "GAME" || showPageTransition) return;
+  const id = setTimeout(() => {
+    const o = makeOffer(year);
+    setOffer(o);
+    setChat([{ who: "Owner", text: o.opener }]);
+    setDecision({ status: null });
+    setOfferOpen(false); setOfferBid("");
+  }, 0);
+  return () => clearTimeout(id);
+}, [scene, year, showPageTransition]);
 
   // overlay timing
   useEffect(() => {
@@ -633,7 +633,7 @@ export default function DDM_RPG_Chat() {
         )}
       </AnimatePresence>
 
-      {/* Single full-page flip animation (elegant book page) */}
+      {/* Single full-page blur+flip animation (book-like) */}
       <AnimatePresence>
         {showPageTransition && (
           <motion.div
@@ -646,31 +646,33 @@ export default function DDM_RPG_Chat() {
           >
             {/* Flipping page that overlays entire screen */}
             <motion.div
-              initial={{ rotateY: 0, filter: "brightness(0.9)" }}
-              animate={{ rotateY: 180, filter: ["brightness(0.9)", "brightness(0.8)", "brightness(1)"] }}
-              exit={{ rotateY: 360, filter: "brightness(1)" }}
-              transition={{ duration: 2.2, ease: "easeInOut" }}
+              initial={{ rotateY: 0, filter: "blur(0px) brightness(0.95)" }}
+              animate={{ rotateY: 180, filter: ["blur(2px) brightness(0.9)", "blur(4px) brightness(0.85)", "blur(0px) brightness(1)"] }}
+              exit={{ rotateY: 360, filter: "blur(0px) brightness(1)" }}
+              transition={{ duration: 2.4, ease: "easeInOut" }}
               className="absolute inset-0"
-              style={{ transformStyle: "preserve-3d", backdropFilter: "blur(4px)" }}
+              style={{ transformStyle: "preserve-3d", background: "rgba(255, 248, 234, 0.6)" }}
             >
               {/* Front face */}
               <div
-                className="absolute inset-0 flex items-center justify-center bg-[#FFF8EA]/70"
+                className="absolute inset-0 flex items-center justify-center"
                 style={{ backfaceVisibility: "hidden", transform: "rotateY(0deg)" }}
               >
                 <div className="text-center select-none">
-                  <Typewriter text="One year later..." speed={28} />
-                  <div className="text-2xl text-amber-900/90 font-vt323 mt-3">Year {year} → {year + 1}</div>
+                  <div className="text-6xl font-bold mb-2 font-vt323 text-amber-900">
+                    <Typewriter text="One year later..." speed={28} />
+                  </div>
                 </div>
               </div>
               {/* Back face */}
               <div
-                className="absolute inset-0 flex items-center justify-center bg-[#FFF8EA]/70"
+                className="absolute inset-0 flex items-center justify-center"
                 style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
               >
                 <div className="text-center select-none">
-                  <Typewriter text="One year later..." speed={28} />
-                  <div className="text-2xl text-amber-900/90 font-vt323 mt-3">Year {year} → {year + 1}</div>
+                  <div className="text-6xl font-bold mb-2 font-vt323 text-amber-900">
+                    <Typewriter text="One year later..." speed={28} />
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -789,11 +791,11 @@ export default function DDM_RPG_Chat() {
               <button onClick={() => { 
                 setBossDlg(null); 
                 setShowPageTransition(true);
-                // Trigger the year transition after the full page flip animation
+                // Delay loading next year's dialogue until after transition completes
                 setTimeout(() => {
                   nextYear();
                   setShowPageTransition(false);
-                }, 3000); // Give full 3 seconds for elegant page flip
+                }, 2600);
               }} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">Okay</button>
             </div>
           </div>
