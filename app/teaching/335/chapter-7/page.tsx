@@ -325,7 +325,7 @@ export default function DDM_RPG_Chat() {
   const doAskLength = () => { if(!offer) return; const T = offer.path.length; speakYou("How long will I have the stock?"); speakOwner(`From now, I expect to pay dividends for about ${T} more year${T===1?"":"s"}.`); setUnlocked(s=> new Set([...s, "offer", "ask-recap"])); };
 
   // Offer & Pass inside chat
-  const openOfferUI = () => { setOfferOpen(true); speakYou("I'm ready to make an offer."); };
+  const openOfferUI = () => { setOfferOpen(true); };
   const submitOffer = () => {
     if(!offer) return;
     const raw = offerBid;
@@ -338,16 +338,16 @@ export default function DDM_RPG_Chat() {
     if (accepted) {
       const newHolding: Holding = { name: `${offer.animal}`, paid: price, path: offer.path, buyYear: year };
       setFunds((f) => f - price); setLastDelta(-price); setPortfolio((pf) => [...pf, newHolding]);
-      speakOwner(`Okay, let's deal at ${money(price)}.`);
+      // No owner reply after offer
       setOfferOpen(false); setOfferBid("");
       setDecision({ status: "accepted", price });
     } else {
       setOfferOpen(false); setOfferBid("");
-      speakOwner("Oh—that's a bit low for me.");
+      // No owner reply after offer
       setDecision({ status: "declined", price });
     }
   };
-  const doPass = () => { speakYou("I'll pass for now."); setDecision({ status: "passed" }); };
+  const doPass = () => { setDecision({ status: "passed" }); };
 
   const nextYear = () => {
     if (year < 10) {
@@ -371,8 +371,8 @@ export default function DDM_RPG_Chat() {
   // ---- GAME ----
   const dialogueInner = (
     <div className="p-0 text-amber-900">
-      {/* Only show owner's answer when not making an offer */}
-      {!offerOpen && (
+      {/* Only show owner's answer when not making an offer and before decision */}
+      {!offerOpen && !decision.status && (
         <>
           <div ref={chatBoxRef} className="px-4 pt-4 pb-2 text-[18px]" style={{ maxHeight: "34svh", overflowY: "auto" }}>
             {(() => {
@@ -422,7 +422,12 @@ export default function DDM_RPG_Chat() {
             <div>
             {decision.status ? (
               <div className="space-y-2">
-                <button
+                <div className="flex items-start gap-3">
+                  <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
+                    <Image src={PLAYER_IMAGE.image} alt={PLAYER_IMAGE.name} fill className="object-contain rounded-lg" />
+                  </div>
+                  <div className="flex-1 flex items-center">
+                    <button
                   onClick={() => {
                     if (!offer) return;
                     const fair = pvHidden(offer);
@@ -444,6 +449,8 @@ export default function DDM_RPG_Chat() {
                 >
                   Ready for the next year
                 </button>
+                  </div>
+                </div>
               </div>
             ) : (
               <>
@@ -640,7 +647,7 @@ export default function DDM_RPG_Chat() {
             {/* Flipping page that overlays entire screen */}
             <motion.div
               initial={{ rotateY: 0, filter: "brightness(0.9)" }}
-              animate={{ rotateY: 180, filter: "brightness(1)" }}
+              animate={{ rotateY: 180, filter: ["brightness(0.9)", "brightness(0.8)", "brightness(1)"] }}
               exit={{ rotateY: 360, filter: "brightness(1)" }}
               transition={{ duration: 2.2, ease: "easeInOut" }}
               className="absolute inset-0"
@@ -652,8 +659,8 @@ export default function DDM_RPG_Chat() {
                 style={{ backfaceVisibility: "hidden", transform: "rotateY(0deg)" }}
               >
                 <div className="text-center select-none">
-                  <div className="text-5xl font-bold mb-3 font-vt323 text-amber-900">One year later...</div>
-                  <div className="text-2xl text-amber-900/90 font-vt323">Year {year} → {year + 1}</div>
+                  <Typewriter text="One year later..." speed={28} />
+                  <div className="text-2xl text-amber-900/90 font-vt323 mt-3">Year {year} → {year + 1}</div>
                 </div>
               </div>
               {/* Back face */}
@@ -662,8 +669,8 @@ export default function DDM_RPG_Chat() {
                 style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
               >
                 <div className="text-center select-none">
-                  <div className="text-5xl font-bold mb-3 font-vt323 text-amber-900">One year later...</div>
-                  <div className="text-2xl text-amber-900/90 font-vt323">Year {year} → {year + 1}</div>
+                  <Typewriter text="One year later..." speed={28} />
+                  <div className="text-2xl text-amber-900/90 font-vt323 mt-3">Year {year} → {year + 1}</div>
                 </div>
               </div>
             </motion.div>
