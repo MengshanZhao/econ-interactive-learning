@@ -149,7 +149,10 @@ const Teach: React.FC<{ onNext: () => void }> = ({ onNext }) => (
           <div>• <b>Finite horizon</b>: P₀ = <span className="inline-block text-center">
             <span>D₁</span><br/>
             <span className="border-t border-current">rₑ-g</span>
-          </span> × (1-((1+g)/(1+rₑ))<sup>T</sup>)</div>
+          </span> × (1-<span className="inline-block text-center">
+            <span>(1+g)</span><br/>
+            <span className="border-t border-current">(1+rₑ)</span>
+          </span><sup>T</sup>)</div>
           <div>• <b>Infinite horizon</b>: P₀ = <span className="inline-block text-center">
             <span>D₁</span><br/>
             <span className="border-t border-current">rₑ-g</span>
