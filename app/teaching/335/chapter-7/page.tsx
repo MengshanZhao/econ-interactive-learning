@@ -146,8 +146,14 @@ const Teach: React.FC<{ onNext: () => void }> = ({ onNext }) => (
         <Frame className="p-5 space-y-3">
           <h2 className="font-semibold">Type 1 — Constant Growth</h2>
           <div>• Same dividend pattern each year with steady growth rate <b>g</b>.</div>
-          <div>• <b>Finite horizon</b>: P₀ = (D₁/(rₑ-g)) × (1-((1+g)/(1+rₑ))^T)</div>
-          <div>• <b>Infinite horizon</b>: P₀ = D₁/(rₑ-g) (if g &lt; rₑ)</div>
+          <div>• <b>Finite horizon</b>: P₀ = <span className="inline-block text-center">
+            <span>D₁</span><br/>
+            <span className="border-t border-current">rₑ-g</span>
+          </span> × (1-((1+g)/(1+rₑ))^T)</div>
+          <div>• <b>Infinite horizon</b>: P₀ = <span className="inline-block text-center">
+            <span>D₁</span><br/>
+            <span className="border-t border-current">rₑ-g</span>
+          </span> (if g &lt; rₑ)</div>
           <div className="text-sm text-amber-700">This game uses finite horizon calculations.</div>
         </Frame>
         <Frame className="p-5 space-y-3">
@@ -398,8 +404,8 @@ useEffect(() => {
   // ---- GAME ----
   const dialogueInner = (
     <div className="p-0 text-amber-900">
-      {/* Only show owner's answer when not making an offer and before decision */}
-      {!offerOpen && !decision.status && (
+      {/* Only show owner's answer when not making an offer */}
+      {!offerOpen && (
         <>
           <div ref={chatBoxRef} className="px-4 pt-4 pb-2 text-[18px]" style={{ maxHeight: "34svh", overflowY: "auto" }}>
             {(() => {
@@ -442,43 +448,49 @@ useEffect(() => {
         </>
       )}
 
-      {/* Options list - only show when not making an offer */}
-      {!offerOpen && (
+      {/* Decision section - show when decision is made */}
+      {!offerOpen && decision.status && (
+        <div className="border-t bg-[#FFF4DF] p-4 text-[18px]">
+          {offer && (
+            <div className="space-y-2">
+              <div className="flex items-start gap-3">
+                <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
+                  <Image src={PLAYER_IMAGE.image} alt={PLAYER_IMAGE.name} fill className="object-contain rounded-lg" />
+                </div>
+                <div className="flex-1 flex items-center">
+                  <button
+                    onClick={() => {
+                      if (!offer) return;
+                      const fair = pvHidden(offer);
+                      let verdict = "";
+                      if (decision.status === "passed") {
+                        verdict = `Boss: You passed. Here's the closed-form calculation:`;
+                      } else if (decision.status === "declined") {
+                        verdict = `Boss: Your ${money(decision.price || 0)} offer was too low. Calculation:`;
+                      } else if (decision.status === "accepted") {
+                        const p = decision.price || 0; const diff = p - fair;
+                        verdict = diff > 0 ? `Boss: Overpaid by ${money(diff)}. Calculation:` : `Boss: Nice margin ${money(Math.abs(diff))}. Calculation:`;
+                      }
+                      const f = bossFormulaText(offer);
+                      const text = `${verdict}\n\n${f.txt}\nFair P₀ ≈ ${money(fair)}.`;
+                      setBossDlg({ face: "Boss", text });
+                    }}
+                    className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700 w-full font-vt323"
+                  >
+                    Ready for the next year
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Options list - only show when not making an offer and no decision made */}
+      {!offerOpen && !decision.status && (
         <div className="border-t bg-[#FFF4DF] p-4 text-[18px]">
           {offer && (
             <div>
-            {decision.status ? (
-              <div className="space-y-2">
-                <div className="flex items-start gap-3">
-                  <div className="relative w-[200px] h-[200px] shrink-0 bg-[#FFF4DF] pixel-inner-amber rounded-lg overflow-hidden">
-                    <Image src={PLAYER_IMAGE.image} alt={PLAYER_IMAGE.name} fill className="object-contain rounded-lg" />
-                  </div>
-                  <div className="flex-1 flex items-center">
-                    <button
-                  onClick={() => {
-                    if (!offer) return;
-                    const fair = pvHidden(offer);
-                    let verdict = "";
-                    if (decision.status === "passed") {
-                      verdict = `Boss: You passed. Here's the closed-form calculation:`;
-                    } else if (decision.status === "declined") {
-                      verdict = `Boss: Your ${money(decision.price || 0)} offer was too low. Calculation:`;
-                    } else if (decision.status === "accepted") {
-                      const p = decision.price || 0; const diff = p - fair;
-                      verdict = diff > 0 ? `Boss: Overpaid by ${money(diff)}. Calculation:` : `Boss: Nice margin ${money(Math.abs(diff))}. Calculation:`;
-                    }
-                    const f = bossFormulaText(offer);
-                    const text = `${verdict}\n\n${f.txt}\nFair P₀ ≈ ${money(fair)}.`;
-                    setBossDlg({ face: "Boss", text });
-                  }}
-                  className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700 w-full font-vt323"
-                >
-                  Ready for the next year
-                </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
               <>
                 <div className="text-sm text-amber-800 mb-2 font-ms">Ask one:</div>
                 <div className="text-left">
@@ -566,7 +578,6 @@ useEffect(() => {
                   </ol>
                 </div>
               </>
-            )}
             </div>
           )}
         </div>
