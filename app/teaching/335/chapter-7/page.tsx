@@ -146,7 +146,7 @@ const Teach: React.FC<{ onNext: () => void }> = ({ onNext }) => (
         <Frame className="p-5 space-y-3">
           <h2 className="font-semibold">Type 1 — Constant Growth</h2>
           <div>• Same dividend pattern each year with steady growth rate <b>g</b>.</div>
-          <div>• <b>Finite horizon</b> (T years): P₀ = (D₁/(rₑ-g)) × (1-((1+g)/(1+rₑ))^T)</div>
+          <div>• <b>Finite horizon</b>: P₀ = (D₁/(rₑ-g)) × (1-((1+g)/(1+rₑ))^T)</div>
           <div>• <b>Infinite horizon</b>: P₀ = D₁/(rₑ-g) (if g &lt; rₑ)</div>
           <div className="text-sm text-amber-700">This game uses finite horizon calculations.</div>
         </Frame>
@@ -189,6 +189,7 @@ const HowTo: React.FC<{ onStart: () => void }> = ({ onStart }) => (
         <li>• Begin with <b>$1,000</b>.</li>
         <li>• Each year an animal owner chats with you and offers a stock.</li>
         <li>• Ask questions in the chat. The last option lets you <b>Make an offer</b>.</li>
+        <li>• You can offer below the real value, but the chance of rejection increases with lower offers.</li>
         <li>• Dividends credit at each year-end; game ends at Year 10.</li>
       </ul>
       <div className="text-right">
@@ -284,14 +285,17 @@ export default function DDM_RPG_Chat() {
   // ---- load offer ----
 useEffect(() => {
   if (scene !== "GAME" || showPageTransition) return;
-  const id = setTimeout(() => {
-    const o = makeOffer(year);
-    setOffer(o);
-    setChat([{ who: "Owner", text: o.opener }]);
-    setDecision({ status: null });
-    setOfferOpen(false); setOfferBid("");
-  }, 0);
-  return () => clearTimeout(id);
+  // Only auto-load offer for the first year or when not transitioning
+  if (year === 1 && !showPageTransition) {
+    const id = setTimeout(() => {
+      const o = makeOffer(year);
+      setOffer(o);
+      setChat([{ who: "Owner", text: o.opener }]);
+      setDecision({ status: null });
+      setOfferOpen(false); setOfferBid("");
+    }, 0);
+    return () => clearTimeout(id);
+  }
 }, [scene, year, showPageTransition]);
 
   // overlay timing
@@ -335,19 +339,42 @@ useEffect(() => {
     if (price > funds) { setMsg("Insufficient funds."); return; }
     const p = acceptProbability(price, pvHidden(offer));
     const accepted = Math.random() <= p;
+    
+    // Add animal response based on offer result
+    let animalResponse = "";
+    if (accepted) {
+      const fairValue = pvHidden(offer);
+      const diff = price - fairValue;
+      if (diff > fairValue * 0.05) {
+        animalResponse = "That's a generous offer! I'll take it.";
+      } else if (diff < -fairValue * 0.05) {
+        animalResponse = "Alright, I'll sell at that price.";
+      } else {
+        animalResponse = "Fair enough, let's make the deal.";
+      }
+    } else {
+      animalResponse = "That's too low for me. I'll pass on this deal.";
+    }
+    
+    if (animalResponse) {
+      speakOwner(animalResponse);
+    }
+    
     if (accepted) {
       const newHolding: Holding = { name: `${offer.animal}`, paid: price, path: offer.path, buyYear: year };
       setFunds((f) => f - price); setLastDelta(-price); setPortfolio((pf) => [...pf, newHolding]);
-      // No owner reply after offer
       setOfferOpen(false); setOfferBid("");
       setDecision({ status: "accepted", price });
     } else {
       setOfferOpen(false); setOfferBid("");
-      // No owner reply after offer
       setDecision({ status: "declined", price });
     }
   };
-  const doPass = () => { setDecision({ status: "passed" }); };
+  const doPass = () => { 
+    // Add animal response for passing
+    speakOwner("Okay, no problem. Maybe next time.");
+    setDecision({ status: "passed" }); 
+  };
 
   const nextYear = () => {
     if (year < 10) {
@@ -678,6 +705,18 @@ useEffect(() => {
                   setTimeout(() => {
                     nextYear();
                     setShowPageTransition(false);
+                    // Load next animal after animation completes
+                    setTimeout(() => {
+                      if (year < 10) {
+                        const newY = year + 1;
+                        const o = makeOffer(newY);
+                        setOffer(o);
+                        setChat([{ who: "Owner", text: o.opener }]);
+                        setDecision({ status: null });
+                        setOfferOpen(false); 
+                        setOfferBid("");
+                      }
+                    }, 200);
                   }, 500);
                 }} />
               </div>
@@ -796,7 +835,10 @@ useEffect(() => {
             <div className="flex justify-end mt-4">
               <button onClick={() => { 
                 setBossDlg(null); 
-                setShowPageTransition(true);
+                // Start the animation after boss dialog closes
+                setTimeout(() => {
+                  setShowPageTransition(true);
+                }, 100);
               }} className="pixel-btn-amber bg-amber-600 text-white hover:bg-amber-700">Okay</button>
             </div>
           </div>
