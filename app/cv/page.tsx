@@ -10,7 +10,7 @@ export default function CVPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Curriculum Vitae</h1>
           <div className="mt-8">
             <Button asChild className="bg-[#FFC107] hover:bg-[#FFA000] text-black px-6 py-2 rounded-full font-semibold transition-colors">
-              <a href="/CV.pdf" download>
+              <a href="/CV/CV_Mengshan_Oct4.pdf" download>
                 <Download className="mr-2 h-4 w-4" /> Download CV
               </a>
             </Button>
@@ -369,7 +369,7 @@ export default function CVPage() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Need a printable version?</h2>
           <Button asChild className="bg-[#FFC107] hover:bg-[#FFA000] text-black px-6 py-2 rounded-full font-semibold transition-colors">
-            <a href="/CV.pdf" download>
+            <a href="/CV/CV_Mengshan_Oct4.pdf" download>
               <Download className="mr-2 h-4 w-4" /> Download Full CV (PDF)
             </a>
           </Button>
