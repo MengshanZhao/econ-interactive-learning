@@ -24,26 +24,17 @@ export default function CVPage() {
           <div className="bg-white rounded-lg shadow-md p-8">
             {/* Personal Info */}
             <div className="mb-12">
-              <h2 className="text-3xl font-bold mb-6 text-gray-800">Mengshan Zhao (She/Her)</h2>
+              <h2 className="text-3xl font-bold mb-6 text-gray-800">Mengshan Zhao</h2>
               <div className="grid md:grid-cols-2 gap-4 text-gray-600">
                 <div>
                   <p>PhD Candidate in Agricultural Economics</p>
                   <p>Washington State University</p>
-                  <p>Pullman, Washington, US</p>
+                  <p>2020 NE Wilson Rd (Campus), Pullman, WA 99163</p>
                 </div>
                 <div>
-                  <p>Email: mengshan.zhao@wsu.edu</p>
+                  <p>Email: <a href="mailto:mengshan.zhao@wsu.edu" className="text-blue-600 hover:text-blue-800">mengshan.zhao@wsu.edu</a></p>
                   <p>Phone: (608) 334-7814</p>
-                  <p>
-                    <a
-                      href="https://www.linkedin.com/in/mengshan-zhao-222422194/"
-                      className="text-gray-600 hover:text-gray-900 inline-flex items-center transition-colors"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      LinkedIn <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="ml-1 h-3 w-3"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" x2="21" y1="14" y2="3"></line></svg>
-                    </a>
-                  </p>
+                  <p>Website: <a href="https://www.mengshanzhao.com" className="text-blue-600 hover:text-blue-800">www.mengshanzhao.com</a></p>
                 </div>
               </div>
             </div>
@@ -51,88 +42,76 @@ export default function CVPage() {
             {/* Education */}
             <div className="mb-12">
               <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Education</h3>
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">Ph.D. in Agriculture Economics</h4>
-                    <span className="text-gray-600">09.2021 – Current</span>
-                  </div>
-                  <p className="text-gray-600 mb-1">Washington State University, United States</p>
-                  <p className="text-gray-600">GPA: 3.9/4.0</p>
-                  <p className="text-gray-600">Research interests: Development and Health</p>
+                  <p className="text-gray-800 font-semibold">Ph.D., Agricultural Economics, Washington State University, 2021–Present (expected 2026)</p>
                 </div>
-
                 <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      Master's Degree in Agriculture and Applied Economics
-                    </h4>
-                    <span className="text-gray-600">09.2019 – 06.2021</span>
-                  </div>
-                  <p className="text-gray-600 mb-1">University of Wisconsin, Madison, United States</p>
-                  <p className="text-gray-600">GPA: 3.8/4.0</p>
+                  <p className="text-gray-800 font-semibold">M.S., Agricultural and Applied Economics, University of Wisconsin–Madison, 2019–2021</p>
                 </div>
-
                 <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">B.B.A. with Honours in Applied Economics, Second Class Upper Division</h4>
-                    <span className="text-gray-600">09.2015 – 06.2019</span>
-                  </div>
-                  <p className="text-gray-600 mb-1">Chinese University of Hong Kong (CUHK), Shenzhen, China</p>
-                  <p className="text-gray-600">GPA: 3.3/4.0</p>
+                  <p className="text-gray-800 font-semibold">B.B.A. (Hons.), Applied Economics, The Chinese University of Hong Kong, Shenzhen, 2015–2019</p>
                 </div>
-
                 <div>
-                  <h4 className="text-xl font-semibold text-gray-800 mb-1">Visiting Program</h4>
-                  <p className="text-gray-600">University of California, Irvine, United States</p>
-                  <p className="text-gray-600">London School of Economics and Political Science, United Kingdom</p>
+                  <p className="text-gray-600 italic">Visiting Programs: University of California, Irvine; London School of Economics and Political Science</p>
                 </div>
               </div>
             </div>
 
-            {/* Research Experience */}
+            {/* References */}
+            <div className="mb-12">
+              <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">References</h3>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Chair: Seollee Park</h4>
+                  <p className="text-gray-600 mb-1">Assistant Professor</p>
+                  <p className="text-gray-600 mb-1">School of Economic Sciences & Paul G. Allen School for Global Health</p>
+                  <p className="text-gray-600 mb-1">Washington State University</p>
+                  <p className="text-gray-600 mb-1">2020 NE Wilson Rd, Pullman, WA 99163</p>
+                  <p className="text-gray-600 mb-1">Email: <a href="mailto:seollee.park@wsu.edu" className="text-blue-600 hover:text-blue-800">seollee.park@wsu.edu</a></p>
+                  <p className="text-gray-600">Phone: 509-335-8521</p>
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Shanthi Manian</h4>
+                  <p className="text-gray-600 mb-1">Associate Professor</p>
+                  <p className="text-gray-600 mb-1">School of Economic Sciences & Paul G. Allen School for Global Health</p>
+                  <p className="text-gray-600 mb-1">Washington State University</p>
+                  <p className="text-gray-600 mb-1">Pullman, WA 99163</p>
+                  <p className="text-gray-600 mb-1">Email: <a href="mailto:shanthi.manian@wsu.edu" className="text-blue-600 hover:text-blue-800">shanthi.manian@wsu.edu</a></p>
+                  <p className="text-gray-600">Phone: 509-335-8739</p>
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Benjamin Cowan</h4>
+                  <p className="text-gray-600 mb-1">Professor</p>
+                  <p className="text-gray-600 mb-1">School of Economic Sciences</p>
+                  <p className="text-gray-600 mb-1">Washington State University</p>
+                  <p className="text-gray-600 mb-1">Pullman, WA 99163</p>
+                  <p className="text-gray-600 mb-1">Email: <a href="mailto:ben.cowan@wsu.edu" className="text-blue-600 hover:text-blue-800">ben.cowan@wsu.edu</a></p>
+                  <p className="text-gray-600">Phone: 509-335-2184</p>
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Gregmar I. Galinato</h4>
+                  <p className="text-gray-600 mb-1">Professor</p>
+                  <p className="text-gray-600 mb-1">School of Economic Sciences</p>
+                  <p className="text-gray-600 mb-1">Washington State University</p>
+                  <p className="text-gray-600 mb-1">Pullman, WA 99163</p>
+                  <p className="text-gray-600 mb-1">Email: <a href="mailto:ggalinato@wsu.edu" className="text-blue-600 hover:text-blue-800">ggalinato@wsu.edu</a></p>
+                  <p className="text-gray-600">Phone: 509-335-6382</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Research Assistant Experience */}
             <div className="mb-12">
               <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">
-                Research Experience
+                Research Assistant Experience
               </h3>
-              <div className="space-y-8">
+              <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between mb-2">
-                    <h4 className="text-xl font-semibold text-gray-800">Research Assistant</h4>
-                    <span className="text-gray-600">Jun 2024 – Current</span>
-                  </div>
-                  <p className="text-gray-600 mb-3">Supervisor: Prof. Galinato, Washington State University</p>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>Conducted randomized controlled trial on organic vegetable technology impacts in the Philippines</li>
-                    <li>Analyzed gender-based agricultural labor productivity changes and income group variations</li>
-                  </ul>
+                  <p className="text-gray-800">Research Assistant, Prof. Seollee Park, Washington State University <span className="text-gray-600 italic">2023–Present</span></p>
                 </div>
-
                 <div>
-                  <div className="flex justify-between mb-2">
-                    <h4 className="text-xl font-semibold text-gray-800">Research Assistant</h4>
-                    <span className="text-gray-600">Jan 2023 – Current</span>
-                  </div>
-                  <p className="text-gray-600 mb-3">Supervisor: Prof. Seollee Park, Washington State University</p>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>Studied the effects of Problem Management Plus (PM+) intervention on maternal mental health and child undernutrition</li>
-                    <li>Conducted data analysis, paper writing, and traveled to Nigeria for experiment training</li>
-                    <li>Worked closely with local teams to design experiments and questionnaires for a randomized control trial of 800 caregivers</li>
-                    <li>Created audio assistant survey tools for sensitive questions and trained data collectors in Gombe, Nigeria</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <h4 className="text-xl font-semibold text-gray-800">Research Assistant</h4>
-                    <span className="text-gray-600">Jan 2022 – Dec 2022</span>
-                  </div>
-                  <p className="text-gray-600 mb-3">Supervisor: Prof. Jake Wagner, Washington State University</p>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>Conducted research on transportation economics and developed code for analyzing big data spanning two decades of import/export data</li>
-                    <li>Co-authored research on optimal pricing policies for campus parking</li>
-                    <li>Collaborated on research examining the impacts of COVID-19 on U.S. containerized agricultural exports</li>
-                  </ul>
+                  <p className="text-gray-800">Research Assistant, Prof. Jake Wagner, Washington State University <span className="text-gray-600 italic">2022</span></p>
                 </div>
               </div>
             </div>
@@ -236,125 +215,148 @@ export default function CVPage() {
               <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">
                 Teaching Experience
               </h3>
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">Instructor</h4>
-                    <span className="text-gray-600">Jan 2025 – May 2025</span>
-                  </div>
-                  <p className="text-gray-600 mb-3">Washington State University</p>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>ECONS 320: Money and Banking (Online) - Received 4.5/5 in course evaluations</li>
-                    <li>ECONS 323: Labor Economics (Online) - Received 4.5/5 in course evaluations</li>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Instructor, Washington State University <span className="text-gray-600 italic">Jan 2025 -- Jan 2026</span></h4>
+                  <ul className="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                    <li>ECONS 320: Money and Banking (Online) — Course evaluations: 4.5/5</li>
+                    <li>ECONS 323: Labor Economics (Online) — Course evaluations: 4.5/5</li>
+                    <li>ECONS 335: Business Finance (Online) — Ongoing</li>
+                    <li>ECONS 426: Transportation Economics and Supply Chain Analysis (Online) — Ongoing</li>
                   </ul>
                 </div>
-
                 <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">Teaching Assistant</h4>
-                    <span className="text-gray-600">Sep 2021 – Dec 2021</span>
-                  </div>
-                  <p className="text-gray-600 mb-3">Washington State University</p>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Teaching Assistant, Washington State University <span className="text-gray-600 italic">Sep 2021 -- Dec 2021</span></h4>
+                  <ul className="list-disc list-inside text-gray-600 space-y-1 ml-4">
                     <li>ECONS 101: Fundamentals of Microeconomics</li>
                   </ul>
                 </div>
               </div>
             </div>
 
-            {/* Presentations */}
+            {/* Conference Presentations */}
             <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Presentations</h3>
+              <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Conference Presentations</h3>
               <div className="space-y-6">
                 <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      Competing for Clean Air: Dynamic Incentives in China's Environmental Protection Interviews
-                    </h4>
-                    <span className="text-gray-600">Upcoming 2025</span>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Competing for Clean Air: Dynamic Incentives in China's Environmental Protection Interviews</h4>
+                  <div className="ml-4">
+                    <p className="text-gray-600 italic mb-1">2025: Association of Environmental and Resource Economists (AERE, May), Western Economic Association International (WEAI, June), WSU Student Seminar (Nov), selected for presentation at 2025 AAEA Annual Meeting</p>
+                    <p className="text-gray-600 italic">2024: Northwest Development Workshop (June 2024)</p>
                   </div>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>Association of Environmental and Resource Economists (AERE), May 2025</li>
-                    <li>Western Economic Association International (WEAI), June 2025</li>
-                    <li>WSU Student Seminar, November 2025</li>
-                    <li>Selected for presentation at 2025 AAEA Annual Meeting</li>
-                  </ul>
                 </div>
-
                 <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      Competing for Clean Air: Dynamic Incentives in China's Environmental Protection Interviews
-                    </h4>
-                    <span className="text-gray-600">Recent</span>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Optimal Pricing Policies for Campus Parking</h4>
+                  <div className="ml-4">
+                    <p className="text-gray-600 italic">Region 10 Transportation Conference (Oct 2022)</p>
                   </div>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>Northwest Development Workshop, June 2024</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">Optimal Pricing Policies for Campus Parking</h4>
-                    <span className="text-gray-600">Oct 2022</span>
-                  </div>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>Region 10 Transportation Conference</li>
-                  </ul>
                 </div>
               </div>
             </div>
 
-            {/* Skills */}
+            {/* Awards & Fellowships */}
             <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Skills</h3>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Programming:</h4>
-                  <p className="text-gray-600">
-                    R, Python (rasterio, pandas, xarray, sklearn, numpy, pytorch), STATA, LaTeX
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-2">AI Tools:</h4>
-                  <p className="text-gray-600">
-                    Claude, ChatGPT, Gemini, Cursor - proficient in leveraging AI assistants for research, writing, and
-                    coding
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Research:</h4>
-                  <p className="text-gray-600">
-                    Natural Language Processing, Econometrics, Experimental Design, Field Research, Survey Design, Data
-                    Analysis
-                  </p>
-                </div>
+              <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Awards & Fellowships</h3>
+              <div className="space-y-2">
+                <p className="text-gray-800">Felloni, Giorgio, and Luisa SES Fellowship, Washington State University</p>
               </div>
             </div>
 
-            {/* Other Experience */}
-            <div>
-              <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Other Experience</h3>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-1">Drama Writing:</h4>
+            {/* Professional Service */}
+            <div className="mb-12">
+              <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Professional Service</h3>
+              <div className="space-y-2">
+                <p className="text-gray-800">Volunteer, Social Platform Team — Committee on Women in Agricultural Economics (CWAE)</p>
+              </div>
+            </div>
+
+            {/* Research */}
+            <div className="mb-12">
+              <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Research</h3>
+              
+              {/* Job Market Paper */}
+              <div className="mb-8">
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">Job Market Paper</h4>
+                <div className="space-y-4">
+                  <h5 className="text-lg font-semibold text-gray-800">When the Worst Compete: Strategic Responses to Environmental Protection Interviews in China</h5>
+                  <p className="text-gray-600 italic">Draft available upon request</p>
                   <p className="text-gray-600">
-                    Worked as a playwright in the university's club; Original work <span className="italic">Bourdieu in a Restaurant</span> joined Shenzhen-Hong Kong-Macao drama festival; Won a local award for playwriting.
+                    This paper explores the dynamic incentives embedded in ranking-based environmental governance, investigating how governments strategically respond to competitive performance evaluations. Using China's Environmental Protection Interview (EPI)—a high-profile, ranking-driven policy targeting underperforming cities—as an empirical case, I leverage high-frequency air-quality data and a difference-in-differences framework to analyze behavior under pressure. Contrary to existing literature, which typically estimates modest pollution reductions for formally sanctioned cities, my analysis shows that cities preemptively reduce PM2.5 by approximately 15.7 μg/m³, nearly four times prior estimates when facing the risk of evaluation sanctions. These reductions exhibit pronounced seasonality, peaking at evaluation periods, indicating short-term strategic efforts by local governments to enhance rankings. The policy also yields measurable healthcare cost savings primarily during narrow evaluation windows. Political factors shape these responses: cities with extensive elite ties intensify short term reductions around evaluation periods, whereas those near capital region oversight sustain steadier improvements throughout the year. Importantly, political connections shift effort across the calendar without increasing the total annual effect. A tournament model explains why elite ties and geographic adjacency generate different patterns by separating rank loss costs from pollution damage costs. Taken together, the findings highlight both the advantages and drawbacks of rank-ordered policy design and underscore the importance of aligning short-term incentives with long-term public-health goals.
                   </p>
                 </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-1">Part Time Work:</h4>
-                  <p className="text-gray-600">
-                    Worked as an editor for the marketing department for School of Management and Economics. Joined several economics seminars and interviewed professors.
-                  </p>
+              </div>
+
+              {/* Working Papers */}
+              <div className="mb-8">
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">Working Papers</h4>
+                <div className="space-y-6">
+                  <div>
+                    <h5 className="text-lg font-semibold text-gray-800 mb-2">Family Plans and Planning Policy: The Role of Women's Human Capital in Shaping China's Fertility Trends</h5>
+                    <p className="text-gray-600 italic mb-2">with Benjamin Cowan, draft available upon request</p>
+                    <p className="text-gray-600">
+                      This paper investigates the impact of women's higher education on fertility decisions in China, focusing on cohorts subject to the One-Child and Second-Child Policies. Using provincial per capita college access at age 17 as an instrument, we isolate exogenous variation in educational attainment stemming from centrally managed quota systems for university enrollment. Drawing on the 2020 China Family Panel Survey, our 2SLS estimates indicate that each additional year of education delays the age at first birth by 0.31 years and reduces total fertility by 0.085 children. We find no significant effect on childbearing within policy limits, but a sizable and significant decline in higher-order births that would violate family planning regulations. This pattern suggests that the channel through which education affects fertility operates primarily via increased compliance with population control policies, rather than shifts in preferences or biological constraints. Further analysis reveals that formal employment and institutional penalties—rather than monetary fines—are likely to mediate this compliance effect. Through this study, we contribute to the broader discourse on the socio-economic factors shaping reproductive behaviors in contemporary China, emphasizing the pivotal role of education in aligning individual fertility choices with national policy objectives.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h5 className="text-lg font-semibold text-gray-800 mb-2">Assessing the Impact of Organic Farm Training on Crop Productivity by Gender</h5>
+                    <p className="text-gray-600 italic mb-2">with Shanthi Manian, Gregmar I. Galinato, Seollee Park, Suzette P. Galinato, Christian Paul L. Fang, Amelia Bello, Shaira Mae C. Calayugan, and Lorna Sister</p>
+                    <p className="text-gray-600">
+                      The objective of this article is to determine the impact of teaching organic vegetable technology interventions on household labor use and labor productivity across genders. We conduct a randomized controlled trial where we introduce household organic vegetable training to vegetable farmers in rural farm households in the Philippines. We find a (1) significant increase in female labor man-days and workers attributed to the organic vegetable technology intervention during the fertilizer, pesticide, and, to a lesser extent, harvesting stages of production for low wealth households and farms that plant multiple types of vegetables. When we(2) examine the high wealth households and those that plant only one type of crop, the effect of the intervention on female labor is either negative or insignificant. The difference in impact of the intervention by wealth is likely due to the low wealth households employing labor intensive agricultural technology while high wealth households employ capital intensive technology. Prior to the intervention, male household labor productivity is larger than female household labor productivity. After the intervention, there was a reduction in the gender labor productivity gap for low wealth households but the impact is not significant. Our results point to the potential for introducing organic technology and practices during the entire production process as a means of reducing the gender labor productivity gap for low-wealth households that utilize labor-intensive agricultural technology.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-1">
-                    Reading Ability and Literature & Sociology Interest:
-                  </h4>
-                  <p className="text-gray-600">
-                    Read in a wide range and sufficient scale; Completed more than 10 courses in the School of Humanity and achieved a GPA above 3.7.
-                  </p>
+              </div>
+
+              {/* Work in Progress */}
+              <div className="mb-8">
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">Work in Progress</h4>
+                <div className="space-y-6">
+                  <div>
+                    <h5 className="text-lg font-semibold text-gray-800 mb-2">Addressing Maternal Mental Health and Child Undernutrition in Nigeria through Psychological Support</h5>
+                    <p className="text-gray-600 italic mb-2">with Seollee Park and Jennifer Ostrowski</p>
+                    <p className="text-gray-600">
+                      Maternal mental health is a serious yet neglected challenge in developing countries, with depression rates ranging from 15–57% globally. Poor maternal mental health undermines childcare, feeding practices, and women's empowerment, with cascading effects on children's nutrition and development. This study investigates whether integrating psychological support into nutrition programs can improve both maternal and child outcomes. We implement a randomized controlled trial in Gombe State, Nigeria, where mothers of acutely malnourished children under five who exhibit at least mild depressive symptoms are offered Problem Management Plus (PM+), a WHO-designed, low-intensity psychological intervention focused on stress management and problem-solving skills. The intervention is delivered alongside the government's community-based management of acute malnutrition (CMAM) program. We measure impacts across six domains: maternal psychosocial wellbeing, caregiving, child feeding, child development, child nutrition, and child health. To probe mechanisms, we also assess changes in women's empowerment, decision-making power, cognitive and socio-emotional skills, and intra-household dynamics including intimate partner violence. To date, we have screened over 5,400 caregivers, enrolling 754 caregiver–child pair. Baseline surveys are complete, and endline data collection has been completed for 562 of the enrolled caregiver. The project provides timely evidence on whether scaling psychological support through existing nutrition platforms can improve maternal and child health at low cost in resource-constrained settings.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h5 className="text-lg font-semibold text-gray-800 mb-2">Organic Farming Training, Child Nutrition, and Intra-Household Mechanisms in Rural Philippines</h5>
+                    <p className="text-gray-600 italic mb-2">with Shanthi Manian, Gregmar I. Galinato, Seollee Park, Suzette P. Galinato, Christian Paul L. Fang, Amelia Bello, Shaira Mae C. Calayugan, and Lorna Sister</p>
+                    <p className="text-gray-600">
+                      This project is embedded within a randomized controlled trial (RCT) in rural Philippines. We examine the impacts of organic farming technology training on child anthropometric and nutritional outcomes, focusing on the causal pathways through which such effects may arise. Using experimental household decision-making games, we construct an intra-household bargaining power index and analyze shifts in expenditures and time allocation as potential mechanisms linking training adoption to improvements in child well-being. Our results indicate that, while the intervention shows no significant effect on child outcomes for intention-to-treat (ITT) effect, local average treatment effect (LATE) estimates suggest meaningful impacts among households that adopt the technologies.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Other Publications and Projects */}
+              <div>
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">Other Publications and Projects</h4>
+                <div className="space-y-6">
+                  <div>
+                    <h5 className="text-lg font-semibold text-gray-800 mb-2">Role of Public Sentiment in Evaluating Lockdown Effects on Mobility: An Application of the Natural Language Processing Method</h5>
+                    <p className="text-gray-600 italic mb-2">with Xiaorui Qiu, Qinan Lu, Liufang Su, and Guanming Shi; under review at Economic Modelling</p>
+                    <p className="text-gray-600">
+                      This study uses county-level COVID-19 tweet sentiment (March–April 2020) to evaluate lockdown effects on mobility. Employing a Regression Discontinuity in Time model, we find lockdowns reduced mobility by 5.5% for about 10 days, with neutral-tone sentiment exerting the strongest negative impact on mobility indices. Results highlight the role of public sentiment in evaluating policy effects.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h5 className="text-lg font-semibold text-gray-800 mb-2">The Impacts of COVID-19 on Containerized Agricultural Exports</h5>
+                    <p className="text-gray-600 italic mb-2">with Jake Wagner, Eric Jessup, and Ben Kenner</p>
+                    <p className="text-gray-600">
+                      Analyzes the disruptions of COVID-19 on U.S. agricultural container exports, focusing on logistics bottlenecks and supply chain resilience.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h5 className="text-lg font-semibold text-gray-800 mb-2">Optimal Pricing Policies for Campus Parking</h5>
+                    <p className="text-gray-600 italic mb-2">with Jake Wagner and David Moore; draft available upon request</p>
+                    <p className="text-gray-600">
+                      Explores efficient pricing structures for campus parking to balance demand management, revenue generation, and equity concerns.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
