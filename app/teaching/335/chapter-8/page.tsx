@@ -185,9 +185,10 @@ export default function InvestmentDecisionGame() {
               </div>
 
               <div className="flex justify-center mt-8">
-                <Button 
+              <Button 
                   onClick={() => setShowIntro(false)} 
-                  className="bg-green-800 text-white hover:bg-green-700 text-xl px-8 py-6"
+                  className="bg-green-800 text-white hover:bg-green-700 text-xl px-8 py-6 rounded-lg border-0"
+                  style={{ backgroundImage: 'none' }}
                 >
                   Start the Game →
                 </Button>
@@ -217,7 +218,7 @@ export default function InvestmentDecisionGame() {
               <span className="text-sm px-3 py-1 rounded-full bg-green-100 text-green-800 border border-green-700">
                 Required return = {(scenario.r * 100).toFixed(0)}%
               </span>
-              <Button onClick={() => { setScenario(buildScenario()); setStep(0); setFeedback(""); }} className="bg-green-800 text-white hover:bg-green-700">
+              <Button onClick={() => { setScenario(buildScenario()); setStep(0); setFeedback(""); }} className="bg-green-800 text-white hover:bg-green-700 rounded-lg border-0" style={{ backgroundImage: 'none' }}>
                 Try a different example
               </Button>
             </div>
@@ -251,7 +252,12 @@ export default function InvestmentDecisionGame() {
 
           <div className="flex flex-col gap-3">
             {current.options.map((opt, i) => (
-              <Button key={i} variant="outline" className="border-green-700 text-green-800 hover:bg-green-100" onClick={() => handleAnswer(opt)}>
+              <Button 
+                key={i} 
+                className="bg-green-700 text-white hover:bg-green-800 rounded-lg border-0 py-6 text-lg font-semibold" 
+                style={{ backgroundImage: 'none' }}
+                onClick={() => handleAnswer(opt)}
+              >
                 {opt}
               </Button>
             ))}
@@ -265,7 +271,7 @@ export default function InvestmentDecisionGame() {
 
           {feedback && (
             <div className="flex justify-center mt-4">
-              <Button onClick={nextQuestion} className="bg-green-800 text-white hover:bg-green-700">
+              <Button onClick={nextQuestion} className="bg-green-800 text-white hover:bg-green-700 rounded-lg border-0 px-8 py-4" style={{ backgroundImage: 'none' }}>
                 {step < questions.length - 1 ? "Next" : "Try a different example"}
               </Button>
             </div>
