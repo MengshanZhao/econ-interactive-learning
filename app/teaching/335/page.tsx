@@ -57,6 +57,9 @@ export default function ECONS335Page() {
                   <Link href="/teaching/335/chapter-7" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
                     Chapter 7: Stock Valuation
                   </Link>
+                  <Link href="/teaching/335/chapter-8" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 8: Investment Decision
+                  </Link>
                 </div>
               </div>
             </div>
@@ -106,6 +109,11 @@ export default function ECONS335Page() {
                   <li>
                     <Link href="/teaching/335/chapter-7" className="text-[color:hsl(var(--primary))] hover:underline">
                       Chapter 7: Stock Valuation
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-8" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 8: Investment Decision
                     </Link>
                   </li>
                 </ol>
