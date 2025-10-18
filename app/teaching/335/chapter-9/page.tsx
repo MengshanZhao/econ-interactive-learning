@@ -152,9 +152,11 @@ export default function IncrementalEarningsGame() {
                     value={answers[i].ebit}
                     onChange={(e) => {
                       const v = e.target.value;
-                      const next = [...answers];
-                      next[i] = { ...next[i], ebit: v };
-                      setAnswers(next);
+                      setAnswers(prev => {
+                        const next = [...prev];
+                        next[i] = { ...next[i], ebit: v };
+                        return next;
+                      });
                     }}
                     placeholder="EBIT"
                   />
@@ -172,9 +174,11 @@ export default function IncrementalEarningsGame() {
                     value={answers[i].earn}
                     onChange={(e) => {
                       const v = e.target.value;
-                      const next = [...answers];
-                      next[i] = { ...next[i], earn: v };
-                      setAnswers(next);
+                      setAnswers(prev => {
+                        const next = [...prev];
+                        next[i] = { ...next[i], earn: v };
+                        return next;
+                      });
                     }}
                     placeholder="Earnings"
                   />
