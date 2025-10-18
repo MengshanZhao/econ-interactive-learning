@@ -184,6 +184,19 @@ export default function IncrementalEarningsGame() {
                       setAnswers(next);
                     }}
                     onFocus={(e) => { lastFocusRef.current = e.currentTarget; }}
+                    onBlur={(e) => {
+                      const nextTarget = e.relatedTarget as HTMLElement | null;
+                      // If focus is not moving to another input, keep it here
+                      if (!nextTarget || nextTarget.tagName !== 'INPUT') {
+                        setTimeout(() => {
+                          if (document.activeElement === document.body) {
+                            e.currentTarget.focus();
+                            const len = e.currentTarget.value.length;
+                            try { e.currentTarget.setSelectionRange(len, len); } catch {}
+                          }
+                        }, 0);
+                      }
+                    }}
                     placeholder="EBIT"
                   />
                 )}
@@ -205,6 +218,18 @@ export default function IncrementalEarningsGame() {
                       setAnswers(next);
                     }}
                     onFocus={(e) => { lastFocusRef.current = e.currentTarget; }}
+                    onBlur={(e) => {
+                      const nextTarget = e.relatedTarget as HTMLElement | null;
+                      if (!nextTarget || nextTarget.tagName !== 'INPUT') {
+                        setTimeout(() => {
+                          if (document.activeElement === document.body) {
+                            e.currentTarget.focus();
+                            const len = e.currentTarget.value.length;
+                            try { e.currentTarget.setSelectionRange(len, len); } catch {}
+                          }
+                        }, 0);
+                      }
+                    }}
                     placeholder="Earnings"
                   />
                 )}
@@ -258,17 +283,7 @@ export default function IncrementalEarningsGame() {
           </div>
         </>
       ) : (
-        // In PLAY, keep focus on the last selected input even if clicking non-input areas
-        <div
-          onMouseDown={(e) => {
-            const target = e.target as HTMLElement;
-            if (!target.closest("input")) {
-              e.preventDefault();
-              lastFocusRef.current?.focus();
-            }
-          }}
-          className="flex flex-col gap-4"
-        >
+        <div className="flex flex-col gap-4">
           <div className="text-sm">Fill only the <span className="underline">EBIT</span> and <span className="underline">Incremental Earnings</span> columns. Everything else is given. Keep two decimals.</div>
           <Table mode="PLAY" />
           <div className="flex gap-3 items-center">
