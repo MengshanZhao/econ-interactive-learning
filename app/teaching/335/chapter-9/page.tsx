@@ -47,6 +47,15 @@ export default function IncrementalEarningsGame() {
   const typeIndex = React.useRef(0);
   const typingRef = React.useRef<number | null>(null);
 
+  const stopAudio = () => {
+    try {
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close();
+      }
+    } catch {}
+    audioCtxRef.current = null;
+  };
+
   const playTick = () => {
     try {
       if (typeof window === "undefined") return;
@@ -89,12 +98,23 @@ export default function IncrementalEarningsGame() {
 
   // ---------------------- STUDENT INPUTS ----------------------
   const [answers, setAnswers] = React.useState(() => ex.rows.map(() => ({ ebit: "", earn: "" })));
+  const firstInputRef = React.useRef<HTMLInputElement | null>(null);
+  const lastFocusRef = React.useRef<HTMLInputElement | null>(null);
+
   const resetGame = () => {
     const e = makeExample();
     setEx(e);
     setAnswers(e.rows.map(() => ({ ebit: "", earn: "" })));
     setScene("TEACH");
   };
+
+  // focus first input automatically in PLAY mode and keep focus unless user chooses another input
+  React.useEffect(() => {
+    if (scene === "PLAY") {
+      stopAudio();
+      setTimeout(() => firstInputRef.current?.focus(), 0);
+    }
+  }, [scene]);
 
   // ---------------------- VALIDATION ----------------------
   const [errors, setErrors] = React.useState<{ key: string; msg: string }[]>([]);
@@ -146,18 +166,18 @@ export default function IncrementalEarningsGame() {
                   <span>{r.ebit}</span>
                 ) : (
                   <input
+                    ref={i === 0 ? firstInputRef : undefined}
                     aria-label={`EBIT year ${r.t}`}
                     inputMode="decimal"
                     className={`w-28 border px-2 py-1 bg-white ${wrong(`ebit-${i}`) ? "ring-2 ring-red-600 rounded-full" : ""}`}
                     value={answers[i].ebit}
                     onChange={(e) => {
                       const v = e.target.value;
-                      setAnswers(prev => {
-                        const next = [...prev];
-                        next[i] = { ...next[i], ebit: v };
-                        return next;
-                      });
+                      const next = [...answers];
+                      next[i] = { ...next[i], ebit: v };
+                      setAnswers(next);
                     }}
+                    onFocus={(e) => { lastFocusRef.current = e.currentTarget; e.currentTarget.select(); }}
                     placeholder="EBIT"
                   />
                 )}
@@ -174,12 +194,11 @@ export default function IncrementalEarningsGame() {
                     value={answers[i].earn}
                     onChange={(e) => {
                       const v = e.target.value;
-                      setAnswers(prev => {
-                        const next = [...prev];
-                        next[i] = { ...next[i], earn: v };
-                        return next;
-                      });
+                      const next = [...answers];
+                      next[i] = { ...next[i], earn: v };
+                      setAnswers(next);
                     }}
+                    onFocus={(e) => { lastFocusRef.current = e.currentTarget; e.currentTarget.select(); }}
                     placeholder="Earnings"
                   />
                 )}
@@ -200,6 +219,7 @@ export default function IncrementalEarningsGame() {
 
   return (
     <div className="min-h-screen w-full bg-white text-black font-mono p-6 flex flex-col gap-6">
+      {/* Title intentionally removed as requested */}
 
       {scene === "TEACH" ? (
         <>
@@ -220,7 +240,7 @@ export default function IncrementalEarningsGame() {
               className="px-4 py-2 border-2 border-black bg-white hover:bg-black hover:text-white transition"
               onClick={() => setScene("PLAY")}
             >
-              Now it's your turn →
+              Now it’s your turn →
             </button>
             <button
               className="px-4 py-2 border-2 border-black bg-white hover:bg-black hover:text-white transition"
@@ -232,10 +252,20 @@ export default function IncrementalEarningsGame() {
           </div>
         </>
       ) : (
-        <>
+        // In PLAY, keep focus on the last selected input even if clicking non-input areas
+        <div
+          onMouseDown={(e) => {
+            const target = e.target as HTMLElement;
+            if (!target.closest("input")) {
+              e.preventDefault();
+              lastFocusRef.current?.focus();
+            }
+          }}
+          className="flex flex-col gap-4"
+        >
           <div className="text-sm">Fill only the <span className="underline">EBIT</span> and <span className="underline">Incremental Earnings</span> columns. Everything else is given. Keep two decimals.</div>
           <Table mode="PLAY" />
-          <div className="flex gap-3 mt-4 items-center">
+          <div className="flex gap-3 items-center">
             <button
               className="px-4 py-2 border-2 border-black bg-white hover:bg-black hover:text-white transition"
               onClick={check}
@@ -252,7 +282,7 @@ export default function IncrementalEarningsGame() {
           </div>
 
           {submitted && (
-            <div className="mt-4">
+            <div className="mt-2">
               {errors.length === 0 ? (
                 <div className="border-2 border-black p-4 bg-neutral-50 font-semibold">Perfect! All entries are correct.</div>
               ) : (
@@ -267,8 +297,10 @@ export default function IncrementalEarningsGame() {
               )}
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
 }
+
+

@@ -1,54 +1,136 @@
-import Link from "next/link";
+import Link from "next/link"
 
-export default function Teaching335() {
-  const chapters = [
-    { number: 1, title: "Chapter 1", path: "/teaching/335/chapter-1" },
-    { number: 2, title: "Chapter 2", path: "/teaching/335/chapter-2" },
-    { number: 3, title: "Chapter 3", path: "/teaching/335/chapter-3" },
-    { number: 4, title: "Chapter 4", path: "/teaching/335/chapter-4" },
-    { number: 5, title: "Chapter 5", path: "/teaching/335/chapter-5" },
-    { number: 6, title: "Chapter 6", path: "/teaching/335/chapter-6" },
-    { number: 7, title: "Chapter 7", path: "/teaching/335/chapter-7" },
-    { number: 8, title: "Chapter 8", path: "/teaching/335/chapter-8" },
-    { number: 9, title: "Chapter 9", path: "/teaching/335/chapter-9" },
-  ];
-
+export default function ECONS335Page() {
   return (
     <div className="min-h-screen bg-background">
-      <section className="py-16 md:py-24 bg-background">
+      <section className="metallic-bg text-foreground py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Finance 335 - Teaching Materials</h1>
-          <p className="text-xl max-w-3xl text-foreground mb-12">
-            Course materials and interactive exercises for Business Finance. Access weekly chapters and practice problems.
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">ECONS 335: Business Finance</h1>
+          <p className="text-lg max-w-3xl">
+            Online course, Fall 2025 (August 2025 – December 2025)
           </p>
         </div>
       </section>
 
-      <section className="py-16 bg-card">
+      <section className="py-12">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 text-foreground">Course Chapters</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {chapters.map((chapter) => (
-              <Link
-                key={chapter.number}
-                href={chapter.path}
-                className="bg-card rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border border-border"
-              >
-                <h3 className="text-xl font-semibold mb-2 text-foreground">{chapter.title}</h3>
-                <p className="text-foreground text-sm mb-4">
-                  {chapter.number === 9 
-                    ? "Interactive Incremental Earnings game with typewriter lesson and practice exercises."
-                    : `Week ${chapter.number} materials and exercises.`
-                  }
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="md:col-span-2 space-y-6">
+              <div className="card-minimal rounded-lg p-6">
+                <h2 className="text-2xl font-semibold mb-3 text-foreground">Course Overview</h2>
+                <p className="text-foreground mb-3">
+                  Core tools of financial economics with practical application to valuation and firm decisions.
                 </p>
-                <div className="text-sm font-medium text-foreground">
-                  Go to Chapter {chapter.number} →
+                <ul className="list-disc list-inside text-foreground space-y-1">
+                  <li>Analyze and interpret financial statements</li>
+                  <li>Apply time value of money and discounting</li>
+                  <li>Understand risk–return and portfolio intuition</li>
+                  <li>Value stocks and bonds; assess capital budgeting</li>
+                  <li>Use and evaluate financial data sources</li>
+                </ul>
+              </div>
+
+              <div className="card-minimal rounded-lg p-6">
+                <h3 className="text-xl font-semibold mb-3 text-foreground">Interactive Practice</h3>
+                <p className="text-foreground mb-4">
+                  Weekly interactive mini‑games will reinforce core concepts. Start with Chapter 1 below.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link href="/teaching/335/chapter-1" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 1: Tax of Corporation Earning
+                  </Link>
+                  <Link href="/teaching/335/chapter-2" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 2: Financial Statement Analysis
+                  </Link>
+                  <Link href="/teaching/335/chapter-3" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 3: Time Value of Money
+                  </Link>
+                  <Link href="/teaching/335/chapter-4" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 4: TVM Rocket — Cash Flow PV
+                  </Link>
+                  <Link href="/teaching/335/chapter-5" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 5: Bank Boss — Animal Borrowers
+                  </Link>
+                  <Link href="/teaching/335/chapter-6" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 6: Bond Memory — Pricing Game
+                  </Link>
+                  <Link href="/teaching/335/chapter-7" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 7: Stock Valuation
+                  </Link>
+                  <Link href="/teaching/335/chapter-8" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 8: Investment Decision
+                  </Link>
+                  <Link href="/teaching/335/chapter-9" className="inline-flex items-center px-4 py-2 rounded-md bg-[color:hsl(var(--primary))] text-white font-semibold hover:opacity-90">
+                    Chapter 9: Incremental Earnings — Practice
+                  </Link>
                 </div>
-              </Link>
-            ))}
+              </div>
+            </div>
+
+            <aside className="space-y-6">
+              <div className="card-minimal rounded-lg p-6">
+                <h3 className="text-xl font-semibold mb-3 text-foreground">Logistics</h3>
+                <ul className="list-disc list-inside text-foreground space-y-1">
+                  <li>Format: Online</li>
+                  <li>Term: Fall 2025</li>
+                </ul>
+              </div>
+
+              <div className="card-minimal rounded-lg p-6">
+                <h3 className="text-xl font-semibold mb-3 text-foreground">Chapters</h3>
+                <ol className="list-decimal list-inside text-foreground space-y-1">
+                  <li>
+                    <Link href="/teaching/335/chapter-1" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 1: Tax of Corporation Earning
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-2" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 2: Financial Statement Analysis
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-3" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 3: Time Value of Money
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-4" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 4: TVM Rocket: Cash Flow PV
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-5" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 5: Bank Boss: Animal Borrowers
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-6" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 6: Bond Price: A Memory Game
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-7" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 7: Stock Valuation
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-8" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 8: Investment Decision
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/teaching/335/chapter-9" className="text-[color:hsl(var(--primary))] hover:underline">
+                      Chapter 9: Incremental Earnings — Practice
+                    </Link>
+                  </li>
+                </ol>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
     </div>
-  );
+  )
 }
+
