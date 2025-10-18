@@ -46,6 +46,7 @@ export default function IncrementalEarningsGame() {
   const audioCtxRef = React.useRef<AudioContext | null>(null);
   const typeIndex = React.useRef(0);
   const typingRef = React.useRef<number | null>(null);
+  const typingTimeoutRef = React.useRef<number | null>(null);
 
   const stopAudio = () => {
     try {
@@ -78,6 +79,7 @@ export default function IncrementalEarningsGame() {
   React.useEffect(() => {
     if (scene !== "TEACH") return;
     if (typingRef.current) cancelAnimationFrame(typingRef.current as any);
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     setTyped("");
     typeIndex.current = 0;
 
@@ -87,12 +89,16 @@ export default function IncrementalEarningsGame() {
         setTyped((s) => s + next);
         if (next !== " " && next !== "\n") playTick();
         typeIndex.current += 1;
-        typingRef.current = requestAnimationFrame(() => setTimeout(step, 22)) as any;
+        typingRef.current = requestAnimationFrame(() => {
+          typingTimeoutRef.current = window.setTimeout(step, 22) as any;
+        }) as any;
       }
     };
     step();
     return () => {
       if (typingRef.current) cancelAnimationFrame(typingRef.current as any);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      stopAudio();
     };
   }, [scene]);
 
@@ -177,7 +183,7 @@ export default function IncrementalEarningsGame() {
                       next[i] = { ...next[i], ebit: v };
                       setAnswers(next);
                     }}
-                    onFocus={(e) => { lastFocusRef.current = e.currentTarget; e.currentTarget.select(); }}
+                    onFocus={(e) => { lastFocusRef.current = e.currentTarget; }}
                     placeholder="EBIT"
                   />
                 )}
@@ -198,7 +204,7 @@ export default function IncrementalEarningsGame() {
                       next[i] = { ...next[i], earn: v };
                       setAnswers(next);
                     }}
-                    onFocus={(e) => { lastFocusRef.current = e.currentTarget; e.currentTarget.select(); }}
+                    onFocus={(e) => { lastFocusRef.current = e.currentTarget; }}
                     placeholder="Earnings"
                   />
                 )}
@@ -238,7 +244,7 @@ export default function IncrementalEarningsGame() {
           <div className="flex gap-3 mt-4">
             <button
               className="px-4 py-2 border-2 border-black bg-white hover:bg-black hover:text-white transition"
-              onClick={() => setScene("PLAY")}
+              onClick={() => { stopAudio(); setScene("PLAY"); }}
             >
               Now it’s your turn →
             </button>
