@@ -105,7 +105,8 @@ export default function IncrementalEarningsGame() {
   // ---------------------- STUDENT INPUTS ----------------------
   const [answers, setAnswers] = React.useState(() => ex.rows.map(() => ({ ebit: "", earn: "" })));
   const firstInputRef = React.useRef<HTMLInputElement | null>(null);
-  const lastFocusRef = React.useRef<HTMLInputElement | null>(null);
+  const ebitRefs = React.useRef<HTMLInputElement[]>([]);
+  const earnRefs = React.useRef<HTMLInputElement[]>([]);
 
   const resetGame = () => {
     const e = makeExample();
@@ -114,7 +115,7 @@ export default function IncrementalEarningsGame() {
     setScene("TEACH");
   };
 
-  // focus first input automatically in PLAY mode and keep focus unless user chooses another input
+  // focus first input automatically in PLAY mode
   React.useEffect(() => {
     if (scene === "PLAY") {
       stopAudio();
@@ -145,6 +146,40 @@ export default function IncrementalEarningsGame() {
 
   const wrong = (key: string) => errors.some((e) => e.key === key);
 
+  // ---------------------- caret-preserving change handlers ----------------------
+  const onChangeEBIT = (i: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const el = ebitRefs.current[i];
+    const start = el?.selectionStart ?? null;
+    const end = el?.selectionEnd ?? null;
+    const next = [...answers];
+    next[i] = { ...next[i], ebit: e.target.value };
+    setAnswers(next);
+    // restore caret on next frame
+    requestAnimationFrame(() => {
+      const node = ebitRefs.current[i];
+      if (node && start !== null && end !== null) {
+        node.focus();
+        try { node.setSelectionRange(start + 1, end + 1); } catch {}
+      }
+    });
+  };
+
+  const onChangeEARN = (i: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const el = earnRefs.current[i];
+    const start = el?.selectionStart ?? null;
+    const end = el?.selectionEnd ?? null;
+    const next = [...answers];
+    next[i] = { ...next[i], earn: e.target.value };
+    setAnswers(next);
+    requestAnimationFrame(() => {
+      const node = earnRefs.current[i];
+      if (node && start !== null && end !== null) {
+        node.focus();
+        try { node.setSelectionRange(start + 1, end + 1); } catch {}
+      }
+    });
+  };
+
   // ---------------------- RENDER ----------------------
   const Table = ({ mode }: { mode: "TEACH" | "PLAY" }) => (
     <div className="w-full overflow-auto">
@@ -172,26 +207,13 @@ export default function IncrementalEarningsGame() {
                   <span>{r.ebit}</span>
                 ) : (
                   <input
-                    ref={i === 0 ? firstInputRef : undefined}
+                    ref={(el) => { if (i === 0) firstInputRef.current = el; ebitRefs.current[i] = el as HTMLInputElement; }}
+                    type="text"
                     aria-label={`EBIT year ${r.t}`}
                     inputMode="decimal"
                     className={`w-28 border px-2 py-1 bg-white ${wrong(`ebit-${i}`) ? "ring-2 ring-red-600 rounded-full" : ""}`}
                     value={answers[i].ebit}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      const next = [...answers];
-                      next[i] = { ...next[i], ebit: v };
-                      setAnswers(next);
-                    }}
-                    onFocus={(e) => { lastFocusRef.current = e.currentTarget; }}
-                    onBlur={(e) => {
-                      // Only refocus if user clicked outside and no other input is being focused
-                      setTimeout(() => {
-                        if (document.activeElement === document.body) {
-                          e.currentTarget.focus();
-                        }
-                      }, 0);
-                    }}
+                    onChange={(e) => onChangeEBIT(i, e)}
                     placeholder="EBIT"
                   />
                 )}
@@ -202,25 +224,13 @@ export default function IncrementalEarningsGame() {
                   <span>{r.earnings}</span>
                 ) : (
                   <input
+                    ref={(el) => { earnRefs.current[i] = el as HTMLInputElement; }}
+                    type="text"
                     aria-label={`Earnings year ${r.t}`}
                     inputMode="decimal"
                     className={`w-28 border px-2 py-1 bg-white ${wrong(`earn-${i}`) ? "ring-2 ring-red-600 rounded-full" : ""}`}
                     value={answers[i].earn}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      const next = [...answers];
-                      next[i] = { ...next[i], earn: v };
-                      setAnswers(next);
-                    }}
-                    onFocus={(e) => { lastFocusRef.current = e.currentTarget; }}
-                    onBlur={(e) => {
-                      // Only refocus if user clicked outside and no other input is being focused
-                      setTimeout(() => {
-                        if (document.activeElement === document.body) {
-                          e.currentTarget.focus();
-                        }
-                      }, 0);
-                    }}
+                    onChange={(e) => onChangeEARN(i, e)}
                     placeholder="Earnings"
                   />
                 )}
@@ -238,6 +248,13 @@ export default function IncrementalEarningsGame() {
       <div className="font-medium">{text}</div>
     </div>
   );
+
+  // ---------------------- RUNTIME TESTS (non-UI; won't show to students) ----------------------
+  if (process.env.NODE_ENV !== "production") {
+    console.assert(calcEBIT(500, 150, 200) === 150, "EBIT basic should be 150");
+    console.assert(calcEarnings(150, 0.2) === 120, "Earnings with 20% on 150 should be 120");
+    console.assert(calcEarnings(-50, 0.2) === -40, "Earnings with tax shield should be -40");
+  }
 
   return (
     <div className="min-h-screen w-full bg-white text-black font-mono p-6 flex flex-col gap-6">
@@ -314,5 +331,3 @@ export default function IncrementalEarningsGame() {
     </div>
   );
 }
-
-
