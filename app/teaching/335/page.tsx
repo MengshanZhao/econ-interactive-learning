@@ -81,7 +81,7 @@ export default function ECONS335Page() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
                   >
-                    View course details and interactive practice →
+                    Syllabus →
                   </a>
                 </div>
               </div>

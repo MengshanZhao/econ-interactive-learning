@@ -52,23 +52,13 @@ export default function TeachingPage() {
                           <li>Value stocks and bonds; assess capital budgeting</li>
                           <li>Use and evaluate financial data sources</li>
                         </ul>
-                        <div className="pt-2 space-y-2">
+                        <div className="pt-2">
                           <Link
                             href="/teaching/335"
                             className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
                           >
                             View course details and interactive practice →
                           </Link>
-                          <div>
-                            <a
-                              href="/Files/335_Syllabus.pdf"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
-                            >
-                              View course details and interactive practice →
-                            </a>
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -96,7 +86,7 @@ export default function TeachingPage() {
                             rel="noopener noreferrer"
                             className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
                           >
-                            View course details and interactive practice →
+                            Syllabus →
                           </a>
                         </div>
                       </div>
@@ -148,7 +138,7 @@ export default function TeachingPage() {
                             rel="noopener noreferrer"
                             className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
                           >
-                            View course details and interactive practice →
+                            Syllabus →
                           </a>
                         </div>
                       </div>
@@ -183,7 +173,7 @@ export default function TeachingPage() {
                             rel="noopener noreferrer"
                             className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
                           >
-                            View course details and interactive practice →
+                            Syllabus →
                           </a>
                         </div>
                       </div>
@@ -237,8 +227,13 @@ export default function TeachingPage() {
           <h2 className="text-3xl font-bold mb-8 text-foreground">Teaching Philosophy</h2>
           <div className="card-minimal rounded-lg p-8">
             <p className="text-foreground mb-4">
-              My philosophy centers on three principles: i) Building trust and providing clear channels for student support; ii) Creating new ways of engagement that enhance motivation; iii) Linking classroom concepts to real-world applications while using new technology tools carefully.
+              My philosophy centers on three principles:
             </p>
+            <ul className="list-disc list-inside text-foreground space-y-2 mb-4">
+              <li>Building trust and providing clear channels for student support</li>
+              <li>Creating new ways of engagement that enhance motivation</li>
+              <li>Linking classroom concepts to real-world applications while using new technology tools carefully</li>
+            </ul>
           </div>
         </div>
       </section>
