@@ -74,6 +74,16 @@ export default function ECONS335Page() {
                   <li>Format: Online</li>
                   <li>Term: Fall 2025</li>
                 </ul>
+                <div className="pt-3">
+                  <a
+                    href="/Files/335_Syllabus.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
+                  >
+                    View course details and interactive practice →
+                  </a>
+                </div>
               </div>
 
               <div className="card-minimal rounded-lg p-6">

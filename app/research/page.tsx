@@ -30,6 +30,7 @@ export default function ResearchPage() {
             >
               <h3 className="text-2xl font-bold mb-3 text-foreground">
                 Competing for Clean Air: Dynamic Incentives in China's Environmental Protection Interviews
+                <span className="text-lg font-semibold text-[color:hsl(var(--primary))] ml-2">(Job Market Paper)</span>
               </h3>
               <div className="flex flex-wrap gap-4 mb-4 text-foreground">
                 <div className="flex items-center">
@@ -50,7 +51,6 @@ export default function ResearchPage() {
                   <li>Northwest Development Workshop, June 2024</li>
                 </ul>
               </div>
-              <Button>Request Draft</Button>
             </div>
 
             <div
@@ -73,7 +73,6 @@ export default function ResearchPage() {
               <p className="text-foreground mb-6">
                 This research critically examines the decline in fertility rates in China beginning in the 1980s when the one-child policy was introduced, focusing on the transition to the two-child policy. I employ a two-stage, discrete-choice model that enables individuals to make fertility decisions based on utility maximization. The model elucidates the roles and relationships of return rates on human-capital accumulation, personal value of the child, time costs associated with child-rearing, and potential penalties for non-compliance in shaping these decisions. Using Chinese Family Panel Survey data from 2010 to 2020 with a log-linear approach, I demonstrate that women with low wage returns to human capital are more likely to favor giving birth at least once, ceteris paribus.
               </p>
-              <Button>Request Draft</Button>
             </div>
 
             <div className="bg-card rounded-lg shadow-md p-8 hover:shadow-xl transition-shadow duration-300">
@@ -97,7 +96,6 @@ export default function ResearchPage() {
                   <li>Region 10 Transportation Conference, October 2022</li>
                 </ul>
               </div>
-              <Button>Request Draft</Button>
             </div>
 
             <div className="bg-card rounded-lg shadow-md p-8 hover:shadow-xl transition-shadow duration-300">
@@ -117,7 +115,6 @@ export default function ResearchPage() {
               <p className="text-foreground mb-6">
                 This study measures the impacts of COVID-19 on monthly U.S. containerized agricultural export volumes using a near-saturated fixed effects panel data model. Results show heterogeneous reductions in containerized agricultural export volumes through time: monthly exports fell by 4.6% from March 2020-May 2021, by 11.1% from May 2021-January 2022, and by 7.5% over the full period from March 2020-August 2022. Impacts vary significantly across origin ports (Long Beach, CA fell 25% vs. Houston, TX fell &lt;1%), commodities (cotton exports fell 25% while tobacco increased 27%), and destination countries (exports to China increased 12% while exports to Japan fell 26%). The analysis includes port-commodity, port-destination, and commodity-destination pairs to evaluate substitution effects at granular levels.
               </p>
-              <Button>Request Draft</Button>
             </div>
 
             <div
@@ -140,7 +137,6 @@ export default function ResearchPage() {
               <p className="text-foreground mb-6">
                 This study determines whether agricultural labor productivity across genders changes following the introduction of organic vegetable technologies through a randomized controlled trial with vegetable farmers in rural households in the Philippines. We introduce household training in the production and use of different organic vegetable technologies to examine gender-specific responses. Exposure to organic vegetable training significantly increased female labor during fertilizer and pesticide application stages for low-income households, with no significant effect for middle and high-income households. The intervention reduced labor productivity gaps across all income groups, with the largest effect for low-income households, pointing to the potential for organic vegetable technology as a means of reducing gender-based productivity disparities.
               </p>
-              <Button>Request Draft</Button>
             </div>
 
             <div
@@ -163,7 +159,6 @@ export default function ResearchPage() {
               <p className="text-foreground mb-6">
                 This paper investigates the potential influence of public sentiment and health policies on behavioral changes, specifically focusing on mobility during COVID-19. We employ daily counts of COVID-related tweets and sentiment trends derived using a natural language processing model to gauge public sentiment. Using Regression Discontinuity in Time Series (RDiT) method with county-level daily data from March to April 2020, we find that lockdown implementation leads to a significant 5.5% reduction in mobility, but this impact is only observed for ten days. Importantly, neutral-tone sentiment has the most pronounced negative impact on mobility compared to both negative and positive sentiments—substituting 3% of positive sentiment tweets with neutral-tone sentiment results in similar magnitude effects on mobility reduction as lockdown policies. This emphasizes the importance of considering public sentiment alongside policy measures to avoid overestimation issues.
               </p>
-              <Button>Request Draft</Button>
             </div>
           </div>
         </div>

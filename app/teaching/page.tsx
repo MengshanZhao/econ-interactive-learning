@@ -52,13 +52,23 @@ export default function TeachingPage() {
                           <li>Value stocks and bonds; assess capital budgeting</li>
                           <li>Use and evaluate financial data sources</li>
                         </ul>
-                        <div className="pt-2">
+                        <div className="pt-2 space-y-2">
                           <Link
                             href="/teaching/335"
                             className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
                           >
                             View course details and interactive practice →
                           </Link>
+                          <div>
+                            <a
+                              href="/Files/335_Syllabus.pdf"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
+                            >
+                              View course details and interactive practice →
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -79,6 +89,16 @@ export default function TeachingPage() {
                           <li>Evaluate policy impacts using microeconomic tools</li>
                           <li>Perform and interpret empirical analysis</li>
                         </ul>
+                        <div className="pt-2">
+                          <a
+                            href="/Files/426_syllabus.pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
+                          >
+                            View course details and interactive practice →
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -121,6 +141,16 @@ export default function TeachingPage() {
                           <li>Central banking and monetary policy</li>
                           <li>International finance and exchange rates</li>
                         </ul>
+                        <div className="pt-2">
+                          <a
+                            href="/Files/320_Syllabus.pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
+                          >
+                            View course details and interactive practice →
+                          </a>
+                        </div>
                       </div>
                     </div>
 
@@ -146,6 +176,16 @@ export default function TeachingPage() {
                           <li>Labor market discrimination</li>
                           <li>Unemployment and job search</li>
                         </ul>
+                        <div className="pt-2">
+                          <a
+                            href="/Files/323_Syllabus.pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-[color:hsl(var(--primary))] font-semibold hover:underline"
+                          >
+                            View course details and interactive practice →
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -197,16 +237,7 @@ export default function TeachingPage() {
           <h2 className="text-3xl font-bold mb-8 text-foreground">Teaching Philosophy</h2>
           <div className="card-minimal rounded-lg p-8">
             <p className="text-foreground mb-4">
-              My teaching philosophy centers on creating an engaging and inclusive learning environment that encourages critical thinking and practical application of economic concepts.
-            </p>
-            <p className="text-foreground mb-4">Key elements of my approach include:</p>
-            <ul className="list-disc list-inside text-foreground space-y-2 mb-4">
-              <li>Connecting theoretical concepts to real-world applications through targeted coursework and assignments</li>
-              <li>Encouraging students to embrace modern tools by incorporating AI and technological methods into learning</li>
-              <li>Providing clear, constructive feedback and comprehensive support for student success</li>
-            </ul>
-            <p className="text-foreground">
-              I strive to make economics accessible and relevant to students' lives and careers while fostering a supportive environment for questions and engagement with challenging material.
+              My philosophy centers on three principles: i) Building trust and providing clear channels for student support; ii) Creating new ways of engagement that enhance motivation; iii) Linking classroom concepts to real-world applications while using new technology tools carefully.
             </p>
           </div>
         </div>
