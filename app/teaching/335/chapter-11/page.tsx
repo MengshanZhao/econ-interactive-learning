@@ -17,8 +17,8 @@ const STEP_THEME: Record<number, { fill: string; stroke: string }> = {
   4: { fill: "#F5D7C7", stroke: "#E5B8A0" }, // light pink/peach
 };
 
-// Submit button color (consistent theme color)
-const SUBMIT_COLOR = "#2AA69A"; // dark teal
+// Submit button color (changed to different color)
+const SUBMIT_COLOR = "#81D8D0"; // Tiffany blue
 
 // ===================== DATA =====================
 type PeriodRow = { label: string; Pt: number; DivNext: number; Pnext: number };
@@ -364,11 +364,16 @@ export default function ReturnsLab() {
                     </button>
                   ))}
                 </div>
-                <div className="mt-6 flex items-center gap-3">
+                <div className="mt-6 flex items-center justify-between">
                   <div className="text-sm" style={{ color: SLATE }}>Selected: {company ?? "—"}</div>
-                  <button onClick={submit1} disabled={!company} className={`px-4 py-2 rounded-xl text-white font-semibold shadow ${company ? "" : "opacity-50 cursor-not-allowed"}`} style={{ background: SUBMIT_COLOR }}>
-                    Submit
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={submit1} disabled={!company} className={`px-4 py-2 rounded-xl text-white font-semibold shadow ${company ? "" : "opacity-50 cursor-not-allowed"}`} style={{ background: SUBMIT_COLOR }}>
+                      Submit
+                    </button>
+                    <button onClick={() => canNext(1) && goToStep(2)} disabled={!canNext(1)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(1) ? "" : "opacity-50 cursor-not-allowed"}`} style={{ background: SLATE }}>
+                      →
+                    </button>
+                  </div>
                 </div>
               </div>
             </StepShell>
@@ -384,9 +389,17 @@ export default function ReturnsLab() {
                   <h2 className="text-2xl md:text-3xl font-bold" style={{ color: SLATE }}>
                     Step 2 — Compute period returns (company: {company ?? "—"})
                   </h2>
-                  <button onClick={submit2} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: SUBMIT_COLOR }}>
-                    Submit
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => goToStep(1)} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow" style={{ background: SLATE }}>
+                      ←
+                    </button>
+                    <button onClick={submit2} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: SUBMIT_COLOR }}>
+                      Submit
+                    </button>
+                    <button onClick={() => canNext(2) && goToStep(3)} disabled={!canNext(2)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(2) ? "" : "opacity-50 cursor-not-allowed"}`} style={{ background: SLATE }}>
+                      →
+                    </button>
+                  </div>
                 </div>
 
                 <div className="rounded-2xl overflow-hidden shadow border" style={{ background: STEP_THEME[2].fill, borderColor: STEP_THEME[2].stroke, opacity: 0.9 }}>
@@ -445,9 +458,17 @@ export default function ReturnsLab() {
                   <h2 className="text-2xl md:text-3xl font-bold" style={{ color: "white" }}>
                     Step 3 — Compute Average & SD
                   </h2>
-                  <button onClick={submit3} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: SUBMIT_COLOR }}>
-                    Submit
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => goToStep(2)} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow" style={{ background: SLATE }}>
+                      ←
+                    </button>
+                    <button onClick={submit3} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: SUBMIT_COLOR }}>
+                      Submit
+                    </button>
+                    <button onClick={() => canNext(3) && goToStep(4)} disabled={!canNext(3)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(3) ? "" : "opacity-50 cursor-not-allowed"}`} style={{ background: SLATE }}>
+                      →
+                    </button>
+                  </div>
                 </div>
 
                 <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: "rgba(255,255,255,0.15)", borderColor: STEP_THEME[3].stroke }}>
@@ -503,9 +524,39 @@ export default function ReturnsLab() {
                   <h2 className="text-2xl md:text-3xl font-bold" style={{ color: SLATE }}>
                     Step 4 — ~95% Prediction Band
                   </h2>
-                  <button onClick={submit4} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: SUBMIT_COLOR }}>
-                    Submit
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => goToStep(3)} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow" style={{ background: SLATE }}>
+                      ←
+                    </button>
+                    {submitted4 ? (
+                      <button
+                        onClick={() => {
+                          setCompany(null);
+                          setStep(1);
+                          setSubmitted1(false);
+                          setSubmitted2(false);
+                          setSubmitted3(false);
+                          setSubmitted4(false);
+                          setRInput([]);
+                          setAvgInput("");
+                          setSdInput("");
+                          setLoInput("");
+                          setHiInput("");
+                          setAnswer2(null);
+                          setAnswer3(null);
+                          setAnswer4(null);
+                        }}
+                        className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow"
+                        style={{ background: SUBMIT_COLOR }}
+                      >
+                        Try another company
+                      </button>
+                    ) : (
+                      <button onClick={submit4} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: SUBMIT_COLOR }}>
+                        Submit
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: STEP_THEME[4].fill, borderColor: STEP_THEME[4].stroke, opacity: 0.9 }}>
@@ -555,30 +606,6 @@ export default function ReturnsLab() {
                   <div className="mt-4 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[4].fill, border: `1px solid ${STEP_THEME[4].stroke}` }}>
                     <div className="font-semibold mb-2" style={{ color: SLATE }}>Answer sheet</div>
                     <pre className="text-xs whitespace-pre-wrap" style={{ color: SLATE }}>{answer4}</pre>
-                    <div className="mt-4 flex items-center gap-3">
-                      <button
-                        onClick={() => {
-                          setCompany(null);
-                          setStep(1);
-                          setSubmitted1(false);
-                          setSubmitted2(false);
-                          setSubmitted3(false);
-                          setSubmitted4(false);
-                          setRInput([]);
-                          setAvgInput("");
-                          setSdInput("");
-                          setLoInput("");
-                          setHiInput("");
-                          setAnswer2(null);
-                          setAnswer3(null);
-                          setAnswer4(null);
-                        }}
-                        className="px-4 py-2 rounded-xl text-white font-semibold"
-                        style={{ background: SUBMIT_COLOR }}
-                      >
-                        Try another company
-                      </button>
-                    </div>
                   </div>
                 )}
               </div>
