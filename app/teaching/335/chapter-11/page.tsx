@@ -9,13 +9,16 @@ const TIF_DARK = "#2AA69A"; // accents & buttons
 const SLATE = "#274248"; // dark text
 const CREAM = "#FFF8F1"; // neutral answer box bg
 
-// Per-step folder colors (elegant Tiffany blue inspired palette)
+// Per-step folder colors (distinct, discrete colors - inspired by reference)
 const STEP_THEME: Record<number, { fill: string; stroke: string }> = {
-  1: { fill: "#A8E6E1", stroke: "#5FCBC4" }, // light tiffany
-  2: { fill: "#B7DFE3", stroke: "#7BB8C1" }, // soft aqua
-  3: { fill: "#C4E8E9", stroke: "#8FCFD0" }, // pale cyan
-  4: { fill: "#D1E4ED", stroke: "#9DC5D6" }, // light sky blue
+  1: { fill: "#E8D5C4", stroke: "#C9A882" }, // muted peach/terracotta
+  2: { fill: "#D4E4D1", stroke: "#9BB599" }, // muted sage green
+  3: { fill: "#2AA69A", stroke: "#1E7F75" }, // dark teal
+  4: { fill: "#F5D7C7", stroke: "#E5B8A0" }, // light pink/peach
 };
+
+// Submit button color (consistent theme color)
+const SUBMIT_COLOR = "#2AA69A"; // dark teal
 
 // ===================== DATA =====================
 type PeriodRow = { label: string; Pt: number; DivNext: number; Pnext: number };
@@ -104,53 +107,72 @@ function FolderShape({
   );
 }
 
-// Small top tab that "bumps" above the folder edge - fixed styling to match reference
-function FolderTab({ left, width = 65, color, stroke, label }: { left: number; width?: number; color: string; stroke: string; label?: string }) {
-  const h = 28; // tab height above the top (smaller for more refined look)
-  const r = 6; // smaller radius for more refined look
+// Right-side tab (like a real folder) - shows all tabs at once
+function FolderTabRight({ top, height = 80, color, stroke, label, isActive, isLocked, onClick }: { top: number; height?: number; color: string; stroke: string; label: string; isActive: boolean; isLocked: boolean; onClick?: () => void }) {
+  const w = 60; // tab width
+  const r = 8; // corner radius
+  const tabColor = isActive ? color : (isLocked ? "#E0E0E0" : color);
+  const tabStroke = isActive ? stroke : (isLocked ? "#B0B0B0" : stroke);
+  const textColor = isLocked ? "#999" : (isActive ? "#16333A" : "#666");
+  
   return (
-    <div className="absolute -top-7" style={{ left, width, height: h, zIndex: 30 }}>
-      <svg width="100%" height={h} viewBox={`0 0 ${width} ${h}`} style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))" }}>
-        {/* Tab shape - rounded rectangle, bottom edge matches folder color (no visible boundary) */}
+    <div 
+      className="absolute cursor-pointer transition-all hover:scale-105" 
+      style={{ 
+        right: -w + 8, 
+        top, 
+        width: w, 
+        height, 
+        zIndex: isActive ? 40 : 30,
+        opacity: isLocked ? 0.5 : 1
+      }}
+      onClick={!isLocked ? onClick : undefined}
+    >
+      <svg width="100%" height={height} viewBox={`0 0 ${w} ${height}`} style={{ filter: isActive ? "drop-shadow(0 2px 8px rgba(0,0,0,0.2))" : "drop-shadow(0 1px 3px rgba(0,0,0,0.1))" }}>
+        {/* Tab shape - rounded rectangle on left side */}
         <path
-          d={`M ${r} 0 H ${width - r} Q ${width} 0 ${width} ${r} V ${h - r} Q ${width} ${h} ${width - r} ${h} H ${r} Q 0 ${h} 0 ${h - r} V ${r} Q 0 0 ${r} 0 Z`}
-          fill={color}
-          stroke={stroke}
-          strokeWidth={1.5}
+          d={`M ${r} 0 H ${w} V ${height - r} Q ${w} ${height} ${w - r} ${height} H ${r} Q 0 ${height} 0 ${height - r} V ${r} Q 0 0 ${r} 0 Z`}
+          fill={tabColor}
+          stroke={tabStroke}
+          strokeWidth={isActive ? 2 : 1.5}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {/* Overlay bottom edge with folder color to hide boundary */}
-        <line x1="0" y1={h} x2={width} y2={h} stroke={color} strokeWidth={3} />
+        {/* Left edge that connects seamlessly - no boundary */}
+        <line x1="0" y1={r} x2="0" y2={height - r} stroke={tabColor} strokeWidth={4} />
       </svg>
-      {label ? (
-        <div className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold" style={{ color: "#16333A" }}>{label}</div>
-      ) : null}
+      <div 
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ 
+          writingMode: "vertical-rl",
+          textOrientation: "mixed",
+          fontSize: "12px",
+          fontWeight: isActive ? "bold" : "semibold",
+          color: textColor
+        }}
+      >
+        {label}
+      </div>
     </div>
   );
 }
 
-// ===================== PAGE WRAPPER + STACKED LOOK =====================
-function LeftPeek({ color, stroke, inset = 16, width = 18 }: { color: string; stroke: string; inset?: number; width?: number }) {
-  // A slim rounded strip peeking from the left to suggest the older folder beneath
-  return (
-    <div className="absolute" style={{ left: -width + 6, top: inset, bottom: inset, width }}>
-      <svg width="100%" height="100%" viewBox="0 0 20 100" preserveAspectRatio="none">
-        <path d="M18 2 Q18 0 16 0 H4 Q2 0 2 2 V98 Q2 100 4 100 H16 Q18 100 18 98 Z" fill={color} stroke={stroke} strokeWidth={2} />
-      </svg>
-    </div>
-  );
-}
-
-function StepShell({ bumpX, color, stroke, prevTabs = [], stepNum, children }: { bumpX: number; color: string; stroke: string; prevTabs?: Array<{ left: number; color: string; stroke: string; label?: string }>; stepNum: number; children: React.ReactNode }) {
-  // Ensure a single parent node wraps the tab + folder content
+// ===================== PAGE WRAPPER WITH RIGHT-SIDE TABS =====================
+function StepShell({ color, stroke, stepNum, currentStep, maxUnlockedStep, onStepClick, children }: { 
+  color: string; 
+  stroke: string; 
+  stepNum: number; 
+  currentStep: number;
+  maxUnlockedStep: number;
+  onStepClick: (step: number) => void;
+  children: React.ReactNode 
+}) {
+  const tabHeight = 75;
+  const tabSpacing = 8;
+  const startTop = 80;
+  
   return (
     <div className="relative w-full max-w-6xl">
-      {/* Left peeks from earlier steps (only show a slice) */}
-      {prevTabs.length > 0 && (
-        <LeftPeek color={prevTabs[prevTabs.length - 1].color} stroke={prevTabs[prevTabs.length - 1].stroke} />
-      )}
-
       {/* Stacked sheets behind for depth */}
       <div className="absolute -top-6 -left-6 -z-10 opacity-70">
         <FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} />
@@ -159,12 +181,33 @@ function StepShell({ bumpX, color, stroke, prevTabs = [], stepNum, children }: {
         <FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} />
       </div>
 
-      {/* Active folder + its tab */}
+      {/* Active folder */}
       <div className="relative">
-        <FolderTab left={bumpX} color={color} stroke={stroke} label={`Step ${stepNum}`} />
         <FolderShape width={1100} height={640} color={color} stroke={stroke} pad={34}>
           {children}
         </FolderShape>
+        
+        {/* Right-side tabs - show all 4 steps */}
+        {[1, 2, 3, 4].map((step) => {
+          const stepTheme = STEP_THEME[step];
+          const isActive = step === currentStep;
+          const isLocked = step > maxUnlockedStep;
+          const top = startTop + (step - 1) * (tabHeight + tabSpacing);
+          
+          return (
+            <FolderTabRight
+              key={step}
+              top={top}
+              height={tabHeight}
+              color={stepTheme.fill}
+              stroke={stepTheme.stroke}
+              label={`Step ${step}`}
+              isActive={isActive}
+              isLocked={isLocked}
+              onClick={() => onStepClick(step)}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -232,8 +275,13 @@ export default function ReturnsLab() {
 
   // ---------- NAV RULES ----------
   const canNext = (s: typeof step) => (s === 1 && submitted1) || (s === 2 && submitted2) || (s === 3 && submitted3);
-  const goNext = () => setStep((s) => (s === 4 ? 4 : ((s + 1) as any)));
-  const goPrev = () => setStep((s) => (s === 1 ? 1 : ((s - 1) as any)));
+  const maxUnlockedStep = (submitted1 ? 2 : 1) + (submitted2 ? 1 : 0) + (submitted3 ? 1 : 0);
+  const goToStep = (s: 1 | 2 | 3 | 4) => {
+    // Can only go to unlocked steps (current or previous)
+    if (s <= maxUnlockedStep) {
+      setStep(s);
+    }
+  };
 
   // ---------- STEP ACTIONS ----------
   const pickCompany = (k: CompanyKey) => {
@@ -293,16 +341,13 @@ export default function ReturnsLab() {
   };
 
   // ===================== RENDER =====================
-  // Adjusted bump positions - tabs very close to left edge, narrow spacing (matching reference image)
-  const bumpByStep = { 1: 24, 2: 100, 3: 176, 4: 252 } as const; // left → right, smaller increments, closer to left
-
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-6" style={{ background: TIF_PAGE }}>
       <AnimatePresence mode="wait">
         {/* ===================== STEP 1 ===================== */}
         {step === 1 && (
           <motion.section key="s1" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
-            <StepShell bumpX={bumpByStep[1]} color={STEP_THEME[1].fill} stroke={STEP_THEME[1].stroke} prevTabs={[]} stepNum={1}>
+            <StepShell color={STEP_THEME[1].fill} stroke={STEP_THEME[1].stroke} stepNum={1} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
               <div className="p-8">
                 <h1 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: SLATE }}>
                   Step 1 — Pick your company
@@ -313,19 +358,16 @@ export default function ReturnsLab() {
                       key={k}
                       onClick={() => pickCompany(k)}
                       className="rounded-2xl px-4 py-8 shadow hover:scale-[1.02] transition text-center font-semibold border"
-                      style={{ background: "#F7E5D1", color: SLATE, borderColor: "#E3C39B" }}
+                      style={{ background: "rgba(255,255,255,0.4)", color: SLATE, borderColor: STEP_THEME[1].stroke }}
                     >
                       {k}
                     </button>
                   ))}
                 </div>
                 <div className="mt-6 flex items-center gap-3">
-                  <div className="text-sm text-slate-700">Selected: {company ?? "—"}</div>
-                  <button onClick={submit1} disabled={!company} className={`px-4 py-2 rounded-xl text-white font-semibold shadow ${company ? "" : "opacity-50 cursor-not-allowed"}`} style={{ background: TIF_DARK }}>
+                  <div className="text-sm" style={{ color: SLATE }}>Selected: {company ?? "—"}</div>
+                  <button onClick={submit1} disabled={!company} className={`px-4 py-2 rounded-xl text-white font-semibold shadow ${company ? "" : "opacity-50 cursor-not-allowed"}`} style={{ background: SUBMIT_COLOR }}>
                     Submit
-                  </button>
-                  <button onClick={() => canNext(1) && goNext()} disabled={!canNext(1)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(1) ? "" : "opacity-50 cursor-not-allowed"}`} style={{ background: TIF_DARK }}>
-                    →
                   </button>
                 </div>
               </div>
@@ -336,44 +378,36 @@ export default function ReturnsLab() {
         {/* ===================== STEP 2 ===================== */}
         {step === 2 && (
           <motion.section key="s2" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
-            <StepShell bumpX={bumpByStep[2]} color={STEP_THEME[2].fill} stroke={STEP_THEME[2].stroke} prevTabs={[{ left: bumpByStep[1], color: STEP_THEME[1].fill, stroke: STEP_THEME[1].stroke, label: "Step 1" }]} stepNum={2}>
+            <StepShell color={STEP_THEME[2].fill} stroke={STEP_THEME[2].stroke} stepNum={2} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
               <div className="p-8">
                 <div className="flex items-start justify-between mb-4">
                   <h2 className="text-2xl md:text-3xl font-bold" style={{ color: SLATE }}>
                     Step 2 — Compute period returns (company: {company ?? "—"})
                   </h2>
-                  <div className="flex gap-2">
-                    <button onClick={goPrev} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow" style={{ background: SLATE }}>
-                      ←
-                    </button>
-                    <button onClick={submit2} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: TIF_DARK }}>
-                      Submit
-                    </button>
-                    <button onClick={() => canNext(2) && goNext()} disabled={!canNext(2)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(2) ? "" : "opacity-50 cursor-not-allowed"}`} style={{ background: TIF_DARK }}>
-                      →
-                    </button>
-                  </div>
+                  <button onClick={submit2} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: SUBMIT_COLOR }}>
+                    Submit
+                  </button>
                 </div>
 
-                <div className="rounded-2xl overflow-hidden shadow border" style={{ background: CREAM, borderColor: "#efd6cc" }}>
+                <div className="rounded-2xl overflow-hidden shadow border" style={{ background: STEP_THEME[2].fill, borderColor: STEP_THEME[2].stroke, opacity: 0.9 }}>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                      <thead className="bg-white/60">
+                      <thead style={{ background: "rgba(255,255,255,0.3)" }}>
                         <tr className="text-left">
-                          <th className="p-3">Period</th>
-                          <th className="p-3">Pₜ</th>
-                          <th className="p-3">Divₜ₊₁</th>
-                          <th className="p-3">Pₜ₊₁</th>
-                          <th className="p-3">Your Rₜ₊₁ (%)</th>
+                          <th className="p-3" style={{ color: SLATE }}>Period</th>
+                          <th className="p-3" style={{ color: SLATE }}>Pₜ</th>
+                          <th className="p-3" style={{ color: SLATE }}>Divₜ₊₁</th>
+                          <th className="p-3" style={{ color: SLATE }}>Pₜ₊₁</th>
+                          <th className="p-3" style={{ color: SLATE }}>Your Rₜ₊₁ (%)</th>
                         </tr>
                       </thead>
                       <tbody>
                         {rows.map((r, i) => (
-                          <tr key={i} className="border-t">
-                            <td className="p-3 whitespace-nowrap">{r.label}</td>
-                            <td className="p-3">{r.Pt.toFixed(2)}</td>
-                            <td className="p-3">{r.DivNext.toFixed(2)}</td>
-                            <td className="p-3">{r.Pnext.toFixed(2)}</td>
+                          <tr key={i} className="border-t" style={{ borderColor: STEP_THEME[2].stroke }}>
+                            <td className="p-3 whitespace-nowrap" style={{ color: SLATE }}>{r.label}</td>
+                            <td className="p-3" style={{ color: SLATE }}>{r.Pt.toFixed(2)}</td>
+                            <td className="p-3" style={{ color: SLATE }}>{r.DivNext.toFixed(2)}</td>
+                            <td className="p-3" style={{ color: SLATE }}>{r.Pnext.toFixed(2)}</td>
                             <td className="p-3">
                               <input
                                 type="number"
@@ -381,6 +415,7 @@ export default function ReturnsLab() {
                                 value={rInput[i] || 0}
                                 onChange={(e) => setRInput((prev) => prev.map((x, j) => (j === i ? Number(e.target.value) : x)))}
                                 className="w-28 rounded-xl px-2 py-1 border bg-white"
+                                style={{ borderColor: STEP_THEME[2].stroke }}
                               />
                             </td>
                           </tr>
@@ -391,9 +426,9 @@ export default function ReturnsLab() {
                 </div>
 
                 {submitted2 && (
-                  <div className="mt-4 p-4 rounded-xl bg-white shadow-inner">
-                    <div className="font-semibold mb-2">Answer sheet</div>
-                    <pre className="text-xs whitespace-pre-wrap">{answer2}</pre>
+                  <div className="mt-4 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[2].fill, border: `1px solid ${STEP_THEME[2].stroke}` }}>
+                    <div className="font-semibold mb-2" style={{ color: SLATE }}>Answer sheet</div>
+                    <pre className="text-xs whitespace-pre-wrap" style={{ color: SLATE }}>{answer2}</pre>
                   </div>
                 )}
               </div>
@@ -404,62 +439,54 @@ export default function ReturnsLab() {
         {/* ===================== STEP 3 ===================== */}
         {step === 3 && (
           <motion.section key="s3" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
-            <StepShell bumpX={bumpByStep[3]} color={STEP_THEME[3].fill} stroke={STEP_THEME[3].stroke} prevTabs={[{ left: bumpByStep[1], color: STEP_THEME[1].fill, stroke: STEP_THEME[1].stroke, label: "Step 1" }, { left: bumpByStep[2], color: STEP_THEME[2].fill, stroke: STEP_THEME[2].stroke, label: "Step 2" }]} stepNum={3}>
+            <StepShell color={STEP_THEME[3].fill} stroke={STEP_THEME[3].stroke} stepNum={3} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
               <div className="p-8">
                 <div className="flex items-start justify-between mb-4">
-                  <h2 className="text-2xl md:text-3xl font-bold" style={{ color: SLATE }}>
+                  <h2 className="text-2xl md:text-3xl font-bold" style={{ color: "white" }}>
                     Step 3 — Compute Average & SD
                   </h2>
-                  <div className="flex gap-2">
-                    <button onClick={goPrev} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow" style={{ background: SLATE }}>
-                      ←
-                    </button>
-                    <button onClick={submit3} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: TIF_DARK }}>
-                      Submit
-                    </button>
-                    <button onClick={() => canNext(3) && goNext()} disabled={!canNext(3)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(3) ? "" : "opacity-50 cursor-not-allowed"}`} style={{ background: TIF_DARK }}>
-                      →
-                    </button>
-                  </div>
+                  <button onClick={submit3} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: SUBMIT_COLOR }}>
+                    Submit
+                  </button>
                 </div>
 
-                <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: "#F7FAFF", borderColor: "#E2ECFB" }}>
+                <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: "rgba(255,255,255,0.15)", borderColor: STEP_THEME[3].stroke }}>
                   <table className="w-full text-sm">
-                    <thead className="bg-white/60">
+                    <thead style={{ background: "rgba(255,255,255,0.2)" }}>
                       <tr className="text-left">
-                        <th className="p-3">Period</th>
-                        <th className="p-3">Correct Rₜ₊₁ (%)</th>
+                        <th className="p-3" style={{ color: "white" }}>Period</th>
+                        <th className="p-3" style={{ color: "white" }}>Correct Rₜ₊₁ (%)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {rows.map((r, i) => (
-                        <tr key={i} className="border-t">
-                          <td className="p-3">{r.label}</td>
-                          <td className="p-3">{to2(toPct(trueR[i]))}</td>
+                        <tr key={i} className="border-t" style={{ borderColor: STEP_THEME[3].stroke }}>
+                          <td className="p-3" style={{ color: "white" }}>{r.label}</td>
+                          <td className="p-3" style={{ color: "white" }}>{to2(toPct(trueR[i]))}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow p-6">
+                <div className="rounded-2xl shadow p-6" style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${STEP_THEME[3].stroke}` }}>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                     <div>
-                      <label className="text-sm">Average (%)</label>
+                      <label className="text-sm" style={{ color: "white" }}>Average (%)</label>
                       <input type="number" step="0.01" value={avgInput} onChange={(e) => setAvgInput(e.target.value)} className="w-full rounded-xl px-3 py-2 border bg-white" />
                     </div>
                     <div>
-                      <label className="text-sm">SD (%)</label>
+                      <label className="text-sm" style={{ color: "white" }}>SD (%)</label>
                       <input type="number" step="0.01" value={sdInput} onChange={(e) => setSdInput(e.target.value)} className="w-full rounded-xl px-3 py-2 border bg-white" />
                     </div>
-                    <div className="text-sm text-slate-600">Use the R table above (correct values).</div>
+                    <div className="text-sm" style={{ color: "rgba(255,255,255,0.9)" }}>Use the R table above (correct values).</div>
                   </div>
                 </div>
 
                 {submitted3 && (
-                  <div className="mt-4 p-4 rounded-xl bg-white shadow-inner">
-                    <div className="font-semibold mb-2">Answer sheet</div>
-                    <pre className="text-xs whitespace-pre-wrap">{answer3}</pre>
+                  <div className="mt-4 p-4 rounded-xl shadow-inner" style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${STEP_THEME[3].stroke}` }}>
+                    <div className="font-semibold mb-2" style={{ color: "white" }}>Answer sheet</div>
+                    <pre className="text-xs whitespace-pre-wrap" style={{ color: "white" }}>{answer3}</pre>
                   </div>
                 )}
               </div>
@@ -470,69 +497,64 @@ export default function ReturnsLab() {
         {/* ===================== STEP 4 ===================== */}
         {step === 4 && (
           <motion.section key="s4" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
-            <StepShell bumpX={bumpByStep[4]} color={STEP_THEME[4].fill} stroke={STEP_THEME[4].stroke} prevTabs={[{ left: bumpByStep[1], color: STEP_THEME[1].fill, stroke: STEP_THEME[1].stroke, label: "Step 1" }, { left: bumpByStep[2], color: STEP_THEME[2].fill, stroke: STEP_THEME[2].stroke, label: "Step 2" }, { left: bumpByStep[3], color: STEP_THEME[3].fill, stroke: STEP_THEME[3].stroke, label: "Step 3" }]} stepNum={4}>
+            <StepShell color={STEP_THEME[4].fill} stroke={STEP_THEME[4].stroke} stepNum={4} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
               <div className="p-8">
                 <div className="flex items-start justify-between mb-4">
                   <h2 className="text-2xl md:text-3xl font-bold" style={{ color: SLATE }}>
                     Step 4 — ~95% Prediction Band
                   </h2>
+                  <button onClick={submit4} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: SUBMIT_COLOR }}>
+                    Submit
+                  </button>
                 </div>
 
-                <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: "#F7FAFF", borderColor: "#E2ECFB" }}>
+                <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: STEP_THEME[4].fill, borderColor: STEP_THEME[4].stroke, opacity: 0.9 }}>
                   <table className="w-full text-sm">
-                    <thead className="bg-white/60">
+                    <thead style={{ background: "rgba(255,255,255,0.3)" }}>
                       <tr className="text-left">
-                        <th className="p-3">Period</th>
-                        <th className="p-3">Correct Rₜ₊₁ (%)</th>
+                        <th className="p-3" style={{ color: SLATE }}>Period</th>
+                        <th className="p-3" style={{ color: SLATE }}>Correct Rₜ₊₁ (%)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {rows.map((r, i) => (
-                        <tr key={i} className="border-t">
-                          <td className="p-3">{r.label}</td>
-                          <td className="p-3">{to2(toPct(trueR[i]))}</td>
+                        <tr key={i} className="border-t" style={{ borderColor: STEP_THEME[4].stroke }}>
+                          <td className="p-3" style={{ color: SLATE }}>{r.label}</td>
+                          <td className="p-3" style={{ color: SLATE }}>{to2(toPct(trueR[i]))}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow p-6">
+                <div className="rounded-2xl shadow p-6" style={{ background: STEP_THEME[4].fill, border: `1px solid ${STEP_THEME[4].stroke}`, opacity: 0.9 }}>
                   <div className="flex flex-col md:flex-row gap-6 items-center">
                     <Bell mean={meanR} sd={sdR} />
                     <div className="flex-1">
                       <table className="w-full text-sm">
                         <tbody>
                           <tr>
-                            <td className="p-2 font-medium">Lower (μ − 2σ) %</td>
+                            <td className="p-2 font-medium" style={{ color: SLATE }}>Lower (μ − 2σ) %</td>
                             <td className="p-2">
                               <input type="number" step="0.01" value={loInput} onChange={(e) => setLoInput(e.target.value)} className="w-36 rounded-xl px-2 py-1 border bg-white" />
                             </td>
                           </tr>
                           <tr>
-                            <td className="p-2 font-medium">Upper (μ + 2σ) %</td>
+                            <td className="p-2 font-medium" style={{ color: SLATE }}>Upper (μ + 2σ) %</td>
                             <td className="p-2">
                               <input type="number" step="0.01" value={hiInput} onChange={(e) => setHiInput(e.target.value)} className="w-36 rounded-xl px-2 py-1 border bg-white" />
                             </td>
                           </tr>
                         </tbody>
                       </table>
-                      <div className="mt-4 flex gap-2">
-                        <button onClick={goPrev} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow" style={{ background: SLATE }}>
-                          ←
-                        </button>
-                        <button onClick={submit4} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow" style={{ background: TIF_DARK }}>
-                          Submit
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </div>
 
                 {submitted4 && (
-                  <div className="mt-4 p-4 rounded-xl bg-white shadow-inner">
-                    <div className="font-semibold mb-2">Answer sheet</div>
-                    <pre className="text-xs whitespace-pre-wrap">{answer4}</pre>
+                  <div className="mt-4 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[4].fill, border: `1px solid ${STEP_THEME[4].stroke}` }}>
+                    <div className="font-semibold mb-2" style={{ color: SLATE }}>Answer sheet</div>
+                    <pre className="text-xs whitespace-pre-wrap" style={{ color: SLATE }}>{answer4}</pre>
                     <div className="mt-4 flex items-center gap-3">
                       <button
                         onClick={() => {
@@ -552,7 +574,7 @@ export default function ReturnsLab() {
                           setAnswer4(null);
                         }}
                         className="px-4 py-2 rounded-xl text-white font-semibold"
-                        style={{ background: SLATE }}
+                        style={{ background: SUBMIT_COLOR }}
                       >
                         Try another company
                       </button>
