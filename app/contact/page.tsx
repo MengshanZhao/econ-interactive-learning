@@ -14,11 +14,12 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Contact Information */}
+      {/* Contact Info */}
       <section className="py-12 bg-card">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8 text-foreground">Contact Information</h2>
+          <div className="max-w-2xl">
+            <div>
+              <h2 className="text-3xl font-bold mb-8 text-foreground">Contact Information</h2>
               <div className="bg-card rounded-lg p-8">
                 <div className="space-y-6">
                   <div className="flex items-start">
