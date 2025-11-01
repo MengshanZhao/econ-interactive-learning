@@ -23,8 +23,8 @@ export default function ContactPage() {
               <div className="bg-card rounded-lg p-8">
                 <div className="space-y-6">
                   <div className="flex items-start">
-                    <div className="bg-foreground p-3 rounded-lg text-background mr-4">
-                      <MapPin className="h-6 w-6" />
+                    <div className="bg-yellow-400 p-3 rounded-lg mr-4">
+                      <MapPin className="h-6 w-6 text-yellow-900" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-foreground mb-1">Location</h3>
@@ -39,8 +39,8 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex items-start">
-                    <div className="bg-foreground p-3 rounded-lg text-background mr-4">
-                      <Mail className="h-6 w-6" />
+                    <div className="bg-yellow-400 p-3 rounded-lg mr-4">
+                      <Mail className="h-6 w-6 text-yellow-900" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-foreground mb-1">Email</h3>
@@ -51,8 +51,8 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex items-start">
-                    <div className="bg-foreground p-3 rounded-lg text-background mr-4">
-                      <Phone className="h-6 w-6" />
+                    <div className="bg-yellow-400 p-3 rounded-lg mr-4">
+                      <Phone className="h-6 w-6 text-yellow-900" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-foreground mb-1">Phone</h3>
@@ -63,8 +63,8 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex items-start">
-                    <div className="bg-foreground p-3 rounded-lg text-background mr-4">
-                      <Linkedin className="h-6 w-6" />
+                    <div className="bg-yellow-400 p-3 rounded-lg mr-4">
+                      <Linkedin className="h-6 w-6 text-yellow-900" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-foreground mb-1">LinkedIn</h3>
