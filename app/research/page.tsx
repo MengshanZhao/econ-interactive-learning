@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Calendar, User } from "lucide-react"
+import { Calendar, User, Download } from "lucide-react"
 
 export default function ResearchPage() {
   return (
@@ -41,6 +41,17 @@ export default function ResearchPage() {
               <p className="text-foreground mb-6">
                 This study examines the Environmental Protection Interview (EPI), a campaign-style environmental policy in China that subjects poorly performing cities to central government scrutiny. Using near real-time air quality data from the Tracking Air Pollution in China (TAP) project and a Difference-in-Differences approach, I demonstrate that previous studies substantially underestimated the policy's impact by overlooking its dynamic competitive structure. I show that cities at risk of being interviewed (top 15 most polluted) achieve PM2.5 reductions of 15.7 μg/m³—nearly four times larger than previous estimates that focused only on initially interviewed cities. The effects are most pronounced at year-end, coinciding with annual evaluations, and lead to significant reductions in household healthcare expenditures, revealing how local governments strategically respond to the EPI's ranking system.
               </p>
+              <div className="mb-6">
+                <a
+                  href="https://drive.google.com/uc?export=download&id=1PJgBnHO3Y6uKGnWLGRMm71in9ndUpVAF"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[color:hsl(var(--primary))] text-white rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  <Download className="h-5 w-5" />
+                  <span>Download PDF</span>
+                </a>
+              </div>
               <div className="bg-card p-4 rounded-lg mb-6">
                 <h4 className="font-semibold text-foreground mb-2">Presentations:</h4>
                 <ul className="list-disc list-inside text-foreground space-y-1">

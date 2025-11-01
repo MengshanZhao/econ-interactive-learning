@@ -77,10 +77,13 @@ export default function Home() {
                 I am a PhD candidate in Agricultural Economics at Washington State University, expecting to graduate in
                 May 2026. My research focuses on development economics, health outcomes, and environmental policy.
               </p>
-              <p className="text-foreground mb-6">
+              <p className="text-foreground mb-4">
                 I have experience in field research, experimental design, and data analysis. My current work examines
                 the effects of Problem Management Plus (PM+) intervention on maternal mental health and child
-                undernutrition, as well as environmental protection policies in China.
+                undernutrition in Gombe, Nigeria, as well as environmental protection policies in China.
+              </p>
+              <p className="text-foreground mb-6">
+                My teaching style emphasizes student engagement through diverse methods, including <Link href="/teaching/335" className="text-[color:hsl(var(--primary))] hover:underline">self-designed interactive games</Link>.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center text-foreground">
@@ -242,22 +245,62 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Skills */}
+      {/* References */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-foreground">Skills</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <h2 className="text-3xl font-bold mb-8 text-foreground">References</h2>
+          <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-card p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-bold mb-2 text-foreground">Data Analysis</h3>
-              <p className="text-foreground">Proficient in statistical analysis and data visualization.</p>
+              <h3 className="text-xl font-bold mb-3 text-foreground">Chair: Seollee Park</h3>
+              <p className="text-foreground mb-2">Assistant Professor</p>
+              <p className="text-foreground mb-2">School of Economic Sciences & Paul G. Allen School for Global Health</p>
+              <p className="text-foreground mb-2">Washington State University</p>
+              <p className="text-foreground mb-2">2020 NE Wilson Rd, Pullman, WA 99163</p>
+              <p className="text-foreground mb-2">
+                Email: <a href="mailto:seollee.park@wsu.edu" className="text-[color:hsl(var(--primary))] hover:underline">seollee.park@wsu.edu</a>
+              </p>
+              <p className="text-foreground">
+                Phone: <a href="tel:5093358521" className="text-[color:hsl(var(--primary))] hover:underline">509-335-8521</a>
+              </p>
             </div>
             <div className="bg-card p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-bold mb-2 text-foreground">Research</h3>
-              <p className="text-foreground">Experienced in conducting field research and surveys.</p>
+              <h3 className="text-xl font-bold mb-3 text-foreground">Benjamin Cowan</h3>
+              <p className="text-foreground mb-2">Professor</p>
+              <p className="text-foreground mb-2">School of Economic Sciences</p>
+              <p className="text-foreground mb-2">Washington State University</p>
+              <p className="text-foreground mb-2">Pullman, WA 99163</p>
+              <p className="text-foreground mb-2">
+                Email: <a href="mailto:ben.cowan@wsu.edu" className="text-[color:hsl(var(--primary))] hover:underline">ben.cowan@wsu.edu</a>
+              </p>
+              <p className="text-foreground">
+                Phone: <a href="tel:5093352184" className="text-[color:hsl(var(--primary))] hover:underline">509-335-2184</a>
+              </p>
             </div>
             <div className="bg-card p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-bold mb-2 text-foreground">Policy Analysis</h3>
-              <p className="text-foreground">Skilled in analyzing agricultural policies and their impacts.</p>
+              <h3 className="text-xl font-bold mb-3 text-foreground">Shanthi Manian</h3>
+              <p className="text-foreground mb-2">Associate Professor</p>
+              <p className="text-foreground mb-2">School of Economic Sciences & Paul G. Allen School for Global Health</p>
+              <p className="text-foreground mb-2">Washington State University</p>
+              <p className="text-foreground mb-2">Pullman, WA 99163</p>
+              <p className="text-foreground mb-2">
+                Email: <a href="mailto:shanthi.manian@wsu.edu" className="text-[color:hsl(var(--primary))] hover:underline">shanthi.manian@wsu.edu</a>
+              </p>
+              <p className="text-foreground">
+                Phone: <a href="tel:5093358739" className="text-[color:hsl(var(--primary))] hover:underline">509-335-8739</a>
+              </p>
+            </div>
+            <div className="bg-card p-6 rounded-lg shadow-md">
+              <h3 className="text-xl font-bold mb-3 text-foreground">Gregmar I. Galinato</h3>
+              <p className="text-foreground mb-2">Professor</p>
+              <p className="text-foreground mb-2">School of Economic Sciences</p>
+              <p className="text-foreground mb-2">Washington State University</p>
+              <p className="text-foreground mb-2">Pullman, WA 99163</p>
+              <p className="text-foreground mb-2">
+                Email: <a href="mailto:ggalinato@wsu.edu" className="text-[color:hsl(var(--primary))] hover:underline">ggalinato@wsu.edu</a>
+              </p>
+              <p className="text-foreground">
+                Phone: <a href="tel:5093356382" className="text-[color:hsl(var(--primary))] hover:underline">509-335-6382</a>
+              </p>
             </div>
           </div>
         </div>
