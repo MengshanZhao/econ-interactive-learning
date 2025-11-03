@@ -43,7 +43,7 @@ export default function ResearchPage() {
               </p>
               <div className="mb-6">
                 <a
-                  href="https://drive.google.com/uc?export=download&id=1PJgBnHO3Y6uKGnWLGRMm71in9ndUpVAF"
+                  href="https://drive.google.com/file/d/1pgGto6meIjppTYab6yB7SwrMCPw9T8ja/view?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-[color:hsl(var(--primary))] text-white rounded-lg hover:opacity-90 transition-opacity"
