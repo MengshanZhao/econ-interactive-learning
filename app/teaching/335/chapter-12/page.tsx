@@ -484,7 +484,7 @@ export default function PortfolioCovarianceLab(){
 
                 `${vOK?"✅":"❌"} Var(Rₚ): your ${to2(v||0)} (%^2) → ${to2(vTrue)} (%^2)\n` +
 
-                `Var(Rₚ) = Σ wᵢ² σᵢ² + 2 Σ_{i<j} wᵢ wⱼ ρᵢⱼ σᵢ σⱼ`;
+                `Var(Rₚ) = Σ wᵢ² SD(Rᵢ)² + 2 Σ_{i<j} wᵢ wⱼ Corr(Rᵢ, Rⱼ) SD(Rᵢ) SD(Rⱼ)`;
 
     setAns2(msg);
 
@@ -773,32 +773,6 @@ export default function PortfolioCovarianceLab(){
                         <div className="rounded-lg p-3" style={{ background: STEP_THEME[2].fill, border: `1px solid ${STEP_THEME[2].stroke}` }}>
 
                           <div className="text-sm font-semibold" style={{color:SLATE}}>Given Cov({corrPair[0]}, {corrPair[1]}) = {to2(toPct(covMatrix[corrPair[0]][corrPair[1]]))} (%²)</div>
-
-                        </div>
-
-                        <div className="rounded-lg p-3 mb-3" style={{ background: "rgba(255,255,255,0.9)", border: `1px solid ${STEP_THEME[2].stroke}` }}>
-
-                          <div className="text-sm font-semibold mb-2" style={{color:SLATE}}>What is Var(R<sub>p</sub>)?</div>
-
-                          <p className="text-xs mb-2" style={{color:SLATE}}>
-
-                            Portfolio variance <b>Var(R<sub>p</sub>)</b> measures the overall risk of your portfolio. It combines:
-
-                          </p>
-
-                          <ul className="text-xs space-y-1 mb-2 ml-4 list-disc" style={{color:SLATE}}>
-
-                            <li><b>Individual stock risks:</b> Each stock's own variance (w<sub>i</sub>² × σ<sub>i</sub>²)</li>
-
-                            <li><b>How stocks move together:</b> The covariance/correlation between pairs (2 × w<sub>i</sub> × w<sub>j</sub> × ρ<sub>ij</sub> × σ<sub>i</sub> × σ<sub>j</sub>)</li>
-
-                          </ul>
-
-                          <div className="text-xs font-mono bg-gray-50 p-2 rounded border" style={{color:SLATE}}>
-
-                            Var(R<sub>p</sub>) = Σ w<sub>i</sub>² σ<sub>i</sub>² + 2 Σ<sub>i&lt;j</sub> w<sub>i</sub> w<sub>j</sub> ρ<sub>ij</sub> σ<sub>i</sub> σ<sub>j</sub>
-
-                          </div>
 
                         </div>
 
