@@ -938,7 +938,7 @@ export default function PortfolioCovarianceLab(){
 
       </AnimatePresence>
 
-        <Modal open={modalOpen} onClose={()=> setModalOpen(false)}>
+      <Modal open={modalOpen} onClose={()=> setModalOpen(false)}>
 
           <h3 className="text-xl font-bold mb-3" style={{color:SLATE}}>Understanding Covariance and Correlation</h3>
 
@@ -1015,8 +1015,6 @@ export default function PortfolioCovarianceLab(){
           </div>
 
         </Modal>
-
-      </div>
 
     </div>
 
