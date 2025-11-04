@@ -58,6 +58,8 @@ type Universe = Record<Ticker, Stock>;
 
 type Correl = Record<Ticker, Record<Ticker, number>>; // symmetric corr matrix
 
+type Covariance = Record<Ticker, Record<Ticker, number>>; // symmetric cov matrix
+
 const BASE_STOCKS: Universe = {
 
   AAPL: { ticker: "AAPL", name: "Apple", sector: "Tech", r: 0.034, sd: 0.045, beta: 1.18 },
@@ -136,79 +138,48 @@ function portfolioVariance(weights: Record<Ticker, number>, u: Universe, corr: C
 
 }
 
-// ===================== FOLDER SHAPE =====================
-
-function FolderShape({ width = 1100, height = 640, color, stroke, pad = 28, children, }:{ width?: number; height?: number; color: string; stroke: string; pad?: number; children?: React.ReactNode; }) {
-
-  const r = 18; const w = width; const h = height;
-
-  const d = [ `M ${r} 0`, `H ${w - r}`, `Q ${w} 0 ${w} ${r}`, `V ${h - r}`, `Q ${w} ${h} ${w - r} ${h}`, `H ${r}`, `Q 0 ${h} 0 ${h - r}`, `V ${r}`, `Q 0 0 ${r} 0`, ].join(" ");
-
-  return (
-
-    <div className="relative w-full" style={{ filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.15))" }}>
-
-      <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="rounded-[20px] block">
-
-        <path d={d} fill={color} stroke={stroke} strokeWidth={2} />
-
-      </svg>
-
-      <div className="absolute left-0 top-0 w-full h-full"><div className="h-full" style={{ padding: pad }}>{children}</div></div>
-
-    </div>
-
-  );
-
+// Calculate covariance from correlation and SDs
+function calculateCovariance(corr: Correl, universe: Universe): Covariance {
+  const cov: Covariance = {} as Covariance;
+  const tickers = Object.keys(universe) as Ticker[];
+  
+  tickers.forEach(ti => {
+    cov[ti] = {} as Record<Ticker, number>;
+    tickers.forEach(tj => {
+      cov[ti][tj] = corr[ti][tj] * universe[ti].sd * universe[tj].sd;
+    });
+  });
+  
+  return cov;
 }
 
-function FolderTabRight({ top, height = 80, color, stroke, label, isActive, isLocked, onClick, }:{ top: number; height?: number; color: string; stroke: string; label: string; isActive: boolean; isLocked: boolean; onClick?: () => void; }) {
+// ===================== DOCUMENT HOLDER DESIGN =====================
 
-  const w = 60; const r = 8; const tabColor = isActive ? color : (isLocked ? "#E0E0E0" : color); const tabStroke = isActive ? stroke : (isLocked ? "#B0B0B0" : stroke); const textColor = isLocked ? "#999" : (isActive ? "#16333A" : "#666");
+function DocumentCard({ step, color, stroke, isActive, children }: { step: number; color: string; stroke: string; isActive: boolean; children: React.ReactNode; }) {
 
-  return (
-
-    <div className="absolute cursor-pointer transition-all hover:scale-105" style={{ right: -w + 8, top, width: w, height, zIndex: isActive ? 40 : 30, opacity: isLocked ? 0.5 : 1 }} onClick={!isLocked ? onClick : undefined}>
-
-      <svg width="100%" height={height} viewBox={`0 0 ${w} ${height}`} style={{ filter: isActive ? "drop-shadow(0 2px 8px rgba(0,0,0,0.2))" : "drop-shadow(0 1px 3px rgba(0,0,0,0.1))" }}>
-
-        <path d={`M ${r} 0 H ${w} V ${height - r} Q ${w} ${height} ${w - r} ${height} H ${r} Q 0 ${height} 0 ${height - r} V ${r} Q 0 0 ${r} 0 Z`} fill={tabColor} stroke={tabStroke} strokeWidth={isActive ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round" />
-
-        <line x1="0" y1={r} x2="0" y2={height - r} stroke={tabColor} strokeWidth={4} />
-
-      </svg>
-
-      <div className="absolute inset-0 flex items-center justify-center" style={{ writingMode: "vertical-rl", textOrientation: "mixed", fontSize: "12px", fontWeight: isActive ? "bold" : "semibold", color: textColor }}>{label}</div>
-
-    </div>
-
-  );
-
-}
-
-function StepShell({ color, stroke, currentStep, maxUnlockedStep, onStepClick, children }: { color: string; stroke: string; currentStep: number; maxUnlockedStep: number; onStepClick: (step: number) => void; children: React.ReactNode; }) {
-
-  const tabHeight = 75; const tabSpacing = 8; const startTop = 80;
+  const offset = isActive ? 0 : (step - 1) * 8; // Offset for stacked effect
+  const scale = isActive ? 1 : 0.96;
+  const opacity = isActive ? 1 : 0.7;
+  const zIndex = isActive ? 10 : 10 - step;
+  const marginTop = isActive ? 0 : -((step - 1) * 8);
 
   return (
 
-    <div className="relative w-full max-w-6xl">
+    <div className="relative" style={{ 
 
-      <div className="absolute -top-6 -left-6 -z-10 opacity-70"><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
+      marginTop: `${marginTop}px`,
+      transform: `translateY(${offset}px) scale(${scale})`,
+      opacity,
+      zIndex,
+      filter: isActive ? "drop-shadow(0 8px 20px rgba(0,0,0,0.2))" : "drop-shadow(0 2px 8px rgba(0,0,0,0.1))",
+      transition: "all 0.3s ease",
+      pointerEvents: isActive ? "auto" : "none"
 
-      <div className="absolute -top-3 left-6 -z-10 opacity-60"><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
+    }}>
 
-      <div className="relative">
+      <div className="rounded-2xl border-2" style={{ background: color, borderColor: stroke }}>
 
-        <FolderShape width={1100} height={640} color={color} stroke={stroke} pad={34}>{children}</FolderShape>
-
-        {[1,2,3,4].map((step)=>{
-
-          const stepTheme = STEP_THEME[step]; const isActive = step===currentStep; const isLocked = step>maxUnlockedStep; const top = startTop + (step-1)*(tabHeight+tabSpacing);
-
-          return <FolderTabRight key={step} top={top} height={tabHeight} color={stepTheme.fill} stroke={stepTheme.stroke} label={`Step ${step}`} isActive={isActive} isLocked={isLocked} onClick={()=>onStepClick(step)} />
-
-        })}
+        {children}
 
       </div>
 
@@ -217,8 +188,6 @@ function StepShell({ color, stroke, currentStep, maxUnlockedStep, onStepClick, c
   );
 
 }
-
-const pageVariants = { enter: { x: 80, opacity: 0 }, center: { x: 0, opacity: 1 }, exit: { x: -80, opacity: 0 } };
 
 // ===================== MODAL =====================
 
@@ -258,17 +227,13 @@ export default function PortfolioCovarianceLab(){
 
   const [corr, setCorr] = useState<Correl>(BASE_CORR);
 
-  const [step, setStep] = useState<1|2|3|4>(1);
+  const [step, setStep] = useState<1|2|3|4>(2); // Start at step 2
 
   // Scenario knobs for CAPM (shown in Step 4 but set here)
 
   const [rf, setRf] = useState(0.02); // 2%
 
   const [mrp, setMrp] = useState(0.055); // market risk premium 5.5%
-
-  // MAIN pick (Step 1)
-
-  const [main, setMain] = useState<Ticker | null>(null);
 
   // Fixed selection: all five stocks
 
@@ -278,9 +243,10 @@ export default function PortfolioCovarianceLab(){
 
   const [weightsPct, setWeightsPct] = useState<Record<Ticker, number>>({AAPL:20, MSFT:20, NVDA:20, TSLA:20, KO:20});
 
-  const weightSum = useMemo(()=> allTickers.reduce((s,t)=> s + (Math.trunc(weightsPct[t]||0)), 0), [weightsPct]);
-
   const weightsDec = useMemo(()=>{ const out:Record<Ticker,number>={AAPL:0,MSFT:0,NVDA:0,TSLA:0,KO:0}; allTickers.forEach(t=> out[t]=(Math.trunc(weightsPct[t]||0))/100); return out; },[weightsPct]);
+
+  // Calculate covariance matrix
+  const covMatrix = useMemo(() => calculateCovariance(corr, universe), [corr, universe]);
 
   // Derived: portfolio return & risk (for checking in Step 3 after submit)
 
@@ -292,13 +258,13 @@ export default function PortfolioCovarianceLab(){
 
   // Step gates
 
-  const [s1, setS1] = useState(false); const [s2, setS2] = useState(false); const [s3, setS3] = useState(false); const [s4, setS4] = useState(false);
+  const [s2, setS2] = useState(false); const [s3, setS3] = useState(false); const [s4, setS4] = useState(false);
 
-  const canNext=(s:1|2|3)=> (s===1&&s1) || (s===2&&s2) || (s===3&&s3);
+  const canNext=(s:2|3)=> (s===2&&s2) || (s===3&&s3);
 
-  const maxUnlockedStep = (s1?2:1) + (s2?1:0) + (s3?1:0);
+  const maxUnlockedStep = 2 + (s2?1:0) + (s3?1:0);
 
-  const goToStep=(t:1|2|3|4)=>{ if(t<=maxUnlockedStep) setStep(t); };
+  const goToStep=(t:2|3|4)=>{ if(t<=maxUnlockedStep) setStep(t); };
 
   // Answers & inputs
 
@@ -310,27 +276,49 @@ export default function PortfolioCovarianceLab(){
 
   const [corrPair, setCorrPair] = useState<[Ticker, Ticker] | null>(null);
 
+  const [corrGuess, setCorrGuess] = useState<string>(""); // For correlation calculation
+
   const [varGuess, setVarGuess] = useState<string>("");
 
   const [ans3, setAns3] = useState<string | null>(null);
 
   const [capmGuess, setCapmGuess] = useState<string>("");
 
+  const [selectedStock, setSelectedStock] = useState<Ticker | null>(null);
+
   const [ans4, setAns4] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
 
-  function normalizeWeights(){
+  function randomizeWeights(){
 
-    // Keep integer-only normalization
+    const total = 100;
 
-    const sum = allTickers.reduce((s,t)=> s + Math.trunc(weightsPct[t]||0), 0) || 1;
+    const weights: Record<Ticker, number> = {} as Record<Ticker, number>;
 
-    const next: Record<Ticker, number> = { ...weightsPct };
+    let remaining = total;
 
-    allTickers.forEach(t=>{ next[t] = Math.round((Math.trunc(weightsPct[t]||0)/sum)*100); });
+    const shuffled = [...allTickers].sort(() => Math.random() - 0.5);
 
-    setWeightsPct(next);
+    shuffled.forEach((t, i) => {
+
+      if (i === shuffled.length - 1) {
+
+        weights[t] = remaining;
+
+      } else {
+
+        const w = Math.floor(Math.random() * remaining * 0.6) + 5; // Between 5 and 60% of remaining
+
+        weights[t] = w;
+
+        remaining -= w;
+
+      }
+
+    });
+
+    setWeightsPct(weights);
 
   }
 
@@ -350,39 +338,31 @@ export default function PortfolioCovarianceLab(){
 
     setUniverse(nextU); setCorr(BASE_CORR);
 
-    setMain(null); setWeightsPct({AAPL:20,MSFT:20,NVDA:20,TSLA:20,KO:20});
+    setWeightsPct({AAPL:20,MSFT:20,NVDA:20,TSLA:20,KO:20});
 
-    setS1(false); setS2(false); setS3(false); setS4(false);
+    setS2(false); setS3(false); setS4(false);
 
     setAns2(null); setAns3(null); setAns4(null); setRpGuess(""); setRpChecked(false);
 
-    setStep(1);
+    setCorrGuess(""); setVarGuess("");
+
+    setSelectedStock(null);
+
+    setStep(2);
 
   }
 
   // ---------- STEP ACTIONS ----------
 
-  function submit1(){
-
-    if(!main){ alert("Pick your main stock."); return; }
-
-    setS1(true);
-
-  }
-
   function submit2(){
 
-    // Enforce integers, main>0, sum==100, and require student's Rp
+    // Enforce integers, sum==100, and require student's Rp
 
     const ints: Record<Ticker, number> = { ...weightsPct } as any;
 
     allTickers.forEach(t=>{ const v = Math.trunc(Number(ints[t])); ints[t] = Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : 0; });
 
     setWeightsPct(ints);
-
-    if(!main){ alert("Pick your main stock first."); return; }
-
-    if((ints[main]||0) <= 0){ alert("Your main stock's weight must be an integer greater than 0%."); return; }
 
     const sum = allTickers.reduce((s,t)=> s + (ints[t]||0), 0);
 
@@ -412,9 +392,21 @@ export default function PortfolioCovarianceLab(){
 
   function submit3(){
 
-    if(!corrPair){ alert("Pick a pair to view the given correlation."); return; }
+    if(!corrPair){ alert("Pick a pair to calculate correlation."); return; }
 
-    // Students provide only Var(Rp). We do NOT reveal answers before submit.
+    const [a, b] = corrPair;
+
+    // First check correlation calculation
+
+    const gCorr = parseFloat(corrGuess||"NaN");
+
+    if(!Number.isFinite(gCorr)){ alert("Please enter your calculated Corr(%) first."); return; }
+
+    const trueCorr = corr[a][b];
+
+    const corrOK = Math.abs((gCorr/100||0)-trueCorr) <= 0.02; // ±2pp
+
+    // Then check variance
 
     const v = parseFloat(varGuess||"NaN"); // expect %^2
 
@@ -424,9 +416,17 @@ export default function PortfolioCovarianceLab(){
 
     const vOK = Math.abs((v||0)-vTrue) <= Math.max(0.01, 0.05*vTrue);
 
-    const [a,b] = corrPair; const givenC = corr[a][b];
+    const givenCov = covMatrix[a][b];
 
-    const msg = `${vOK?"✅":"❌"} Var(Rₚ): your ${to2(v||0)} (%^2) → ${to2(vTrue)} (%^2)\n\nGiven Corr(${a},${b}) = ${to2(givenC*100)}%\nVar(Rₚ) = Σ wᵢ² σᵢ² + 2 Σ_{i<j} wᵢ wⱼ ρᵢⱼ σᵢ σⱼ`;
+    const msg = `${corrOK?"✅":"❌"} Corr(${a},${b}): your ${to2(gCorr||0)}% → ${to2(trueCorr*100)}%\n` +
+
+                `Given Cov(${a},${b}) = ${to2(toPct(givenCov))} (%^2), SD(${a}) = ${to2(toPct(universe[a].sd))}%, SD(${b}) = ${to2(toPct(universe[b].sd))}%\n` +
+
+                `Corr = Cov / (SD(${a}) × SD(${b}))\n\n` +
+
+                `${vOK?"✅":"❌"} Var(Rₚ): your ${to2(v||0)} (%^2) → ${to2(vTrue)} (%^2)\n` +
+
+                `Var(Rₚ) = Σ wᵢ² σᵢ² + 2 Σ_{i<j} wᵢ wⱼ ρᵢⱼ σᵢ σⱼ`;
 
     setAns3(msg);
 
@@ -436,13 +436,13 @@ export default function PortfolioCovarianceLab(){
 
   function submit4(){
 
-    if(!main) return;
+    if(!selectedStock){ alert("Pick a stock first."); return; }
 
-    const beta = universe[main].beta; const trueER = rf + beta * mrp; // CAPM
+    const beta = universe[selectedStock].beta; const trueER = rf + beta * mrp; // CAPM
 
     const g = parseFloat(capmGuess||"NaN")/100; const ok = Math.abs((g||0)-trueER) <= 0.003; // ~0.3pp
 
-    const msg = `${ok?"✅":"❌"} E[R_${main}] = r_f + β (E[R_m]-r_f) = ${to2(rf*100)}% + ${beta.toFixed(2)} × ${to2(mrp*100)}% = ${to2(trueER*100)}%`;
+    const msg = `${ok?"✅":"❌"} E[R_${selectedStock}] = r_f + β (E[R_m]-r_f) = ${to2(rf*100)}% + ${beta.toFixed(2)} × ${to2(mrp*100)}% = ${to2(trueER*100)}%`;
 
     setAns4(msg);
 
@@ -450,357 +450,390 @@ export default function PortfolioCovarianceLab(){
 
   }
 
-  useEffect(()=>{ // default pair suggestion once main set
+  useEffect(()=>{ // default pair suggestion
 
-    if(main){ const b = allTickers.find(t=> t!==main)!; setCorrPair([main, b]); }
+    if(allTickers.length >= 2 && !corrPair){ setCorrPair([allTickers[0], allTickers[1]]); }
 
-  },[main]);
-
-  // ===================== DEV TESTS =====================
-
-  useEffect(()=>{
-
-    // T1: newline join works
-
-    const demo = ["A","B","C"].join("\n") + "\nEND";
-
-    console.assert(demo === "A\nB\nC\nEND", "[Test] newline join should match");
-
-    // T2: variance non-negative
-
-    const wEq: Record<Ticker,number> = {AAPL:0.2,MSFT:0.2,NVDA:0.2,TSLA:0.2,KO:0.2};
-
-    const v2 = portfolioVariance(wEq, universe, BASE_CORR);
-
-    console.assert(v2 >= 0, "[Test] Var >= 0");
-
-    // T3: CAPM arithmetic stable
-
-    const er = rf + universe.AAPL.beta * mrp;
-
-    console.assert(Math.abs(er - (rf + universe.AAPL.beta*mrp)) < 1e-10, "[Test] CAPM calc stable");
-
-  },[universe, rf, mrp]);
+  },[allTickers.length]);
 
   // ===================== RENDER =====================
 
   return (
 
-    <div className="min-h-screen w-full flex items-center justify-center p-6" style={{ background: TIF_PAGE }}>
+    <div className="min-h-screen w-full flex items-center justify-center p-6 py-12" style={{ background: TIF_PAGE }}>
 
-      <AnimatePresence mode="wait">
+      <div className="relative w-full max-w-6xl space-y-0">
 
-        {/* ===================== STEP 1 ===================== */}
+        {/* Document holder style - show previous steps underneath, stacked */}
 
-        {step===1 && (
+          <DocumentCard step={2} color={STEP_THEME[2].fill} stroke={STEP_THEME[2].stroke} isActive={step === 2}>
 
-          <motion.section key="s1" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
+            <div className="p-4">
 
-            <StepShell color={STEP_THEME[1].fill} stroke={STEP_THEME[1].stroke} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
+              <div className="flex items-start justify-between mb-4">
 
-              <div className="p-6">
+                <h2 className="text-2xl md:text-3xl font-bold" style={{color:SLATE}}>Step 2 — Set portfolio weights & compute R<sub>p</sub></h2>
 
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex gap-2">
 
-                  <h1 className="text-3xl md:text-4xl font-bold" style={{color:SLATE}}>Step 1 — Pick your main stock</h1>
+                  <button onClick={randomizeWeights} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Random</button>
 
-                  <button onClick={reshuffleScenario} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Try different example</button>
+                  <button onClick={submit2} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background: SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
 
-                </div>
-
-                {/* Only company names here */}
-
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-
-                  {allTickers.map((t)=> (
-
-                    <button key={t} onClick={()=> setMain(t)} className={`rounded-2xl px-4 py-8 shadow transition text-center font-semibold border ${main===t?"scale-[1.02]" : "hover:scale-[1.02]"}`} style={{ background: main===t?"rgba(255,255,255,0.7)":"rgba(255,255,255,0.4)", color: SLATE, borderColor: STEP_THEME[1].stroke }}>
-
-                      {t}
-
-                    </button>
-
-                  ))}
-
-                </div>
-
-                <div className="mt-6 flex items-center justify-between">
-
-                  <div className="text-sm" style={{ color: SLATE }}>Selected main: {main ?? "—"}</div>
-
-                  <div className="flex gap-2">
-
-                    <button onClick={submit1} className={`px-4 py-2 rounded-xl text-white font-semibold shadow hover:brightness-110 hover:shadow-lg`} style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
-
-                    <button onClick={()=> canNext(1) && setStep(2)} disabled={!canNext(1)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(1)?"hover:brightness-110 hover:shadow-lg":"opacity-50 cursor-not-allowed"}`} style={{background:SLATE}}>→</button>
-
-                  </div>
+                  {step > 2 && <button onClick={()=> setStep(3)} className="rounded-full w-10 h-10 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>→</button>}
 
                 </div>
 
               </div>
 
-            </StepShell>
+              <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: "rgba(255,255,255,0.3)", borderColor: STEP_THEME[2].stroke}}>
 
-          </motion.section>
+                <table className="w-full text-xs">
 
-        )}
+                  <thead style={{ background: "rgba(255,255,255,0.5)" }}>
 
-        {/* ===================== STEP 2 ===================== */}
+                    <tr className="text-left">
 
-        {step===2 && (
+                      <th className="p-2" style={{color:SLATE}}>Ticker</th>
 
-          <motion.section key="s2" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
+                      <th className="p-2" style={{color:SLATE}}>R<sub>i</sub> (%)</th>
 
-            <StepShell color={STEP_THEME[2].fill} stroke={STEP_THEME[2].stroke} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
+                      <th className="p-2" style={{color:SLATE}}>Weight (%)</th>
 
-              <div className="p-6">
+                      <th className="p-2" style={{color:SLATE}}>w<sub>i</sub>·R<sub>i</sub> (%)</th>
 
-                <div className="flex items-start justify-between mb-4">
+                    </tr>
 
-                  <h2 className="text-2xl md:text-3xl font-bold" style={{color:SLATE}}>Step 2 — Set portfolio weights & compute R<sub>p</sub></h2>
+                  </thead>
 
-                  <div className="flex gap-2">
+                  <tbody>
 
-                    <button onClick={()=> setStep(1)} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>←</button>
+                    {allTickers.map(t=>{
 
-                    <button onClick={normalizeWeights} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Normalize</button>
+                      const s = universe[t]; const w = Math.trunc(weightsPct[t]||0); const contrib=(w/100)*s.r;
 
-                    <button onClick={submit2} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background: SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
+                      return (
 
-                    <button onClick={()=> canNext(2) && setStep(3)} disabled={!canNext(2)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(2)?"hover:brightness-110 hover:shadow-lg":"opacity-50 cursor-not-allowed"}`} style={{background:SLATE}}>→</button>
+                        <tr key={t} className="border-t" style={{borderColor:STEP_THEME[2].stroke}}>
 
-                  </div>
+                          <td className="p-2" style={{color:SLATE}}>{t}</td>
 
-                </div>
+                          <td className="p-2" style={{color:SLATE}}>{to2(toPct(s.r))}</td>
 
-                <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: STEP_THEME[2].fill, borderColor: STEP_THEME[2].stroke}}>
+                          <td className="p-2" style={{color:SLATE}}>{w}%</td>
 
-                  <table className="w-full text-sm">
+                          <td className="p-2" style={{color:SLATE}}>{to2(toPct(contrib))}</td>
 
-                    <thead style={{ background: "rgba(255,255,255,0.3)" }}>
+                        </tr>
 
-                      <tr className="text-left">
+                      );
 
-                        <th className="p-3" style={{color:SLATE}}>Ticker</th>
+                    })}
 
-                        <th className="p-3" style={{color:SLATE}}>Sector</th>
+                  </tbody>
 
-                        <th className="p-3" style={{color:SLATE}}>R<sub>i</sub> (%)</th>
-
-                        <th className="p-3" style={{color:SLATE}}>σ<sub>i</sub> (%)</th>
-
-                        <th className="p-3" style={{color:SLATE}}>β<sub>i</sub></th>
-
-                        <th className="p-3" style={{color:SLATE}}>Weight (%)</th>
-
-                        <th className="p-3" style={{color:SLATE}}>Corr with {main||"—"}</th>
-
-                        <th className="p-3" style={{color:SLATE}}>w<sub>i</sub>·R<sub>i</sub> (%)</th>
-
-                      </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                      {allTickers.map(t=>{
-
-                        const s = universe[t]; const w = Math.trunc(weightsPct[t]||0); const contrib=(w/100)*s.r;
-
-                        const showCorr = main? `${to2(corr[t][main]*100)}%` : "–";
-
-                        return (
-
-                          <tr key={t} className="border-t" style={{borderColor:STEP_THEME[2].stroke}}>
-
-                            <td className="p-3" style={{color:SLATE}}>{t}</td>
-
-                            <td className="p-3" style={{color:SLATE}}>{s.sector}</td>
-
-                            <td className="p-3" style={{color:SLATE}}>{to2(toPct(s.r))}</td>
-
-                            <td className="p-3" style={{color:SLATE}}>{to2(toPct(s.sd))}</td>
-
-                            <td className="p-3" style={{color:SLATE}}>{s.beta.toFixed(2)}</td>
-
-                            <td className="p-3">
-
-                              <input type="number" step={1} min={0} max={100} value={w}
-
-                                onChange={(e)=> {
-
-                                  const v = Math.trunc(Number(e.target.value));
-
-                                  setWeightsPct(prev=> ({...prev, [t]: Number.isFinite(v)? Math.max(0, Math.min(100, v)) : 0}));
-
-                                }}
-
-                                className="w-24 rounded-xl px-2 py-1 border bg-white"/>
-
-                            </td>
-
-                            <td className="p-3" style={{color:SLATE}}>{showCorr}</td>
-
-                            <td className="p-3" style={{color:SLATE}}>{to2(toPct(contrib))}</td>
-
-                          </tr>
-
-                        );
-
-                      })}
-
-                      <tr className="border-t" style={{borderColor:STEP_THEME[2].stroke}}>
-
-                        <td className="p-3 font-semibold" style={{color:SLATE}} colSpan={5}>Totals</td>
-
-                        <td className="p-3 font-semibold" style={{color:SLATE}}>{allTickers.reduce((s,t)=> s + Math.trunc(weightsPct[t]||0), 0)}%</td>
-
-                        <td className="p-3" />
-
-                        <td className="p-3 font-semibold" style={{color:SLATE}}>—</td>
-
-                      </tr>
-
-                    </tbody>
-
-                  </table>
-
-                </div>
-
-                <div className="rounded-2xl p-4 mb-2" style={{ background: STEP_THEME[2].fill, border: `1px solid ${STEP_THEME[2].stroke}`}}>
-
-                  <label className="text-sm block mb-1" style={{color:SLATE}}>Your R<sub>p</sub> (%) — compute Σ w<sub>i</sub>R<sub>i</sub> yourself, then enter:</label>
-
-                  <input type="number" step={1} value={rpGuess} onChange={(e)=> setRpGuess(e.target.value)} className="w-40 rounded-xl px-3 py-2 border bg-white"/>
-
-                  {rpChecked ? <span className="ml-3 text-sm" style={{color:SLATE}}>Submitted ✓</span> : null}
-
-                </div>
-
-                {ans2 && (
-
-                  <div className="mt-2 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[2].fill, border: `1px solid ${STEP_THEME[2].stroke}`}}>
-
-                    <div className="font-semibold mb-2" style={{color:SLATE}}>Answer sheet</div>
-
-                    <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans2}</pre>
-
-                  </div>
-
-                )}
+                </table>
 
               </div>
 
-            </StepShell>
+              {step === 2 && (
 
-          </motion.section>
+                <>
 
-        )}
+                  <div className="rounded-2xl p-4 mb-2" style={{ background: STEP_THEME[2].fill, border: `1px solid ${STEP_THEME[2].stroke}`}}>
 
-        {/* ===================== STEP 3 ===================== */}
+                    <label className="text-sm block mb-1" style={{color:SLATE}}>Your R<sub>p</sub> (%) — compute Σ w<sub>i</sub>R<sub>i</sub>:</label>
 
-        {step===3 && (
-
-          <motion.section key="s3" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
-
-            <StepShell color={STEP_THEME[3].fill} stroke={STEP_THEME[3].stroke} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
-
-              <div className="p-6">
-
-                <div className="flex items-start justify-between mb-2">
-
-                  <h2 className="text-2xl md:text-3xl font-bold text-white">Step 3 — Covariance, Correlation & Var(R<sub>p</sub>)</h2>
-
-                  <div className="flex gap-2">
-
-                    <button onClick={()=> setStep(2)} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>←</button>
-
-                    <button onClick={()=> setModalOpen(true)} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Explain</button>
-
-                    <button onClick={submit3} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
-
-                    <button onClick={()=> canNext(3) && setStep(4)} disabled={!canNext(3)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(3)?"hover:brightness-110 hover:shadow-lg":"opacity-50 cursor-not-allowed"}`} style={{background:SLATE}}>→</button>
+                    <input type="number" step={1} value={rpGuess} onChange={(e)=> setRpGuess(e.target.value)} className="w-40 rounded-xl px-3 py-2 border bg-white"/>
 
                   </div>
 
+                  {ans2 && (
+
+                    <div className="mt-2 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[2].fill, border: `1px solid ${STEP_THEME[2].stroke}`}}>
+
+                      <div className="font-semibold mb-2" style={{color:SLATE}}>Answer sheet</div>
+
+                      <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans2}</pre>
+
+                    </div>
+
+                  )}
+
+                </>
+
+              )}
+
+
+            </div>
+
+          </DocumentCard>
+
+        )}
+
+        {step >= 3 && (
+
+          <DocumentCard step={3} color={STEP_THEME[3].fill} stroke={STEP_THEME[3].stroke} isActive={step === 3}>
+
+            <div className="p-4">
+
+              <div className="flex items-start justify-between mb-2">
+
+                <h2 className="text-2xl md:text-3xl font-bold text-white">Step 3 — Covariance, Correlation & Var(R<sub>p</sub>)</h2>
+
+                <div className="flex gap-2">
+
+                  {step > 3 && <button onClick={()=> setStep(2)} className="rounded-full w-10 h-10 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>←</button>}
+
+                  <button onClick={()=> setModalOpen(true)} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Explain</button>
+
+                  <button onClick={submit3} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
+
+                  {step > 3 && <button onClick={()=> setStep(4)} className="rounded-full w-10 h-10 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>→</button>}
+
                 </div>
 
-                <div className="rounded-2xl p-4 mb-3" style={{background:"rgba(255,255,255,0.15)", border:`1px solid ${STEP_THEME[3].stroke}`}}>
+              </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+              {step === 3 && (
 
-                    <div>
+                <>
 
-                      <label className="text-sm text-white">Choose a pair (Corr is given)</label>
+                  <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: "rgba(255,255,255,0.15)", borderColor: STEP_THEME[3].stroke}}>
 
-                      <div className="flex gap-2 mt-1">
+                    <table className="w-full text-xs">
 
-                        <select value={corrPair?.[0]||""} onChange={(e)=> setCorrPair([e.target.value as Ticker, corrPair?.[1] || allTickers[0]])} className="rounded-xl px-3 py-2 border bg-white min-w-[120px]">
+                      <thead style={{ background: "rgba(255,255,255,0.2)" }}>
 
-                          <option value="">—</option>
+                        <tr className="text-left">
 
-                          {allTickers.map(t=> <option key={t} value={t}>{t}</option>)}
+                          <th className="p-2" style={{color:"white"}}>Ticker</th>
 
-                        </select>
+                          <th className="p-2" style={{color:"white"}}>SD (σ<sub>i</sub>) (%)</th>
 
-                        <span className="text-white">×</span>
+                          <th className="p-2" style={{color:"white"}}>Weight (%)</th>
 
-                        <select value={corrPair?.[1]||""} onChange={(e)=> setCorrPair([corrPair?.[0] || allTickers[0], e.target.value as Ticker])} className="rounded-xl px-3 py-2 border bg-white min-w-[120px]">
+                        </tr>
 
-                          <option value="">—</option>
+                      </thead>
 
-                          {allTickers.map(t=> <option key={t} value={t}>{t}</option>)}
+                      <tbody>
 
-                        </select>
+                        {allTickers.map(t=>{
+
+                          const s = universe[t]; const w = Math.trunc(weightsPct[t]||0);
+
+                          return (
+
+                            <tr key={t} className="border-t" style={{borderColor:STEP_THEME[3].stroke}}>
+
+                              <td className="p-2" style={{color:"white"}}>{t}</td>
+
+                              <td className="p-2" style={{color:"white"}}>{to2(toPct(s.sd))}</td>
+
+                              <td className="p-2" style={{color:"white"}}>{w}%</td>
+
+                            </tr>
+
+                          );
+
+                        })}
+
+                      </tbody>
+
+                    </table>
+
+                  </div>
+
+                  <div className="rounded-2xl p-4 mb-3" style={{background:"rgba(255,255,255,0.15)", border:`1px solid ${STEP_THEME[3].stroke}`}}>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+
+                      <div>
+
+                        <label className="text-sm text-white block mb-1">Choose a pair</label>
+
+                        <div className="flex gap-2">
+
+                          <select value={corrPair?.[0]||""} onChange={(e)=> setCorrPair([e.target.value as Ticker, corrPair?.[1] || allTickers[0]])} className="rounded-xl px-3 py-2 border bg-white min-w-[100px] text-sm">
+
+                            <option value="">—</option>
+
+                            {allTickers.map(t=> <option key={t} value={t}>{t}</option>)}
+
+                          </select>
+
+                          <span className="text-white flex items-center">×</span>
+
+                          <select value={corrPair?.[1]||""} onChange={(e)=> setCorrPair([corrPair?.[0] || allTickers[0], e.target.value as Ticker])} className="rounded-xl px-3 py-2 border bg-white min-w-[100px] text-sm">
+
+                            <option value="">—</option>
+
+                            {allTickers.map(t=> <option key={t} value={t}>{t}</option>)}
+
+                          </select>
+
+                        </div>
 
                       </div>
 
-                      {corrPair && (
+                    </div>
 
-                        <div className="mt-2 text-white text-sm">Given Corr({corrPair[0]},{corrPair[1]}) = {to2(corr[corrPair[0]][corrPair[1]]*100)}%</div>
+                    {corrPair && (
 
-                      )}
+                      <div className="space-y-3">
+
+                        <div className="rounded-lg p-3 bg-white/20">
+
+                          <div className="text-white text-sm mb-2">Given Cov({corrPair[0]}, {corrPair[1]}) = {to2(toPct(covMatrix[corrPair[0]][corrPair[1]]))} (%²)</div>
+
+                          <div className="text-white text-sm">SD({corrPair[0]}) = {to2(toPct(universe[corrPair[0]].sd))}%</div>
+
+                          <div className="text-white text-sm">SD({corrPair[1]}) = {to2(toPct(universe[corrPair[1]].sd))}%</div>
+
+                        </div>
+
+                        <div>
+
+                          <label className="text-sm text-white block mb-1">Your Corr({corrPair[0]}, {corrPair[1]}) (%) — calculate from Cov and SDs:</label>
+
+                          <input type="number" step="0.01" value={corrGuess} onChange={(e)=> setCorrGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border bg-white"/>
+
+                          <div className="text-xs text-white/90 mt-1">Corr = Cov / (SD₁ × SD₂)</div>
+
+                        </div>
+
+                        <div>
+
+                          <label className="text-sm text-white block mb-1">Your Var(R<sub>p</sub>) (%²)</label>
+
+                          <input type="number" step="0.001" value={varGuess} onChange={(e)=> setVarGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border bg-white"/>
+
+                          <div className="text-xs text-white/90 mt-1">Use calculated correlations for all pairs</div>
+
+                        </div>
+
+                      </div>
+
+                    )}
+
+                  </div>
+
+                  {ans3 && (
+
+                    <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${STEP_THEME[3].stroke}`}}>
+
+                      <div className="font-semibold mb-2 text-white">Answer sheet</div>
+
+                      <pre className="text-xs whitespace-pre-wrap text-white">{ans3}</pre>
 
                     </div>
 
-                    <div className="col-span-2">
+                  )}
 
-                      <label className="text-sm text-white">Your Var(R<sub>p</sub>) (%^2)</label>
+                </>
 
-                      <input type="number" step="0.001" value={varGuess} onChange={(e)=> setVarGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border bg-white"/>
+              )}
 
-                      <div className="text-xs text-white/90 mt-1">Hint: Var adds own variances and all pairwise covariances; ρ is the relationship part.</div>
+            </div>
+
+          </DocumentCard>
+
+        )}
+
+        {step >= 4 && (
+
+          <DocumentCard step={4} color={STEP_THEME[4].fill} stroke={STEP_THEME[4].stroke} isActive={step === 4}>
+
+            <div className="p-4">
+
+              <div className="flex items-start justify-between mb-2">
+
+                <h2 className="text-2xl md:text-3xl font-bold" style={{color:SLATE}}>Step 4 — CAPM Expected Return</h2>
+
+                <div className="flex gap-2">
+
+                  <button onClick={()=> setStep(3)} className="rounded-full w-10 h-10 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>←</button>
+
+                  {s4 ? (
+
+                    <button onClick={reshuffleScenario} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>New example</button>
+
+                  ) : (
+
+                    <button onClick={submit4} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
+
+                  )}
+
+                </div>
+
+              </div>
+
+              {step === 4 && (
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+                  <div className="rounded-2xl p-4 border" style={{background:STEP_THEME[4].fill, borderColor:STEP_THEME[4].stroke}}>
+
+                    <div className="text-sm mb-3" style={{color:SLATE}}>
+
+                      CAPM: E[R<sub>i</sub>] = r<sub>f</sub> + β<sub>i</sub> (E[R<sub>m</sub>] − r<sub>f</sub>)
+
+                    </div>
+
+                    <div className="flex gap-4 mb-3">
+
+                      <div>
+
+                        <label className="text-sm" style={{color:SLATE}}>r<sub>f</sub> (%)</label>
+
+                        <input type="number" step="0.01" value={to2(rf*100)} onChange={(e)=> setRf(Number(e.target.value)/100)} className="w-24 rounded-xl px-2 py-1 border bg-white text-sm"/>
+
+                      </div>
+
+                      <div>
+
+                        <label className="text-sm" style={{color:SLATE}}>MRP (%)</label>
+
+                        <input type="number" step="0.01" value={to2(mrp*100)} onChange={(e)=> setMrp(Number(e.target.value)/100)} className="w-24 rounded-xl px-2 py-1 border bg-white text-sm"/>
+
+                      </div>
+
+                    </div>
+
+                    <div className="mb-3">
+
+                      <label className="text-sm block mb-1" style={{color:SLATE}}>Select stock:</label>
+
+                      <select value={selectedStock||""} onChange={(e)=> setSelectedStock(e.target.value as Ticker)} className="w-full rounded-xl px-3 py-2 border bg-white text-sm">
+
+                        <option value="">—</option>
+
+                        {allTickers.map(t=> <option key={t} value={t}>{t} (β={universe[t].beta.toFixed(2)})</option>)}
+
+                      </select>
+
+                    </div>
+
+                    <div>
+
+                      <label className="text-sm block mb-1" style={{color:SLATE}}>Your E[R] (%)</label>
+
+                      <input type="number" step="0.01" value={capmGuess} onChange={(e)=> setCapmGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border bg-white text-sm"/>
 
                     </div>
 
                   </div>
 
-                </div>
+                  <div className="rounded-2xl p-4 border" style={{background:STEP_THEME[4].fill, borderColor:STEP_THEME[4].stroke}}>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="text-sm mb-2" style={{color:SLATE}}>Stock betas:</div>
 
-                  {s3 ? (
+                    <ul className="text-sm space-y-1" style={{color:SLATE}}>
 
-                    <div className="rounded-2xl p-4" style={{background:"rgba(255,255,255,0.15)", border:`1px solid ${STEP_THEME[3].stroke}`}}>
+                      {allTickers.map(t=> (
 
-                      <div className="text-white font-semibold mb-2">Your portfolio (computed after submit)</div>
-
-                      <div className="text-white text-sm">σ<sub>p</sub> = {to2(toPct(pSd))}% | Var(R<sub>p</sub>) = {to2(toPct(toPct(pVar)))} (%^2)</div>
-
-                    </div>
-
-                  ) : null}
-
-                  <div className="rounded-2xl p-4" style={{background:"rgba(255,255,255,0.15)", border:`1px solid ${STEP_THEME[3].stroke}`}}>
-
-                    <div className="text-white font-semibold mb-2">Correlations with main ({main||"—"})</div>
-
-                    <ul className="text-white text-sm list-disc pl-6">
-
-                      {main && allTickers.filter(t=>t!==main).map(t=> (
-
-                        <li key={t}>{main}–{t}: {to2(corr[main][t]*100)}%</li>
+                        <li key={t}>{t}: β = {universe[t].beta.toFixed(2)}</li>
 
                       ))}
 
@@ -810,190 +843,108 @@ export default function PortfolioCovarianceLab(){
 
                 </div>
 
-                {ans3 && (
+              )}
 
-                  <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${STEP_THEME[3].stroke}`}}>
+              {ans4 && step === 4 && (
 
-                    <div className="font-semibold mb-2 text-white">Answer sheet</div>
+                <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[4].fill, border: `1px solid ${STEP_THEME[4].stroke}`}}>
 
-                    <pre className="text-xs whitespace-pre-wrap text-white">{ans3}</pre>
+                  <div className="font-semibold mb-2" style={{color:SLATE}}>Answer sheet</div>
 
-                  </div>
-
-                )}
-
-                <Modal open={modalOpen} onClose={()=> setModalOpen(false)}>
-
-                  <h3 className="text-xl font-bold mb-3" style={{color:SLATE}}>Understanding Covariance and Correlation</h3>
-
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-base font-semibold mb-2" style={{color:SLATE}}>What is Covariance?</h4>
-                      <p className="text-sm mb-2" style={{color:SLATE}}>
-                        Covariance measures how two stocks move together. It depends on two things:
-                      </p>
-                      <ul className="list-disc list-inside text-sm mb-2 ml-2" style={{color:SLATE}}>
-                        <li><b>Individual volatility:</b> The variance/standard deviation of returns for each stock (σ<sub>i</sub> and σ<sub>j</sub>)</li>
-                        <li><b>Their relationship:</b> How they tend to move together (the correlation ρ<sub>ij</sub>)</li>
-                      </ul>
-                      <p className="text-sm mb-2" style={{color:SLATE}}>
-                        Think of Gala and Honeycrisp apples: they aren't independent—weather and demand affect both varieties. When one goes up, the other tends to go up too, so their covariance is positive. If one usually rises when the other falls, covariance can be negative.
-                      </p>
-                      <pre className="text-sm p-3 rounded-lg bg-gray-50 border mt-2">Cov(R<sub>i</sub>, R<sub>j</sub>) = ρ<sub>ij</sub> · σ<sub>i</sub> · σ<sub>j</sub></pre>
-                    </div>
-
-                    <div>
-                      <h4 className="text-base font-semibold mb-2" style={{color:SLATE}}>What is Correlation?</h4>
-                      <p className="text-sm mb-2" style={{color:SLATE}}>
-                        Correlation is scaled covariance. Once we have the covariance, we calculate correlation by dividing by the product of both stocks' standard deviations. This gives us a number between -1 and +1 that's easier to interpret.
-                      </p>
-                      <pre className="text-sm p-3 rounded-lg bg-gray-50 border">Corr(R<sub>i</sub>, R<sub>j</sub>) = Cov(R<sub>i</sub>, R<sub>j</sub>) / (SD(R<sub>i</sub>) · SD(R<sub>j</sub>))</pre>
-                      <p className="text-sm mt-2" style={{color:SLATE}}>
-                        In this exercise, <b>correlation is given</b> for each pair. You can think of it as the "relationship strength" between the two stocks.
-                      </p>
-                    </div>
-
-                    <div>
-                      <h4 className="text-base font-semibold mb-2" style={{color:SLATE}}>Using Correlation to Calculate Portfolio Variance</h4>
-                      <p className="text-sm mb-2" style={{color:SLATE}}>
-                        Portfolio variance depends on both each stock's own variance and the relationships (correlations) between all pairs:
-                      </p>
-                      <pre className="text-sm p-3 rounded-lg bg-gray-50 border">Var(R<sub>p</sub>) = Σ w<sub>i</sub>² σ<sub>i</sub>² + 2 Σ<sub>i&lt;j</sub> w<sub>i</sub> w<sub>j</sub> ρ<sub>ij</sub> σ<sub>i</sub> σ<sub>j</sub></pre>
-                      <p className="text-sm mt-2" style={{color:SLATE}}>
-                        The first term captures each stock's individual risk. The second term captures how pairs of stocks move together—diversification reduces risk when correlations are lower.
-                      </p>
-                    </div>
-                  </div>
-
-                </Modal>
-
-              </div>
-
-            </StepShell>
-
-          </motion.section>
-
-        )}
-
-        {/* ===================== STEP 4 ===================== */}
-
-        {step===4 && (
-
-          <motion.section key="s4" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
-
-            <StepShell color={STEP_THEME[4].fill} stroke={STEP_THEME[4].stroke} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
-
-              <div className="p-6">
-
-                <div className="flex items-start justify-between mb-2">
-
-                  <h2 className="text-2xl md:text-3xl font-bold" style={{color:SLATE}}>Step 4 — CAPM Expected Return for your main stock</h2>
-
-                  <div className="flex gap-2">
-
-                    <button onClick={()=> setStep(3)} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>←</button>
-
-                    {s4 ? (
-
-                      <button onClick={reshuffleScenario} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Try different example</button>
-
-                    ) : (
-
-                      <button onClick={submit4} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
-
-                    )}
-
-                  </div>
+                  <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans4}</pre>
 
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              )}
 
-                  <div className="rounded-2xl p-4 border" style={{background:STEP_THEME[4].fill, borderColor:STEP_THEME[4].stroke}}>
+            </div>
 
-                    <div className="text-sm" style={{color:SLATE}}>
-
-                      CAPM says the expected return equals a safe baseline plus compensation for undiversifiable market risk:
-
-                    </div>
-
-                    <pre className="mt-2 p-3 rounded-lg bg-white/80 border">E[R<sub>i</sub>] = r<sub>f</sub> + β<sub>i</sub> (E[R<sub>m</sub>] − r<sub>f</sub>)</pre>
-
-                    <ul className="list-disc pl-6 mt-2 text-sm" style={{color:SLATE}}>
-
-                      <li><b>r<sub>f</sub></b>: a near‑riskless baseline (set below).</li>
-
-                      <li><b>β<sub>i</sub></b>: sensitivity to market swings (systematic risk).</li>
-
-                      <li><b>E[R<sub>m</sub>] − r<sub>f</sub></b>: market risk premium.</li>
-
-                    </ul>
-
-                  </div>
-
-                  <div className="rounded-2xl p-4 border" style={{background:STEP_THEME[4].fill, borderColor:STEP_THEME[4].stroke}}>
-
-                    <div className="text-sm mb-2" style={{color:SLATE}}>Parameters</div>
-
-                    <div className="flex gap-4 mb-3">
-
-                      <div>
-
-                        <label className="text-sm" style={{color:SLATE}}>r<sub>f</sub> (%)</label>
-
-                        <input type="number" step="0.01" value={to2(rf*100)} onChange={(e)=> setRf(Number(e.target.value)/100)} className="w-28 rounded-xl px-3 py-2 border bg-white"/>
-
-                      </div>
-
-                      <div>
-
-                        <label className="text-sm" style={{color:SLATE}}>MRP (%)</label>
-
-                        <input type="number" step="0.01" value={to2(mrp*100)} onChange={(e)=> setMrp(Number(e.target.value)/100)} className="w-28 rounded-xl px-3 py-2 border bg-white"/>
-
-                      </div>
-
-                    </div>
-
-                    <div className="text-sm" style={{color:SLATE}}>main = {main||"—"} (β={main?universe[main].beta.toFixed(2):"—"})</div>
-
-                    <div className="mt-3">
-
-                      <label className="text-sm" style={{color:SLATE}}>Your E[R] for main (%)</label>
-
-                      <input type="number" step="0.01" value={capmGuess} onChange={(e)=> setCapmGuess(e.target.value)} className="w-48 rounded-xl px-3 py-2 border bg-white"/>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-                {ans4 && (
-
-                  <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[4].fill, border: `1px solid ${STEP_THEME[4].stroke}`}}>
-
-                    <div className="font-semibold mb-2" style={{color:SLATE}}>Answer sheet</div>
-
-                    <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans4}</pre>
-
-                  </div>
-
-                )}
-
-              </div>
-
-            </StepShell>
-
-          </motion.section>
+          </DocumentCard>
 
         )}
 
-      </AnimatePresence>
+        <Modal open={modalOpen} onClose={()=> setModalOpen(false)}>
+
+          <h3 className="text-xl font-bold mb-3" style={{color:SLATE}}>Understanding Covariance and Correlation</h3>
+
+          <div className="space-y-4">
+
+            <div>
+
+              <h4 className="text-base font-semibold mb-2" style={{color:SLATE}}>What is Covariance?</h4>
+
+              <p className="text-sm mb-2" style={{color:SLATE}}>
+
+                Covariance measures how two stocks move together. It depends on two things:
+
+              </p>
+
+              <ul className="list-disc list-inside text-sm mb-2 ml-2" style={{color:SLATE}}>
+
+                <li><b>Individual volatility:</b> The variance/standard deviation of returns for each stock (σ<sub>i</sub> and σ<sub>j</sub>)</li>
+
+                <li><b>Their relationship:</b> How they tend to move together (the correlation ρ<sub>ij</sub>)</li>
+
+              </ul>
+
+              <p className="text-sm mb-2" style={{color:SLATE}}>
+
+                Think of Gala and Honeycrisp apples: they aren't independent—weather and demand affect both varieties. When one goes up, the other tends to go up too, so their covariance is positive. If one usually rises when the other falls, covariance can be negative.
+
+              </p>
+
+              <pre className="text-sm p-3 rounded-lg bg-gray-50 border mt-2">Cov(R<sub>i</sub>, R<sub>j</sub>) = ρ<sub>ij</sub> · σ<sub>i</sub> · σ<sub>j</sub></pre>
+
+            </div>
+
+            <div>
+
+              <h4 className="text-base font-semibold mb-2" style={{color:SLATE}}>What is Correlation?</h4>
+
+              <p className="text-sm mb-2" style={{color:SLATE}}>
+
+                Correlation is scaled covariance. Once we have the covariance, we calculate correlation by dividing by the product of both stocks' standard deviations. This gives us a number between -1 and +1 that's easier to interpret.
+
+              </p>
+
+              <pre className="text-sm p-3 rounded-lg bg-gray-50 border">Corr(R<sub>i</sub>, R<sub>j</sub>) = Cov(R<sub>i</sub>, R<sub>j</sub>) / (SD(R<sub>i</sub>) · SD(R<sub>j</sub>))</pre>
+
+              <p className="text-sm mt-2" style={{color:SLATE}}>
+
+                In this exercise, <b>covariance is given</b>. You calculate correlation from it, then use correlation to find portfolio variance.
+
+              </p>
+
+            </div>
+
+            <div>
+
+              <h4 className="text-base font-semibold mb-2" style={{color:SLATE}}>Using Correlation to Calculate Portfolio Variance</h4>
+
+              <p className="text-sm mb-2" style={{color:SLATE}}>
+
+                Portfolio variance depends on both each stock's own variance and the relationships (correlations) between all pairs:
+
+              </p>
+
+              <pre className="text-sm p-3 rounded-lg bg-gray-50 border">Var(R<sub>p</sub>) = Σ w<sub>i</sub>² σ<sub>i</sub>² + 2 Σ<sub>i&lt;j</sub> w<sub>i</sub> w<sub>j</sub> ρ<sub>ij</sub> σ<sub>i</sub> σ<sub>j</sub></pre>
+
+              <p className="text-sm mt-2" style={{color:SLATE}}>
+
+                The first term captures each stock's individual risk. The second term captures how pairs of stocks move together—diversification reduces risk when correlations are lower.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </Modal>
+
+      </div>
 
     </div>
 
   );
 
 }
-
