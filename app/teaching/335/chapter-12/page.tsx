@@ -790,21 +790,19 @@ export default function PortfolioCovarianceLab(){
 
                     )}
 
+                </div>
+
+                {ans2 && (
+
+                  <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${STEP_THEME[2].stroke}`}}>
+
+                    <div className="font-semibold mb-2 text-white">Answer sheet</div>
+
+                    <pre className="text-xs whitespace-pre-wrap text-white">{ans2}</pre>
+
                   </div>
 
-                  {ans2 && (
-
-                    <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${STEP_THEME[2].stroke}`}}>
-
-                      <div className="font-semibold mb-2 text-white">Answer sheet</div>
-
-                      <pre className="text-xs whitespace-pre-wrap text-white">{ans2}</pre>
-
-                    </div>
-
-                  )}
-
-                </div>
+                )}
 
               </div>
 
@@ -917,8 +915,6 @@ export default function PortfolioCovarianceLab(){
                   </div>
 
                 </div>
-
-              )}
 
                 {ans3 && (
 
