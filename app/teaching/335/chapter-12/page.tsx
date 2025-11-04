@@ -167,7 +167,7 @@ function FolderShape({ width = 1100, height = 640, color, stroke, pad = 28, chil
 
       <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="xMidYMid meet" className="rounded-[20px] block" style={{ maxWidth: "100%", display: "block", position: "relative", zIndex: 0 }}>
 
-        <path d={d} fill={color} stroke={stroke} strokeWidth={2} />
+        <path d={d} fill={color} stroke={stroke} strokeWidth={4} />
 
       </svg>
 
@@ -338,6 +338,10 @@ export default function PortfolioCovarianceLab(){
 
   const [modalOpen, setModalOpen] = useState(false);
 
+  const [answerModalOpen, setAnswerModalOpen] = useState(false);
+
+  const [currentAnswer, setCurrentAnswer] = useState<string | null>(null);
+
   function randomizeWeights(){
 
     const total = 100;
@@ -430,11 +434,17 @@ export default function PortfolioCovarianceLab(){
 
     const verdict = ok ? "✅ Correct" : `❌ Not quite (your ${to2(g)}% vs hidden true ${trueRpPct}%).`;
 
-    setAns1(lines.join("\n") + "\n\nRₚ check → " + verdict);
+    const answer = lines.join("\n") + "\n\nRₚ check → " + verdict;
+
+    setAns1(answer);
+
+    setCurrentAnswer(answer);
 
     setRpChecked(true);
 
     setS1(true);
+
+    setAnswerModalOpen(true);
 
   }
 
@@ -478,7 +488,11 @@ export default function PortfolioCovarianceLab(){
 
     setAns2(msg);
 
+    setCurrentAnswer(msg);
+
     setS2(true);
+
+    setAnswerModalOpen(true);
 
   }
 
@@ -494,7 +508,11 @@ export default function PortfolioCovarianceLab(){
 
     setAns3(msg);
 
+    setCurrentAnswer(msg);
+
     setS3(true);
+
+    setAnswerModalOpen(true);
 
   }
 
@@ -508,7 +526,7 @@ export default function PortfolioCovarianceLab(){
 
   return (
 
-    <div className="min-h-screen w-full" style={{ background: TIF_PAGE, overflowX: "hidden", overflowY: "auto" }}>
+    <div className="min-h-screen w-full" style={{ backgroundImage: "url('/images/city_background.jpg')", backgroundSize: "cover", backgroundPosition: "center", backgroundAttachment: "fixed", overflowX: "hidden", overflowY: "auto" }}>
 
       <div className="flex items-start justify-center min-h-screen py-6 px-4 md:px-6" style={{ overflowX: "visible", position: "relative" }}>
 
@@ -540,7 +558,7 @@ export default function PortfolioCovarianceLab(){
 
                 </div>
 
-                <div className="rounded-2xl overflow-hidden shadow-lg mb-4" style={{ background: "white", border: `3px solid ${STEP_THEME[1].stroke}`, maxHeight: "500px", overflowY: "auto" }}>
+                <div className="rounded-2xl overflow-hidden shadow mb-4" style={{ background: "white", border: `1px solid ${STEP_THEME[1].stroke}`, maxHeight: "500px", overflowY: "auto" }}>
 
                   <table className="w-full text-sm">
 
@@ -590,7 +608,7 @@ export default function PortfolioCovarianceLab(){
 
                                 }}
 
-                                className="w-24 rounded-xl px-2 py-1 border-2 bg-white" style={{ borderColor: STEP_THEME[1].stroke }}/>
+                                className="w-24 rounded-xl px-2 py-1 border bg-white" style={{ borderColor: STEP_THEME[1].stroke }}/>
 
                             </td>
 
@@ -618,23 +636,17 @@ export default function PortfolioCovarianceLab(){
 
                 </div>
 
-                <div className="rounded-2xl p-4 mb-2" style={{ background: "white", border: `3px solid ${STEP_THEME[1].stroke}`, boxShadow: `0 2px 8px rgba(0,0,0,0.1)` }}>
+                <div className="rounded-2xl p-4 mb-2" style={{ background: "white", border: `1px solid ${STEP_THEME[1].stroke}`, boxShadow: `0 1px 3px rgba(0,0,0,0.1)` }}>
 
                   <label className="text-sm block mb-1 font-semibold" style={{color:SLATE}}>Your R<sub>p</sub> (%) — compute Σ w<sub>i</sub>R<sub>i</sub>:</label>
 
-                  <input type="number" step={1} value={rpGuess} onChange={(e)=> setRpGuess(e.target.value)} className="w-40 rounded-xl px-3 py-2 border-2" style={{ borderColor: STEP_THEME[1].stroke, bg: "white" }}/>
+                  <input type="number" step={1} value={rpGuess} onChange={(e)=> setRpGuess(e.target.value)} className="w-40 rounded-xl px-3 py-2 border bg-white" style={{ borderColor: STEP_THEME[1].stroke }}/>
 
                 </div>
 
-                {ans1 && (
+                {s1 && (
 
-                  <div className="mt-2 p-4 rounded-xl shadow-lg" style={{ background: "white", border: `3px solid ${STEP_THEME[1].stroke}`, maxHeight: "400px", overflowY: "auto" }}>
-
-                    <div className="font-semibold mb-2 text-lg" style={{color:STEP_THEME[1].stroke}}>Answer sheet</div>
-
-                    <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans1}</pre>
-
-                  </div>
+                  <button onClick={()=> {setCurrentAnswer(ans1); setAnswerModalOpen(true);}} className="mt-3 w-full px-4 py-2 rounded-xl text-white font-semibold shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>View Answer</button>
 
                 )}
 
@@ -720,7 +732,7 @@ export default function PortfolioCovarianceLab(){
 
                 </div>
 
-                <div className="rounded-2xl p-4 mb-3" style={{background:"white", border:`3px solid ${STEP_THEME[2].stroke}`, boxShadow: `0 2px 8px rgba(0,0,0,0.1)`, maxHeight: "600px", overflowY: "auto" }}>
+                <div className="rounded-2xl p-4 mb-3" style={{background:"white", border:`1px solid ${STEP_THEME[2].stroke}`, boxShadow: `0 1px 3px rgba(0,0,0,0.1)`, maxHeight: "600px", overflowY: "auto" }}>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
 
@@ -758,7 +770,7 @@ export default function PortfolioCovarianceLab(){
 
                       <div className="space-y-3">
 
-                        <div className="rounded-lg p-3" style={{ background: STEP_THEME[2].fill, border: `2px solid ${STEP_THEME[2].stroke}` }}>
+                        <div className="rounded-lg p-3" style={{ background: STEP_THEME[2].fill, border: `1px solid ${STEP_THEME[2].stroke}` }}>
 
                           <div className="text-sm mb-2 font-semibold" style={{color:SLATE}}>Given Cov({corrPair[0]}, {corrPair[1]}) = {to2(toPct(covMatrix[corrPair[0]][corrPair[1]]))} (%²)</div>
 
@@ -768,23 +780,27 @@ export default function PortfolioCovarianceLab(){
 
                         </div>
 
-                        <div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                          <label className="text-sm block mb-1 font-semibold" style={{color:SLATE}}>Your Corr({corrPair[0]}, {corrPair[1]}) (%) — calculate from Cov and SDs:</label>
+                          <div>
 
-                          <input type="number" step="0.01" value={corrGuess} onChange={(e)=> setCorrGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border-2 bg-white" style={{ borderColor: STEP_THEME[2].stroke }}/>
+                            <label className="text-sm block mb-1 font-semibold" style={{color:SLATE}}>Your Corr({corrPair[0]}, {corrPair[1]}) (%) — calculate from Cov and SDs:</label>
 
-                          <div className="text-xs mt-1" style={{color:SLATE, opacity: 0.7}}>Corr = Cov / (SD₁ × SD₂)</div>
+                            <input type="number" step="0.01" value={corrGuess} onChange={(e)=> setCorrGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border bg-white" style={{ borderColor: STEP_THEME[2].stroke }}/>
 
-                        </div>
+                            <div className="text-xs mt-1" style={{color:SLATE, opacity: 0.7}}>Corr = Cov / (SD₁ × SD₂)</div>
 
-                        <div>
+                          </div>
 
-                          <label className="text-sm block mb-1 font-semibold" style={{color:SLATE}}>Your Var(R<sub>p</sub>) (%²)</label>
+                          <div>
 
-                          <input type="number" step="0.001" value={varGuess} onChange={(e)=> setVarGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border-2 bg-white" style={{ borderColor: STEP_THEME[2].stroke }}/>
+                            <label className="text-sm block mb-1 font-semibold" style={{color:SLATE}}>Your Var(R<sub>p</sub>) (%²)</label>
 
-                          <div className="text-xs mt-1" style={{color:SLATE, opacity: 0.7}}>Use calculated correlations for all pairs</div>
+                            <input type="number" step="0.001" value={varGuess} onChange={(e)=> setVarGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border bg-white" style={{ borderColor: STEP_THEME[2].stroke }}/>
+
+                            <div className="text-xs mt-1" style={{color:SLATE, opacity: 0.7}}>Use calculated correlations for all pairs</div>
+
+                          </div>
 
                         </div>
 
@@ -794,15 +810,9 @@ export default function PortfolioCovarianceLab(){
 
                 </div>
 
-                {ans2 && (
+                {s2 && (
 
-                  <div className="mt-3 p-4 rounded-xl shadow-lg" style={{ background: "white", border: `3px solid ${STEP_THEME[2].stroke}`, maxHeight: "400px", overflowY: "auto" }}>
-
-                    <div className="font-semibold mb-2 text-lg" style={{color:STEP_THEME[2].stroke}}>Answer sheet</div>
-
-                    <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans2}</pre>
-
-                  </div>
+                  <button onClick={()=> {setCurrentAnswer(ans2); setAnswerModalOpen(true);}} className="mt-3 w-full px-4 py-2 rounded-xl text-white font-semibold shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>View Answer</button>
 
                 )}
 
@@ -848,7 +858,7 @@ export default function PortfolioCovarianceLab(){
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
-                  <div className="rounded-2xl p-4 border-2 shadow-lg" style={{background:"white", borderColor:STEP_THEME[3].stroke, borderWidth: "3px" }}>
+                  <div className="rounded-2xl p-4 border shadow" style={{background:"white", borderColor:STEP_THEME[3].stroke, borderWidth: "1px" }}>
 
                     <div className="text-sm mb-3 font-semibold" style={{color:STEP_THEME[3].stroke}}>
 
@@ -900,7 +910,7 @@ export default function PortfolioCovarianceLab(){
 
                   </div>
 
-                  <div className="rounded-2xl p-4 border-2 shadow-lg" style={{background:"white", borderColor:STEP_THEME[3].stroke, borderWidth: "3px" }}>
+                  <div className="rounded-2xl p-4 border shadow" style={{background:"white", borderColor:STEP_THEME[3].stroke, borderWidth: "1px" }}>
 
                     <div className="text-sm mb-2 font-semibold" style={{color:STEP_THEME[3].stroke}}>Stock betas:</div>
 
@@ -918,15 +928,9 @@ export default function PortfolioCovarianceLab(){
 
                 </div>
 
-                {ans3 && (
+                {s3 && (
 
-                  <div className="mt-3 p-4 rounded-xl shadow-lg" style={{ background: "white", border: `3px solid ${STEP_THEME[3].stroke}`, maxHeight: "400px", overflowY: "auto" }}>
-
-                    <div className="font-semibold mb-2 text-lg" style={{color:STEP_THEME[3].stroke}}>Answer sheet</div>
-
-                    <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans3}</pre>
-
-                  </div>
+                  <button onClick={()=> {setCurrentAnswer(ans3); setAnswerModalOpen(true);}} className="mt-3 w-full px-4 py-2 rounded-xl text-white font-semibold shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>View Answer</button>
 
                 )}
 
@@ -1015,6 +1019,14 @@ export default function PortfolioCovarianceLab(){
             </div>
 
           </div>
+
+        </Modal>
+
+        <Modal open={answerModalOpen} onClose={()=> setAnswerModalOpen(false)}>
+
+          <h3 className="text-xl font-bold mb-3" style={{color:SLATE}}>Answer Sheet</h3>
+
+          <pre className="text-sm whitespace-pre-wrap p-4 rounded-lg bg-gray-50 border" style={{color:SLATE, maxHeight: "400px", overflowY: "auto" }}>{currentAnswer || "No answer available"}</pre>
 
         </Modal>
 
