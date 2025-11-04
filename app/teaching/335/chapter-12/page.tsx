@@ -163,15 +163,15 @@ function FolderShape({ width = 1100, height = 640, color, stroke, pad = 28, chil
 
   return (
 
-    <div className="relative w-full" style={{ filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.15))" }}>
+    <div className="relative w-full max-w-full" style={{ filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.15))" }}>
 
-      <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="rounded-[20px] block">
+      <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="xMidYMid meet" className="rounded-[20px] block" style={{ maxWidth: "100%", display: "block" }}>
 
         <path d={d} fill={color} stroke={stroke} strokeWidth={2} />
 
       </svg>
 
-      <div className="absolute left-0 top-0 w-full h-full"><div className="h-full" style={{ padding: pad }}>{children}</div></div>
+      <div className="absolute left-0 top-0 w-full" style={{ minHeight: h }}><div style={{ padding: pad }}>{children}</div></div>
 
     </div>
 
@@ -209,13 +209,13 @@ function StepShell({ color, stroke, currentStep, maxUnlockedStep, onStepClick, c
 
   return (
 
-    <div className="relative w-full max-w-6xl">
+    <div className="relative w-full max-w-6xl mx-auto" style={{ maxWidth: "100%", overflowX: "hidden" }}>
 
-      <div className="absolute -top-6 -left-6 -z-10 opacity-70"><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
+      <div className="absolute -top-6 -left-6 -z-10 opacity-70 overflow-hidden"><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
 
-      <div className="absolute -top-3 left-6 -z-10 opacity-60"><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
+      <div className="absolute -top-3 left-6 -z-10 opacity-60 overflow-hidden"><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
 
-      <div className="relative">
+      <div className="relative overflow-visible">
 
         <FolderShape width={1100} height={640} color={color} stroke={stroke} pad={34}>{children}</FolderShape>
 
@@ -508,7 +508,9 @@ export default function PortfolioCovarianceLab(){
 
   return (
 
-    <div className="min-h-screen w-full flex items-center justify-center p-6" style={{ background: TIF_PAGE }}>
+    <div className="min-h-screen w-full overflow-x-hidden" style={{ background: TIF_PAGE }}>
+
+      <div className="flex items-start justify-center min-h-screen py-6 px-4 md:px-6">
 
       <AnimatePresence mode="wait">
 
@@ -1015,6 +1017,8 @@ export default function PortfolioCovarianceLab(){
           </div>
 
         </Modal>
+
+      </div>
 
     </div>
 
