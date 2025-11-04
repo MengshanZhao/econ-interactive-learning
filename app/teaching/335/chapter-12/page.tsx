@@ -540,11 +540,11 @@ export default function PortfolioCovarianceLab(){
 
                 </div>
 
-                <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: STEP_THEME[1].fill, borderColor: STEP_THEME[1].stroke}}>
+                <div className="rounded-2xl overflow-hidden shadow-lg mb-4" style={{ background: "white", border: `3px solid ${STEP_THEME[1].stroke}`, maxHeight: "500px", overflowY: "auto" }}>
 
                   <table className="w-full text-sm">
 
-                    <thead style={{ background: "rgba(255,255,255,0.3)" }}>
+                    <thead style={{ background: STEP_THEME[1].fill }}>
 
                       <tr className="text-left">
 
@@ -590,7 +590,7 @@ export default function PortfolioCovarianceLab(){
 
                                 }}
 
-                                className="w-24 rounded-xl px-2 py-1 border bg-white"/>
+                                className="w-24 rounded-xl px-2 py-1 border-2 bg-white" style={{ borderColor: STEP_THEME[1].stroke }}/>
 
                             </td>
 
@@ -618,19 +618,19 @@ export default function PortfolioCovarianceLab(){
 
                 </div>
 
-                <div className="rounded-2xl p-4 mb-2" style={{ background: STEP_THEME[1].fill, border: `1px solid ${STEP_THEME[1].stroke}`}}>
+                <div className="rounded-2xl p-4 mb-2" style={{ background: "white", border: `3px solid ${STEP_THEME[1].stroke}`, boxShadow: `0 2px 8px rgba(0,0,0,0.1)` }}>
 
-                  <label className="text-sm block mb-1" style={{color:SLATE}}>Your R<sub>p</sub> (%) — compute Σ w<sub>i</sub>R<sub>i</sub>:</label>
+                  <label className="text-sm block mb-1 font-semibold" style={{color:SLATE}}>Your R<sub>p</sub> (%) — compute Σ w<sub>i</sub>R<sub>i</sub>:</label>
 
-                  <input type="number" step={1} value={rpGuess} onChange={(e)=> setRpGuess(e.target.value)} className="w-40 rounded-xl px-3 py-2 border bg-white"/>
+                  <input type="number" step={1} value={rpGuess} onChange={(e)=> setRpGuess(e.target.value)} className="w-40 rounded-xl px-3 py-2 border-2" style={{ borderColor: STEP_THEME[1].stroke, bg: "white" }}/>
 
                 </div>
 
                 {ans1 && (
 
-                  <div className="mt-2 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[1].fill, border: `1px solid ${STEP_THEME[1].stroke}`}}>
+                  <div className="mt-2 p-4 rounded-xl shadow-lg" style={{ background: "white", border: `3px solid ${STEP_THEME[1].stroke}`, maxHeight: "400px", overflowY: "auto" }}>
 
-                    <div className="font-semibold mb-2" style={{color:SLATE}}>Answer sheet</div>
+                    <div className="font-semibold mb-2 text-lg" style={{color:STEP_THEME[1].stroke}}>Answer sheet</div>
 
                     <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans1}</pre>
 
@@ -674,19 +674,19 @@ export default function PortfolioCovarianceLab(){
 
                 </div>
 
-                <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: "rgba(255,255,255,0.15)", borderColor: STEP_THEME[2].stroke}}>
+                <div className="rounded-2xl overflow-hidden shadow-lg mb-4" style={{ background: "white", border: `3px solid ${STEP_THEME[2].stroke}`, maxHeight: "300px", overflowY: "auto" }}>
 
                     <table className="w-full text-sm">
 
-                      <thead style={{ background: "rgba(255,255,255,0.2)" }}>
+                      <thead style={{ background: STEP_THEME[2].fill }}>
 
                         <tr className="text-left">
 
-                          <th className="p-3" style={{color:"white"}}>Ticker</th>
+                          <th className="p-3" style={{color:SLATE}}>Ticker</th>
 
-                          <th className="p-3" style={{color:"white"}}>SD (σ<sub>i</sub>) (%)</th>
+                          <th className="p-3" style={{color:SLATE}}>SD (σ<sub>i</sub>) (%)</th>
 
-                          <th className="p-3" style={{color:"white"}}>Weight (%)</th>
+                          <th className="p-3" style={{color:SLATE}}>Weight (%)</th>
 
                         </tr>
 
@@ -702,11 +702,11 @@ export default function PortfolioCovarianceLab(){
 
                             <tr key={t} className="border-t" style={{borderColor:STEP_THEME[2].stroke}}>
 
-                              <td className="p-3" style={{color:"white"}}>{t}</td>
+                              <td className="p-3" style={{color:SLATE}}>{t}</td>
 
-                              <td className="p-3" style={{color:"white"}}>{to2(toPct(s.sd))}</td>
+                              <td className="p-3" style={{color:SLATE}}>{to2(toPct(s.sd))}</td>
 
-                              <td className="p-3" style={{color:"white"}}>{w}%</td>
+                              <td className="p-3" style={{color:SLATE}}>{w}%</td>
 
                             </tr>
 
@@ -720,13 +720,13 @@ export default function PortfolioCovarianceLab(){
 
                 </div>
 
-                <div className="rounded-2xl p-4 mb-3" style={{background:"rgba(255,255,255,0.15)", border:`1px solid ${STEP_THEME[2].stroke}`}}>
+                <div className="rounded-2xl p-4 mb-3" style={{background:"white", border:`3px solid ${STEP_THEME[2].stroke}`, boxShadow: `0 2px 8px rgba(0,0,0,0.1)`, maxHeight: "600px", overflowY: "auto" }}>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
 
                       <div>
 
-                        <label className="text-sm text-white block mb-1">Choose a pair</label>
+                        <label className="text-sm block mb-1 font-semibold" style={{color:SLATE}}>Choose a pair</label>
 
                         <div className="flex gap-2">
 
@@ -738,7 +738,7 @@ export default function PortfolioCovarianceLab(){
 
                           </select>
 
-                          <span className="text-white flex items-center">×</span>
+                          <span className="flex items-center" style={{color:SLATE}}>×</span>
 
                           <select value={corrPair?.[1]||""} onChange={(e)=> setCorrPair([corrPair?.[0] || allTickers[0], e.target.value as Ticker])} className="rounded-xl px-3 py-2 border bg-white min-w-[100px] text-sm">
 
@@ -758,33 +758,33 @@ export default function PortfolioCovarianceLab(){
 
                       <div className="space-y-3">
 
-                        <div className="rounded-lg p-3 bg-white/20">
+                        <div className="rounded-lg p-3" style={{ background: STEP_THEME[2].fill, border: `2px solid ${STEP_THEME[2].stroke}` }}>
 
-                          <div className="text-white text-sm mb-2">Given Cov({corrPair[0]}, {corrPair[1]}) = {to2(toPct(covMatrix[corrPair[0]][corrPair[1]]))} (%²)</div>
+                          <div className="text-sm mb-2 font-semibold" style={{color:SLATE}}>Given Cov({corrPair[0]}, {corrPair[1]}) = {to2(toPct(covMatrix[corrPair[0]][corrPair[1]]))} (%²)</div>
 
-                          <div className="text-white text-sm">SD({corrPair[0]}) = {to2(toPct(universe[corrPair[0]].sd))}%</div>
+                          <div className="text-sm" style={{color:SLATE}}>SD({corrPair[0]}) = {to2(toPct(universe[corrPair[0]].sd))}%</div>
 
-                          <div className="text-white text-sm">SD({corrPair[1]}) = {to2(toPct(universe[corrPair[1]].sd))}%</div>
-
-                        </div>
-
-                        <div>
-
-                          <label className="text-sm text-white block mb-1">Your Corr({corrPair[0]}, {corrPair[1]}) (%) — calculate from Cov and SDs:</label>
-
-                          <input type="number" step="0.01" value={corrGuess} onChange={(e)=> setCorrGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border bg-white"/>
-
-                          <div className="text-xs text-white/90 mt-1">Corr = Cov / (SD₁ × SD₂)</div>
+                          <div className="text-sm" style={{color:SLATE}}>SD({corrPair[1]}) = {to2(toPct(universe[corrPair[1]].sd))}%</div>
 
                         </div>
 
                         <div>
 
-                          <label className="text-sm text-white block mb-1">Your Var(R<sub>p</sub>) (%²)</label>
+                          <label className="text-sm block mb-1 font-semibold" style={{color:SLATE}}>Your Corr({corrPair[0]}, {corrPair[1]}) (%) — calculate from Cov and SDs:</label>
 
-                          <input type="number" step="0.001" value={varGuess} onChange={(e)=> setVarGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border bg-white"/>
+                          <input type="number" step="0.01" value={corrGuess} onChange={(e)=> setCorrGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border-2 bg-white" style={{ borderColor: STEP_THEME[2].stroke }}/>
 
-                          <div className="text-xs text-white/90 mt-1">Use calculated correlations for all pairs</div>
+                          <div className="text-xs mt-1" style={{color:SLATE, opacity: 0.7}}>Corr = Cov / (SD₁ × SD₂)</div>
+
+                        </div>
+
+                        <div>
+
+                          <label className="text-sm block mb-1 font-semibold" style={{color:SLATE}}>Your Var(R<sub>p</sub>) (%²)</label>
+
+                          <input type="number" step="0.001" value={varGuess} onChange={(e)=> setVarGuess(e.target.value)} className="w-full rounded-xl px-3 py-2 border-2 bg-white" style={{ borderColor: STEP_THEME[2].stroke }}/>
+
+                          <div className="text-xs mt-1" style={{color:SLATE, opacity: 0.7}}>Use calculated correlations for all pairs</div>
 
                         </div>
 
@@ -796,11 +796,11 @@ export default function PortfolioCovarianceLab(){
 
                 {ans2 && (
 
-                  <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${STEP_THEME[2].stroke}`}}>
+                  <div className="mt-3 p-4 rounded-xl shadow-lg" style={{ background: "white", border: `3px solid ${STEP_THEME[2].stroke}`, maxHeight: "400px", overflowY: "auto" }}>
 
-                    <div className="font-semibold mb-2 text-white">Answer sheet</div>
+                    <div className="font-semibold mb-2 text-lg" style={{color:STEP_THEME[2].stroke}}>Answer sheet</div>
 
-                    <pre className="text-xs whitespace-pre-wrap text-white">{ans2}</pre>
+                    <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans2}</pre>
 
                   </div>
 
@@ -848,9 +848,9 @@ export default function PortfolioCovarianceLab(){
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
-                  <div className="rounded-2xl p-4 border" style={{background:STEP_THEME[3].fill, borderColor:STEP_THEME[3].stroke}}>
+                  <div className="rounded-2xl p-4 border-2 shadow-lg" style={{background:"white", borderColor:STEP_THEME[3].stroke, borderWidth: "3px" }}>
 
-                    <div className="text-sm mb-3" style={{color:SLATE}}>
+                    <div className="text-sm mb-3 font-semibold" style={{color:STEP_THEME[3].stroke}}>
 
                       CAPM: E[R<sub>i</sub>] = r<sub>f</sub> + β<sub>i</sub> (E[R<sub>m</sub>] − r<sub>f</sub>)
 
@@ -900,9 +900,9 @@ export default function PortfolioCovarianceLab(){
 
                   </div>
 
-                  <div className="rounded-2xl p-4 border" style={{background:STEP_THEME[3].fill, borderColor:STEP_THEME[3].stroke}}>
+                  <div className="rounded-2xl p-4 border-2 shadow-lg" style={{background:"white", borderColor:STEP_THEME[3].stroke, borderWidth: "3px" }}>
 
-                    <div className="text-sm mb-2" style={{color:SLATE}}>Stock betas:</div>
+                    <div className="text-sm mb-2 font-semibold" style={{color:STEP_THEME[3].stroke}}>Stock betas:</div>
 
                     <ul className="text-sm space-y-1" style={{color:SLATE}}>
 
@@ -920,9 +920,9 @@ export default function PortfolioCovarianceLab(){
 
                 {ans3 && (
 
-                  <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[3].fill, border: `1px solid ${STEP_THEME[3].stroke}`}}>
+                  <div className="mt-3 p-4 rounded-xl shadow-lg" style={{ background: "white", border: `3px solid ${STEP_THEME[3].stroke}`, maxHeight: "400px", overflowY: "auto" }}>
 
-                    <div className="font-semibold mb-2" style={{color:SLATE}}>Answer sheet</div>
+                    <div className="font-semibold mb-2 text-lg" style={{color:STEP_THEME[3].stroke}}>Answer sheet</div>
 
                     <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans3}</pre>
 
