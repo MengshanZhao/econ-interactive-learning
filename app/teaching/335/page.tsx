@@ -147,7 +147,7 @@ export default function ECONS335Page() {
                   </li>
                   <li>
                     <Link href="/teaching/335/chapter-12" className="text-[color:hsl(var(--primary))] hover:underline">
-                      Chapter 12: Portfolio Covariance Lab
+                      Chapter 12: Portfolio Covariance 
                     </Link>
                   </li>
                 </ol>
