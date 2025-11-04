@@ -772,11 +772,7 @@ export default function PortfolioCovarianceLab(){
 
                         <div className="rounded-lg p-3" style={{ background: STEP_THEME[2].fill, border: `1px solid ${STEP_THEME[2].stroke}` }}>
 
-                          <div className="text-sm mb-2 font-semibold" style={{color:SLATE}}>Given Cov({corrPair[0]}, {corrPair[1]}) = {to2(toPct(covMatrix[corrPair[0]][corrPair[1]]))} (%²)</div>
-
-                          <div className="text-sm" style={{color:SLATE}}>SD({corrPair[0]}) = {to2(toPct(universe[corrPair[0]].sd))}%</div>
-
-                          <div className="text-sm" style={{color:SLATE}}>SD({corrPair[1]}) = {to2(toPct(universe[corrPair[1]].sd))}%</div>
+                          <div className="text-sm font-semibold" style={{color:SLATE}}>Given Cov({corrPair[0]}, {corrPair[1]}) = {to2(toPct(covMatrix[corrPair[0]][corrPair[1]]))} (%²)</div>
 
                         </div>
 
