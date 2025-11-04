@@ -484,7 +484,7 @@ export default function PortfolioCovarianceLab(){
 
                 `${vOK?"✅":"❌"} Var(Rₚ): your ${to2(v||0)} (%^2) → ${to2(vTrue)} (%^2)\n` +
 
-                `Var(Rₚ) = Σ wᵢ² SD(Rᵢ)² + 2 Σ_{i<j} wᵢ wⱼ Corr(Rᵢ, Rⱼ) SD(Rᵢ) SD(Rⱼ)`;
+                `Var(Rₚ) = Σ wᵢ² SD(Rᵢ)² + 2 wᵢ wⱼ Corr(Rᵢ, Rⱼ) SD(Rᵢ) SD(Rⱼ)`;
 
     setAns2(msg);
 
