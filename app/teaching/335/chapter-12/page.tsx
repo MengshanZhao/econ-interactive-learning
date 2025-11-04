@@ -155,31 +155,77 @@ function calculateCovariance(corr: Correl, universe: Universe): Covariance {
 
 // ===================== DOCUMENT HOLDER DESIGN =====================
 
-function DocumentCard({ step, color, stroke, isActive, children }: { step: number; color: string; stroke: string; isActive: boolean; children: React.ReactNode; }) {
+function FolderShape({ width = 1100, height = 640, color, stroke, pad = 28, children, }:{ width?: number; height?: number; color: string; stroke: string; pad?: number; children?: React.ReactNode; }) {
 
-  const offset = isActive ? 0 : (step - 1) * 8; // Offset for stacked effect
-  const scale = isActive ? 1 : 0.96;
-  const opacity = isActive ? 1 : 0.7;
-  const zIndex = isActive ? 10 : 10 - step;
-  const marginTop = isActive ? 0 : -((step - 1) * 8);
+  const r = 18; const w = width; const h = height;
+
+  const d = [ `M ${r} 0`, `H ${w - r}`, `Q ${w} 0 ${w} ${r}`, `V ${h - r}`, `Q ${w} ${h} ${w - r} ${h}`, `H ${r}`, `Q 0 ${h} 0 ${h - r}`, `V ${r}`, `Q 0 0 ${r} 0`, ].join(" ");
 
   return (
 
-    <div className="relative" style={{ 
+    <div className="relative w-full" style={{ filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.15))" }}>
 
-      marginTop: `${marginTop}px`,
-      transform: `translateY(${offset}px) scale(${scale})`,
-      opacity,
-      zIndex,
-      filter: isActive ? "drop-shadow(0 8px 20px rgba(0,0,0,0.2))" : "drop-shadow(0 2px 8px rgba(0,0,0,0.1))",
-      transition: "all 0.3s ease",
-      pointerEvents: isActive ? "auto" : "none"
+      <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="rounded-[20px] block">
 
-    }}>
+        <path d={d} fill={color} stroke={stroke} strokeWidth={2} />
 
-      <div className="rounded-2xl border-2" style={{ background: color, borderColor: stroke }}>
+      </svg>
 
-        {children}
+      <div className="absolute left-0 top-0 w-full h-full"><div className="h-full" style={{ padding: pad }}>{children}</div></div>
+
+    </div>
+
+  );
+
+}
+
+function FolderTabRight({ top, height = 80, color, stroke, label, isActive, isLocked, onClick, }:{ top: number; height?: number; color: string; stroke: string; label: string; isActive: boolean; isLocked: boolean; onClick?: () => void; }) {
+
+  const w = 60; const r = 8; const tabColor = isActive ? color : (isLocked ? "#E0E0E0" : color); const tabStroke = isActive ? stroke : (isLocked ? "#B0B0B0" : stroke); const textColor = isLocked ? "#999" : (isActive ? "#16333A" : "#666");
+
+  return (
+
+    <div className="absolute cursor-pointer transition-all hover:scale-105" style={{ right: -w + 8, top, width: w, height, zIndex: isActive ? 40 : 30, opacity: isLocked ? 0.5 : 1 }} onClick={!isLocked ? onClick : undefined}>
+
+      <svg width="100%" height={height} viewBox={`0 0 ${w} ${height}`} style={{ filter: isActive ? "drop-shadow(0 2px 8px rgba(0,0,0,0.2))" : "drop-shadow(0 1px 3px rgba(0,0,0,0.1))" }}>
+
+        <path d={`M ${r} 0 H ${w} V ${height - r} Q ${w} ${height} ${w - r} ${height} H ${r} Q 0 ${height} 0 ${height - r} V ${r} Q 0 0 ${r} 0 Z`} fill={tabColor} stroke={tabStroke} strokeWidth={isActive ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round" />
+
+        <line x1="0" y1={r} x2="0" y2={height - r} stroke={tabColor} strokeWidth={4} />
+
+      </svg>
+
+      <div className="absolute inset-0 flex items-center justify-center" style={{ writingMode: "vertical-rl", textOrientation: "mixed", fontSize: "12px", fontWeight: isActive ? "bold" : "semibold", color: textColor }}>{label}</div>
+
+    </div>
+
+  );
+
+}
+
+function StepShell({ color, stroke, currentStep, maxUnlockedStep, onStepClick, children }: { color: string; stroke: string; currentStep: number; maxUnlockedStep: number; onStepClick: (step: number) => void; children: React.ReactNode; }) {
+
+  const tabHeight = 75; const tabSpacing = 8; const startTop = 80;
+
+  return (
+
+    <div className="relative w-full max-w-6xl">
+
+      <div className="absolute -top-6 -left-6 -z-10 opacity-70"><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
+
+      <div className="absolute -top-3 left-6 -z-10 opacity-60"><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
+
+      <div className="relative">
+
+        <FolderShape width={1100} height={640} color={color} stroke={stroke} pad={34}>{children}</FolderShape>
+
+        {[1,2,3].map((step)=>{
+
+          const stepTheme = STEP_THEME[step]; const isActive = step===currentStep; const isLocked = step>maxUnlockedStep; const top = startTop + (step-1)*(tabHeight+tabSpacing);
+
+          return <FolderTabRight key={step} top={top} height={tabHeight} color={stepTheme.fill} stroke={stepTheme.stroke} label={`Step ${step}`} isActive={isActive} isLocked={isLocked} onClick={()=>onStepClick(step)} />
+
+        })}
 
       </div>
 
@@ -188,6 +234,8 @@ function DocumentCard({ step, color, stroke, isActive, children }: { step: numbe
   );
 
 }
+
+const pageVariants = { enter: { x: 80, opacity: 0 }, center: { x: 0, opacity: 1 }, exit: { x: -80, opacity: 0 } };
 
 // ===================== MODAL =====================
 
@@ -227,9 +275,9 @@ export default function PortfolioCovarianceLab(){
 
   const [corr, setCorr] = useState<Correl>(BASE_CORR);
 
-  const [step, setStep] = useState<1|2|3|4>(2); // Start at step 2
+  const [step, setStep] = useState<1|2|3>(1); // Start at step 1
 
-  // Scenario knobs for CAPM (shown in Step 4 but set here)
+  // Scenario knobs for CAPM (shown in Step 3 but set here)
 
   const [rf, setRf] = useState(0.02); // 2%
 
@@ -258,17 +306,17 @@ export default function PortfolioCovarianceLab(){
 
   // Step gates
 
-  const [s2, setS2] = useState(false); const [s3, setS3] = useState(false); const [s4, setS4] = useState(false);
+  const [s1, setS1] = useState(false); const [s2, setS2] = useState(false); const [s3, setS3] = useState(false);
 
-  const canNext=(s:2|3)=> (s===2&&s2) || (s===3&&s3);
+  const canNext=(s:1|2)=> (s===1&&s1) || (s===2&&s2);
 
-  const maxUnlockedStep = 2 + (s2?1:0) + (s3?1:0);
+  const maxUnlockedStep = 1 + (s1?1:0) + (s2?1:0);
 
-  const goToStep=(t:2|3|4)=>{ if(t<=maxUnlockedStep) setStep(t); };
+  const goToStep=(t:1|2|3)=>{ if(t<=maxUnlockedStep) setStep(t); };
 
   // Answers & inputs
 
-  const [ans2, setAns2] = useState<string | null>(null);
+  const [ans1, setAns1] = useState<string | null>(null);
 
   const [rpGuess, setRpGuess] = useState<string>("");
 
@@ -280,13 +328,13 @@ export default function PortfolioCovarianceLab(){
 
   const [varGuess, setVarGuess] = useState<string>("");
 
-  const [ans3, setAns3] = useState<string | null>(null);
+  const [ans2, setAns2] = useState<string | null>(null);
 
   const [capmGuess, setCapmGuess] = useState<string>("");
 
   const [selectedStock, setSelectedStock] = useState<Ticker | null>(null);
 
-  const [ans4, setAns4] = useState<string | null>(null);
+  const [ans3, setAns3] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -340,21 +388,21 @@ export default function PortfolioCovarianceLab(){
 
     setWeightsPct({AAPL:20,MSFT:20,NVDA:20,TSLA:20,KO:20});
 
-    setS2(false); setS3(false); setS4(false);
+    setS1(false); setS2(false); setS3(false);
 
-    setAns2(null); setAns3(null); setAns4(null); setRpGuess(""); setRpChecked(false);
+    setAns1(null); setAns2(null); setAns3(null); setRpGuess(""); setRpChecked(false);
 
     setCorrGuess(""); setVarGuess("");
 
     setSelectedStock(null);
 
-    setStep(2);
+    setStep(1);
 
   }
 
   // ---------- STEP ACTIONS ----------
 
-  function submit2(){
+  function submit1(){
 
     // Enforce integers, sum==100, and require student's Rp
 
@@ -382,15 +430,15 @@ export default function PortfolioCovarianceLab(){
 
     const verdict = ok ? "✅ Correct" : `❌ Not quite (your ${to2(g)}% vs hidden true ${trueRpPct}%).`;
 
-    setAns2(lines.join("\n") + "\n\nRₚ check → " + verdict);
+    setAns1(lines.join("\n") + "\n\nRₚ check → " + verdict);
 
     setRpChecked(true);
 
-    setS2(true);
+    setS1(true);
 
   }
 
-  function submit3(){
+  function submit2(){
 
     if(!corrPair){ alert("Pick a pair to calculate correlation."); return; }
 
@@ -428,13 +476,13 @@ export default function PortfolioCovarianceLab(){
 
                 `Var(Rₚ) = Σ wᵢ² σᵢ² + 2 Σ_{i<j} wᵢ wⱼ ρᵢⱼ σᵢ σⱼ`;
 
-    setAns3(msg);
+    setAns2(msg);
 
-    setS3(true);
+    setS2(true);
 
   }
 
-  function submit4(){
+  function submit3(){
 
     if(!selectedStock){ alert("Pick a stock first."); return; }
 
@@ -444,9 +492,9 @@ export default function PortfolioCovarianceLab(){
 
     const msg = `${ok?"✅":"❌"} E[R_${selectedStock}] = r_f + β (E[R_m]-r_f) = ${to2(rf*100)}% + ${beta.toFixed(2)} × ${to2(mrp*100)}% = ${to2(trueER*100)}%`;
 
-    setAns4(msg);
+    setAns3(msg);
 
-    setS4(true);
+    setS3(true);
 
   }
 
@@ -460,158 +508,183 @@ export default function PortfolioCovarianceLab(){
 
   return (
 
-    <div className="min-h-screen w-full flex items-center justify-center p-6 py-12" style={{ background: TIF_PAGE }}>
+    <div className="min-h-screen w-full flex items-center justify-center p-6" style={{ background: TIF_PAGE }}>
 
-      <div className="relative w-full max-w-6xl space-y-0">
+      <AnimatePresence mode="wait">
 
-        {/* Document holder style - show previous steps underneath, stacked */}
+        {/* ===================== STEP 1 ===================== */}
 
-          <DocumentCard step={2} color={STEP_THEME[2].fill} stroke={STEP_THEME[2].stroke} isActive={step === 2}>
+        {step===1 && (
 
-            <div className="p-4">
+          <motion.section key="s1" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
 
-              <div className="flex items-start justify-between mb-4">
+            <StepShell color={STEP_THEME[1].fill} stroke={STEP_THEME[1].stroke} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
 
-                <h2 className="text-2xl md:text-3xl font-bold" style={{color:SLATE}}>Step 2 — Set portfolio weights & compute R<sub>p</sub></h2>
+              <div className="p-6">
 
-                <div className="flex gap-2">
+                <div className="flex items-start justify-between mb-4">
 
-                  <button onClick={randomizeWeights} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Random</button>
+                  <h1 className="text-2xl md:text-3xl font-bold" style={{color:SLATE}}>Step 1 — Set portfolio weights & compute R<sub>p</sub></h1>
 
-                  <button onClick={submit2} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background: SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
+                  <div className="flex gap-2">
 
-                  {step > 2 && <button onClick={()=> setStep(3)} className="rounded-full w-10 h-10 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>→</button>}
+                    <button onClick={randomizeWeights} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Random</button>
 
-                </div>
+                    <button onClick={submit1} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background: SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
 
-              </div>
-
-              <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: "rgba(255,255,255,0.3)", borderColor: STEP_THEME[2].stroke}}>
-
-                <table className="w-full text-xs">
-
-                  <thead style={{ background: "rgba(255,255,255,0.5)" }}>
-
-                    <tr className="text-left">
-
-                      <th className="p-2" style={{color:SLATE}}>Ticker</th>
-
-                      <th className="p-2" style={{color:SLATE}}>R<sub>i</sub> (%)</th>
-
-                      <th className="p-2" style={{color:SLATE}}>Weight (%)</th>
-
-                      <th className="p-2" style={{color:SLATE}}>w<sub>i</sub>·R<sub>i</sub> (%)</th>
-
-                    </tr>
-
-                  </thead>
-
-                  <tbody>
-
-                    {allTickers.map(t=>{
-
-                      const s = universe[t]; const w = Math.trunc(weightsPct[t]||0); const contrib=(w/100)*s.r;
-
-                      return (
-
-                        <tr key={t} className="border-t" style={{borderColor:STEP_THEME[2].stroke}}>
-
-                          <td className="p-2" style={{color:SLATE}}>{t}</td>
-
-                          <td className="p-2" style={{color:SLATE}}>{to2(toPct(s.r))}</td>
-
-                          <td className="p-2" style={{color:SLATE}}>{w}%</td>
-
-                          <td className="p-2" style={{color:SLATE}}>{to2(toPct(contrib))}</td>
-
-                        </tr>
-
-                      );
-
-                    })}
-
-                  </tbody>
-
-                </table>
-
-              </div>
-
-              {step === 2 && (
-
-                <>
-
-                  <div className="rounded-2xl p-4 mb-2" style={{ background: STEP_THEME[2].fill, border: `1px solid ${STEP_THEME[2].stroke}`}}>
-
-                    <label className="text-sm block mb-1" style={{color:SLATE}}>Your R<sub>p</sub> (%) — compute Σ w<sub>i</sub>R<sub>i</sub>:</label>
-
-                    <input type="number" step={1} value={rpGuess} onChange={(e)=> setRpGuess(e.target.value)} className="w-40 rounded-xl px-3 py-2 border bg-white"/>
+                    <button onClick={()=> canNext(1) && setStep(2)} disabled={!canNext(1)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(1)?"hover:brightness-110 hover:shadow-lg":"opacity-50 cursor-not-allowed"}`} style={{background:SLATE}}>→</button>
 
                   </div>
 
-                  {ans2 && (
+                </div>
 
-                    <div className="mt-2 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[2].fill, border: `1px solid ${STEP_THEME[2].stroke}`}}>
+                <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: STEP_THEME[1].fill, borderColor: STEP_THEME[1].stroke}}>
 
-                      <div className="font-semibold mb-2" style={{color:SLATE}}>Answer sheet</div>
+                  <table className="w-full text-sm">
 
-                      <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans2}</pre>
+                    <thead style={{ background: "rgba(255,255,255,0.3)" }}>
 
-                    </div>
+                      <tr className="text-left">
 
-                  )}
+                        <th className="p-3" style={{color:SLATE}}>Ticker</th>
 
-                </>
+                        <th className="p-3" style={{color:SLATE}}>R<sub>i</sub> (%)</th>
 
-              )}
+                        <th className="p-3" style={{color:SLATE}}>σ<sub>i</sub> (%)</th>
 
+                        <th className="p-3" style={{color:SLATE}}>Weight (%)</th>
 
-            </div>
+                        <th className="p-3" style={{color:SLATE}}>w<sub>i</sub>·R<sub>i</sub> (%)</th>
 
-          </DocumentCard>
+                      </tr>
 
-        )}
+                    </thead>
 
-        {step >= 3 && (
+                    <tbody>
 
-          <DocumentCard step={3} color={STEP_THEME[3].fill} stroke={STEP_THEME[3].stroke} isActive={step === 3}>
+                      {allTickers.map(t=>{
 
-            <div className="p-4">
+                        const s = universe[t]; const w = Math.trunc(weightsPct[t]||0); const contrib=(w/100)*s.r;
 
-              <div className="flex items-start justify-between mb-2">
+                        return (
 
-                <h2 className="text-2xl md:text-3xl font-bold text-white">Step 3 — Covariance, Correlation & Var(R<sub>p</sub>)</h2>
+                          <tr key={t} className="border-t" style={{borderColor:STEP_THEME[1].stroke}}>
 
-                <div className="flex gap-2">
+                            <td className="p-3" style={{color:SLATE}}>{t}</td>
 
-                  {step > 3 && <button onClick={()=> setStep(2)} className="rounded-full w-10 h-10 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>←</button>}
+                            <td className="p-3" style={{color:SLATE}}>{to2(toPct(s.r))}</td>
 
-                  <button onClick={()=> setModalOpen(true)} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Explain</button>
+                            <td className="p-3" style={{color:SLATE}}>{to2(toPct(s.sd))}</td>
 
-                  <button onClick={submit3} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
+                            <td className="p-3">
 
-                  {step > 3 && <button onClick={()=> setStep(4)} className="rounded-full w-10 h-10 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>→</button>}
+                              <input type="number" step={1} min={0} max={100} value={w}
+
+                                onChange={(e)=> {
+
+                                  const v = Math.trunc(Number(e.target.value));
+
+                                  setWeightsPct(prev=> ({...prev, [t]: Number.isFinite(v)? Math.max(0, Math.min(100, v)) : 0}));
+
+                                }}
+
+                                className="w-24 rounded-xl px-2 py-1 border bg-white"/>
+
+                            </td>
+
+                            <td className="p-3" style={{color:SLATE}}>{to2(toPct(contrib))}</td>
+
+                          </tr>
+
+                        );
+
+                      })}
+
+                      <tr className="border-t" style={{borderColor:STEP_THEME[1].stroke}}>
+
+                        <td className="p-3 font-semibold" style={{color:SLATE}} colSpan={3}>Totals</td>
+
+                        <td className="p-3 font-semibold" style={{color:SLATE}}>{allTickers.reduce((s,t)=> s + Math.trunc(weightsPct[t]||0), 0)}%</td>
+
+                        <td className="p-3 font-semibold" style={{color:SLATE}}>—</td>
+
+                      </tr>
+
+                    </tbody>
+
+                  </table>
 
                 </div>
 
+                <div className="rounded-2xl p-4 mb-2" style={{ background: STEP_THEME[1].fill, border: `1px solid ${STEP_THEME[1].stroke}`}}>
+
+                  <label className="text-sm block mb-1" style={{color:SLATE}}>Your R<sub>p</sub> (%) — compute Σ w<sub>i</sub>R<sub>i</sub>:</label>
+
+                  <input type="number" step={1} value={rpGuess} onChange={(e)=> setRpGuess(e.target.value)} className="w-40 rounded-xl px-3 py-2 border bg-white"/>
+
+                </div>
+
+                {ans1 && (
+
+                  <div className="mt-2 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[1].fill, border: `1px solid ${STEP_THEME[1].stroke}`}}>
+
+                    <div className="font-semibold mb-2" style={{color:SLATE}}>Answer sheet</div>
+
+                    <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans1}</pre>
+
+                  </div>
+
+                )}
+
               </div>
 
-              {step === 3 && (
+            </StepShell>
 
-                <>
+          </motion.section>
 
-                  <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: "rgba(255,255,255,0.15)", borderColor: STEP_THEME[3].stroke}}>
+        )}
 
-                    <table className="w-full text-xs">
+        {/* ===================== STEP 2 ===================== */}
+
+        {step===2 && (
+
+          <motion.section key="s2" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
+
+            <StepShell color={STEP_THEME[2].fill} stroke={STEP_THEME[2].stroke} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
+
+              <div className="p-6">
+
+                <div className="flex items-start justify-between mb-2">
+
+                  <h2 className="text-2xl md:text-3xl font-bold text-white">Step 2 — Covariance, Correlation & Var(R<sub>p</sub>)</h2>
+
+                  <div className="flex gap-2">
+
+                    <button onClick={()=> setStep(1)} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>←</button>
+
+                    <button onClick={()=> setModalOpen(true)} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Explain</button>
+
+                    <button onClick={submit2} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
+
+                    <button onClick={()=> canNext(2) && setStep(3)} disabled={!canNext(2)} className={`rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow ${canNext(2)?"hover:brightness-110 hover:shadow-lg":"opacity-50 cursor-not-allowed"}`} style={{background:SLATE}}>→</button>
+
+                  </div>
+
+                </div>
+
+                <div className="rounded-2xl overflow-hidden shadow border mb-4" style={{ background: "rgba(255,255,255,0.15)", borderColor: STEP_THEME[2].stroke}}>
+
+                    <table className="w-full text-sm">
 
                       <thead style={{ background: "rgba(255,255,255,0.2)" }}>
 
                         <tr className="text-left">
 
-                          <th className="p-2" style={{color:"white"}}>Ticker</th>
+                          <th className="p-3" style={{color:"white"}}>Ticker</th>
 
-                          <th className="p-2" style={{color:"white"}}>SD (σ<sub>i</sub>) (%)</th>
+                          <th className="p-3" style={{color:"white"}}>SD (σ<sub>i</sub>) (%)</th>
 
-                          <th className="p-2" style={{color:"white"}}>Weight (%)</th>
+                          <th className="p-3" style={{color:"white"}}>Weight (%)</th>
 
                         </tr>
 
@@ -625,13 +698,13 @@ export default function PortfolioCovarianceLab(){
 
                           return (
 
-                            <tr key={t} className="border-t" style={{borderColor:STEP_THEME[3].stroke}}>
+                            <tr key={t} className="border-t" style={{borderColor:STEP_THEME[2].stroke}}>
 
-                              <td className="p-2" style={{color:"white"}}>{t}</td>
+                              <td className="p-3" style={{color:"white"}}>{t}</td>
 
-                              <td className="p-2" style={{color:"white"}}>{to2(toPct(s.sd))}</td>
+                              <td className="p-3" style={{color:"white"}}>{to2(toPct(s.sd))}</td>
 
-                              <td className="p-2" style={{color:"white"}}>{w}%</td>
+                              <td className="p-3" style={{color:"white"}}>{w}%</td>
 
                             </tr>
 
@@ -643,9 +716,9 @@ export default function PortfolioCovarianceLab(){
 
                     </table>
 
-                  </div>
+                </div>
 
-                  <div className="rounded-2xl p-4 mb-3" style={{background:"rgba(255,255,255,0.15)", border:`1px solid ${STEP_THEME[3].stroke}`}}>
+                <div className="rounded-2xl p-4 mb-3" style={{background:"rgba(255,255,255,0.15)", border:`1px solid ${STEP_THEME[2].stroke}`}}>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
 
@@ -719,49 +792,15 @@ export default function PortfolioCovarianceLab(){
 
                   </div>
 
-                  {ans3 && (
+                  {ans2 && (
 
-                    <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${STEP_THEME[3].stroke}`}}>
+                    <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${STEP_THEME[2].stroke}`}}>
 
                       <div className="font-semibold mb-2 text-white">Answer sheet</div>
 
-                      <pre className="text-xs whitespace-pre-wrap text-white">{ans3}</pre>
+                      <pre className="text-xs whitespace-pre-wrap text-white">{ans2}</pre>
 
                     </div>
-
-                  )}
-
-                </>
-
-              )}
-
-            </div>
-
-          </DocumentCard>
-
-        )}
-
-        {step >= 4 && (
-
-          <DocumentCard step={4} color={STEP_THEME[4].fill} stroke={STEP_THEME[4].stroke} isActive={step === 4}>
-
-            <div className="p-4">
-
-              <div className="flex items-start justify-between mb-2">
-
-                <h2 className="text-2xl md:text-3xl font-bold" style={{color:SLATE}}>Step 4 — CAPM Expected Return</h2>
-
-                <div className="flex gap-2">
-
-                  <button onClick={()=> setStep(3)} className="rounded-full w-10 h-10 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>←</button>
-
-                  {s4 ? (
-
-                    <button onClick={reshuffleScenario} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>New example</button>
-
-                  ) : (
-
-                    <button onClick={submit4} className="rounded-full px-3 h-10 flex items-center justify-center text-white text-sm shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
 
                   )}
 
@@ -769,11 +808,47 @@ export default function PortfolioCovarianceLab(){
 
               </div>
 
-              {step === 4 && (
+            </StepShell>
+
+          </motion.section>
+
+        )}
+
+        {/* ===================== STEP 3 ===================== */}
+
+        {step===3 && (
+
+          <motion.section key="s3" variants={pageVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45 }}>
+
+            <StepShell color={STEP_THEME[3].fill} stroke={STEP_THEME[3].stroke} currentStep={step} maxUnlockedStep={maxUnlockedStep} onStepClick={goToStep}>
+
+              <div className="p-6">
+
+                <div className="flex items-start justify-between mb-2">
+
+                  <h2 className="text-2xl md:text-3xl font-bold" style={{color:SLATE}}>Step 3 — CAPM Expected Return</h2>
+
+                  <div className="flex gap-2">
+
+                    <button onClick={()=> setStep(2)} className="rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow hover:brightness-110 hover:shadow-lg" style={{background:SLATE}}>←</button>
+
+                    {s3 ? (
+
+                      <button onClick={reshuffleScenario} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>New example</button>
+
+                    ) : (
+
+                      <button onClick={submit3} className="rounded-full px-4 h-12 flex items-center justify-center text-white text-base shadow hover:brightness-110 hover:shadow-lg" style={{background:SUBMIT_COLOR, border:`2px solid ${SUBMIT_BORDER}`}}>Submit</button>
+
+                    )}
+
+                  </div>
+
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
-                  <div className="rounded-2xl p-4 border" style={{background:STEP_THEME[4].fill, borderColor:STEP_THEME[4].stroke}}>
+                  <div className="rounded-2xl p-4 border" style={{background:STEP_THEME[3].fill, borderColor:STEP_THEME[3].stroke}}>
 
                     <div className="text-sm mb-3" style={{color:SLATE}}>
 
@@ -825,7 +900,7 @@ export default function PortfolioCovarianceLab(){
 
                   </div>
 
-                  <div className="rounded-2xl p-4 border" style={{background:STEP_THEME[4].fill, borderColor:STEP_THEME[4].stroke}}>
+                  <div className="rounded-2xl p-4 border" style={{background:STEP_THEME[3].fill, borderColor:STEP_THEME[3].stroke}}>
 
                     <div className="text-sm mb-2" style={{color:SLATE}}>Stock betas:</div>
 
@@ -845,23 +920,27 @@ export default function PortfolioCovarianceLab(){
 
               )}
 
-              {ans4 && step === 4 && (
+                {ans3 && (
 
-                <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[4].fill, border: `1px solid ${STEP_THEME[4].stroke}`}}>
+                  <div className="mt-3 p-4 rounded-xl shadow-inner" style={{ background: STEP_THEME[3].fill, border: `1px solid ${STEP_THEME[3].stroke}`}}>
 
-                  <div className="font-semibold mb-2" style={{color:SLATE}}>Answer sheet</div>
+                    <div className="font-semibold mb-2" style={{color:SLATE}}>Answer sheet</div>
 
-                  <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans4}</pre>
+                    <pre className="text-xs whitespace-pre-wrap" style={{color:SLATE}}>{ans3}</pre>
 
-                </div>
+                  </div>
 
-              )}
+                )}
 
-            </div>
+              </div>
 
-          </DocumentCard>
+            </StepShell>
+
+          </motion.section>
 
         )}
+
+      </AnimatePresence>
 
         <Modal open={modalOpen} onClose={()=> setModalOpen(false)}>
 
