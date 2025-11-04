@@ -163,15 +163,15 @@ function FolderShape({ width = 1100, height = 640, color, stroke, pad = 28, chil
 
   return (
 
-    <div className="relative w-full max-w-full" style={{ filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.15))" }}>
+    <div className="relative w-full max-w-full" style={{ filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.15))", backgroundColor: color, borderRadius: "20px", minHeight: h }}>
 
-      <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="xMidYMid meet" className="rounded-[20px] block" style={{ maxWidth: "100%", display: "block" }}>
+      <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="xMidYMid meet" className="rounded-[20px] block" style={{ maxWidth: "100%", display: "block", position: "relative", zIndex: 0 }}>
 
         <path d={d} fill={color} stroke={stroke} strokeWidth={2} />
 
       </svg>
 
-      <div className="absolute left-0 top-0 w-full" style={{ minHeight: h }}><div style={{ padding: pad }}>{children}</div></div>
+      <div className="absolute left-0 top-0 w-full" style={{ minHeight: h, zIndex: 1 }}><div style={{ padding: pad }}>{children}</div></div>
 
     </div>
 
@@ -185,7 +185,7 @@ function FolderTabRight({ top, height = 80, color, stroke, label, isActive, isLo
 
   return (
 
-    <div className="absolute cursor-pointer transition-all hover:scale-105" style={{ right: -w + 8, top, width: w, height, zIndex: isActive ? 40 : 30, opacity: isLocked ? 0.5 : 1 }} onClick={!isLocked ? onClick : undefined}>
+    <div className="absolute cursor-pointer transition-all hover:scale-105" style={{ right: -w + 8, top, width: w, height, zIndex: 50, opacity: isLocked ? 0.5 : 1, pointerEvents: isLocked ? "none" : "auto" }} onClick={!isLocked ? onClick : undefined}>
 
       <svg width="100%" height={height} viewBox={`0 0 ${w} ${height}`} style={{ filter: isActive ? "drop-shadow(0 2px 8px rgba(0,0,0,0.2))" : "drop-shadow(0 1px 3px rgba(0,0,0,0.1))" }}>
 
@@ -209,13 +209,13 @@ function StepShell({ color, stroke, currentStep, maxUnlockedStep, onStepClick, c
 
   return (
 
-    <div className="relative w-full max-w-6xl mx-auto" style={{ maxWidth: "100%", overflowX: "hidden" }}>
+    <div className="relative w-full max-w-6xl mx-auto" style={{ maxWidth: "100%", overflowX: "visible", overflowY: "visible", paddingRight: "60px" }}>
 
-      <div className="absolute -top-6 -left-6 -z-10 opacity-70 overflow-hidden"><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
+      <div className="absolute -top-6 -left-6 -z-10 opacity-70" style={{ overflow: "hidden" }}><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
 
-      <div className="absolute -top-3 left-6 -z-10 opacity-60 overflow-hidden"><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
+      <div className="absolute -top-3 left-6 -z-10 opacity-60" style={{ overflow: "hidden" }}><FolderShape width={1100} height={640} color={color} stroke={stroke} pad={28} /></div>
 
-      <div className="relative overflow-visible">
+      <div className="relative" style={{ overflow: "visible", zIndex: 1 }}>
 
         <FolderShape width={1100} height={640} color={color} stroke={stroke} pad={34}>{children}</FolderShape>
 
@@ -508,9 +508,9 @@ export default function PortfolioCovarianceLab(){
 
   return (
 
-    <div className="min-h-screen w-full overflow-x-hidden" style={{ background: TIF_PAGE }}>
+    <div className="min-h-screen w-full" style={{ background: TIF_PAGE, overflowX: "hidden", overflowY: "auto" }}>
 
-      <div className="flex items-start justify-center min-h-screen py-6 px-4 md:px-6">
+      <div className="flex items-start justify-center min-h-screen py-6 px-4 md:px-6" style={{ overflowX: "visible", position: "relative" }}>
 
       <AnimatePresence mode="wait">
 
