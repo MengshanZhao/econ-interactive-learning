@@ -383,8 +383,8 @@ export default function WACCCardGame() {
       </div>
 
       {/* Controls - Transparent, on middle left */}
-      <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-20 w-auto">
-        <div className="bg-black/30 backdrop-blur-md rounded-2xl p-8 border border-white/20 min-h-[400px] flex flex-col justify-between">
+      <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-20">
+        <div className="bg-black/30 backdrop-blur-md rounded-2xl p-8 border border-white/20 min-h-[400px] flex flex-col justify-between" style={{ width: "320px" }}>
           <div className="flex flex-col gap-6">
             {/* Step 1 */}
             {state === "initial" && (
@@ -400,7 +400,7 @@ export default function WACCCardGame() {
                   />
                   <button
                     onClick={handlePlaceBet}
-                    className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all w-full"
+                    className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all w-full whitespace-nowrap"
                   >
                     Place Bet & Reveal 1st Card
                   </button>
@@ -428,7 +428,7 @@ export default function WACCCardGame() {
                   />
                   <button
                     onClick={handleExtraBet}
-                    className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all w-full"
+                    className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all w-full whitespace-nowrap"
                   >
                     Add & Reveal 2nd Card
                   </button>
@@ -446,7 +446,7 @@ export default function WACCCardGame() {
             {state === "afterSecond" && (
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-3">
-                  <span className="text-white font-semibold">Add more (optional):</span>
+                  <span className="text-white font-semibold whitespace-nowrap">Add more (optional):</span>
                   <input
                     type="number"
                     id="extra-bet-2"
