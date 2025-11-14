@@ -214,7 +214,7 @@ export default function WACCCardGame() {
       {showIntro && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-black/50 backdrop-blur-xl rounded-2xl p-8 max-w-2xl w-[90%] shadow-2xl border border-white/20">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-amber-100" style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.9)" }}>
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white" style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.9)" }}>
               Welcome to the WACC Card Game!
             </h1>
             <p className="text-lg mb-4 text-white/80">
@@ -358,36 +358,21 @@ export default function WACCCardGame() {
             {player && (
               <>
                 <div className="relative" style={cardSizeStyle}>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div
-                      className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50"
-                      style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}
-                    >
-                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
-                      <div className="text-3xl font-bold text-gray-900">{player.costEquity}%</div>
-                    </div>
+                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                    <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
+                    <div className="text-3xl font-bold text-gray-900">{player.costEquity}%</div>
                   </div>
                 </div>
                 <div className="relative" style={cardSizeStyle}>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div
-                      className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50"
-                      style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}
-                    >
-                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
-                      <div className="text-3xl font-bold text-gray-900">{player.costDebt}%</div>
-                    </div>
+                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                    <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
+                    <div className="text-3xl font-bold text-gray-900">{player.costDebt}%</div>
                   </div>
                 </div>
                 <div className="relative" style={cardSizeStyle}>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div
-                      className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50"
-                      style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}
-                    >
-                      <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
-                      <div className="text-3xl font-bold text-gray-900">{player.shareEquity}%</div>
-                    </div>
+                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                    <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
+                    <div className="text-3xl font-bold text-gray-900">{player.shareEquity}%</div>
                   </div>
                 </div>
               </>
