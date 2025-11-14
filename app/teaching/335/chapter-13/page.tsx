@@ -25,7 +25,7 @@ function opponentContinues(pot: number, oppWacc: number) {
 
 export default function WACCCardGame() {
   const CARD_WIDTH = 220;
-  const CARD_HEIGHT = Math.round(CARD_WIDTH * (3976 / 2552));
+  const CARD_HEIGHT = Math.round(CARD_WIDTH * (3976 / 2552)); // ~342px
   const cardSizeStyle = { width: `${CARD_WIDTH}px`, height: `${CARD_HEIGHT}px` };
 
   const [showIntro, setShowIntro] = useState(true);
@@ -402,7 +402,7 @@ export default function WACCCardGame() {
       </div>
 
       {/* Controls - Transparent, on middle left */}
-      <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-20">
+      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-auto">
         <div className="bg-black/30 backdrop-blur-md rounded-2xl p-8 border border-white/20 min-h-[400px] flex flex-col justify-between" style={{ width: "320px" }}>
           <div className="flex flex-col gap-6">
             {/* Step 1 */}
