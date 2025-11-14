@@ -188,8 +188,8 @@ export default function WACCCardGame() {
         backgroundAttachment: "fixed",
       }}
     >
-      {/* Decorative card lot in bottom right */}
-      <div className="fixed bottom-0 right-0 z-0 pointer-events-none" style={{ opacity: 0.5 }}>
+      {/* Decorative card lot in bottom right - hidden/covered */}
+      <div className="fixed bottom-0 right-0 z-0 pointer-events-none" style={{ opacity: 0, display: "none" }}>
         <Image
           src="/images/card_lot.png"
           alt="Card decoration"
@@ -247,6 +247,13 @@ export default function WACCCardGame() {
           <span className="text-2xl">🪙</span>
           <span>Pot: ${pot.toFixed(2)}</span>
         </div>
+        <button
+          onClick={() => setShowIntro(true)}
+          className="px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm text-white font-semibold hover:bg-white/30 transition-all border border-white/30"
+          style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.8)" }}
+        >
+          📖 Rules
+        </button>
       </div>
 
       {/* Cards Layout - Opponent on top, Player on bottom */}
@@ -369,84 +376,90 @@ export default function WACCCardGame() {
         </div>
       </div>
 
-      {/* Controls - Transparent, at bottom */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-4xl px-4">
+      {/* Controls - Transparent, on left side */}
+      <div className="absolute bottom-8 left-8 z-20 w-auto">
         <div className="bg-black/30 backdrop-blur-md rounded-2xl p-6 border border-white/20">
           {/* Step 1 */}
           {state === "initial" && (
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <span className="text-white font-semibold">Initial bet:</span>
-              <input
-                type="number"
-                id="initial-bet"
-                defaultValue={10}
-                min={1}
-                className="px-4 py-2 rounded-lg border-2 border-white/30 bg-white/90 text-gray-900 font-semibold w-32"
-              />
-              <button
-                onClick={handlePlaceBet}
-                className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all"
-              >
-                Place Bet & Reveal 1st Card
-              </button>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <span className="text-white font-semibold">Initial bet:</span>
+                <input
+                  type="number"
+                  id="initial-bet"
+                  defaultValue={10}
+                  min={1}
+                  className="px-4 py-2 rounded-lg border-2 border-white/30 bg-white/90 text-gray-900 font-semibold w-32"
+                />
+                <button
+                  onClick={handlePlaceBet}
+                  className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all"
+                >
+                  Place Bet & Reveal 1st Card
+                </button>
+              </div>
             </div>
           )}
 
           {/* Step 2 */}
           {state === "afterFirst" && (
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <span className="text-white font-semibold">Extra bet:</span>
-              <input
-                type="number"
-                id="extra-bet"
-                defaultValue={5}
-                min={0}
-                className="px-4 py-2 rounded-lg border-2 border-white/30 bg-white/90 text-gray-900 font-semibold w-32"
-              />
-              <button
-                onClick={handleExtraBet}
-                className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all"
-              >
-                Add & Reveal 2nd Card
-              </button>
-              <button
-                onClick={handleGiveUp}
-                className="px-6 py-3 rounded-lg bg-red-500/90 text-white font-bold shadow-lg hover:bg-red-600 transition-all"
-              >
-                Fold
-              </button>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <span className="text-white font-semibold">Extra bet:</span>
+                <input
+                  type="number"
+                  id="extra-bet"
+                  defaultValue={5}
+                  min={0}
+                  className="px-4 py-2 rounded-lg border-2 border-white/30 bg-white/90 text-gray-900 font-semibold w-32"
+                />
+                <button
+                  onClick={handleExtraBet}
+                  className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all"
+                >
+                  Add & Reveal 2nd Card
+                </button>
+                <button
+                  onClick={handleGiveUp}
+                  className="px-6 py-3 rounded-lg bg-red-500/90 text-white font-bold shadow-lg hover:bg-red-600 transition-all"
+                >
+                  Fold
+                </button>
+              </div>
             </div>
           )}
 
           {/* Step 3 */}
           {state === "afterSecond" && (
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <span className="text-white font-semibold">Add more (optional):</span>
-              <input
-                type="number"
-                id="extra-bet-2"
-                defaultValue={0}
-                min={0}
-                className="px-4 py-2 rounded-lg border-2 border-white/30 bg-white/90 text-gray-900 font-semibold w-32"
-              />
-              <button
-                onClick={handleExtraBet2}
-                className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all"
-              >
-                Add
-              </button>
-              <button
-                onClick={handleShowdown}
-                className="px-6 py-3 rounded-lg bg-green-500/90 text-white font-bold shadow-lg hover:bg-green-600 transition-all"
-              >
-                Final Showdown
-              </button>
-              <button
-                onClick={handleFoldLate}
-                className="px-6 py-3 rounded-lg bg-red-500/90 text-white font-bold shadow-lg hover:bg-red-600 transition-all"
-              >
-                Fold
-              </button>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
+                <span className="text-white font-semibold">Add more (optional):</span>
+                <input
+                  type="number"
+                  id="extra-bet-2"
+                  defaultValue={0}
+                  min={0}
+                  className="px-4 py-2 rounded-lg border-2 border-white/30 bg-white/90 text-gray-900 font-semibold w-32"
+                />
+                <button
+                  onClick={handleExtraBet2}
+                  className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all"
+                >
+                  Add
+                </button>
+                <button
+                  onClick={handleShowdown}
+                  className="px-6 py-3 rounded-lg bg-green-500/90 text-white font-bold shadow-lg hover:bg-green-600 transition-all"
+                >
+                  Final Showdown
+                </button>
+                <button
+                  onClick={handleFoldLate}
+                  className="px-6 py-3 rounded-lg bg-red-500/90 text-white font-bold shadow-lg hover:bg-red-600 transition-all"
+                >
+                  Fold
+                </button>
+              </div>
             </div>
           )}
 
@@ -462,7 +475,7 @@ export default function WACCCardGame() {
             </div>
           )}
 
-          <div className="mt-4 text-center">
+          <div className="mt-4">
             <div className="text-white font-semibold text-sm" style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.8)" }} dangerouslySetInnerHTML={{ __html: status }} />
           </div>
         </div>
