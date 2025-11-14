@@ -24,6 +24,10 @@ function opponentContinues(pot: number, oppWacc: number) {
 }
 
 export default function WACCCardGame() {
+  const CARD_WIDTH = 220;
+  const CARD_HEIGHT = Math.round(CARD_WIDTH * (3976 / 2552));
+  const cardSizeStyle = { width: `${CARD_WIDTH}px`, height: `${CARD_HEIGHT}px` };
+
   const [showIntro, setShowIntro] = useState(true);
   const [bankroll, setBankroll] = useState(100);
   const [pot, setPot] = useState(0);
@@ -208,34 +212,34 @@ export default function WACCCardGame() {
 
       {/* Intro Modal */}
       {showIntro && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 rounded-2xl p-8 max-w-2xl w-[90%] shadow-2xl border-4 border-amber-600/50 backdrop-blur-md">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-amber-400" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-black/50 backdrop-blur-xl rounded-2xl p-8 max-w-2xl w-[90%] shadow-2xl border border-white/20">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-amber-100" style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.9)" }}>
               Welcome to the WACC Card Game!
             </h1>
-            <p className="text-lg mb-4 text-white/90">
+            <p className="text-lg mb-4 text-white/80">
               You are the CFO of a firm. Each round you receive <b>three cards</b>:
             </p>
-            <ul className="list-disc list-inside mb-4 space-y-2 text-white/90">
+            <ul className="list-disc list-inside mb-4 space-y-2 text-white/80">
               <li><b>Cost of Equity:</b> 0–15%</li>
               <li><b>Cost of Debt:</b> 3–7%</li>
               <li><b>Equity Share:</b> 0–100%</li>
             </ul>
-            <p className="text-lg mb-4 text-white/90">
+            <p className="text-lg mb-4 text-white/80">
               Your opponent gets three <b>hidden</b> cards.
             </p>
-            <p className="text-lg mb-4 text-white/90">
+            <p className="text-lg mb-4 text-white/80">
               You bet on who will have the <b>lower WACC</b>.
             </p>
-            <p className="text-lg mb-4 text-white/90">You can:</p>
-            <ul className="list-disc list-inside mb-6 space-y-2 text-white/90">
+            <p className="text-lg mb-4 text-white/80">You can:</p>
+            <ul className="list-disc list-inside mb-6 space-y-2 text-white/80">
               <li>Place an initial bet to see 1 opponent card</li>
               <li>Add more money to see more information</li>
               <li>Fold at any time before showdown</li>
             </ul>
             <button
               onClick={() => setShowIntro(false)}
-              className="w-full py-3 px-6 rounded-lg bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold text-lg shadow-lg hover:from-amber-700 hover:to-amber-800 transition-all transform hover:scale-105 border-2 border-amber-500/50"
+              className="w-full py-3 px-6 rounded-lg bg-white/90 text-gray-900 font-bold text-lg shadow-lg hover:bg-white transition-all"
             >
               Start Game
             </button>
@@ -272,7 +276,7 @@ export default function WACCCardGame() {
           <div className="flex gap-6 items-center justify-center">
             {opp && (
               <>
-                <div className="relative" style={{ width: "200px", height: "280px" }}>
+                <div className="relative" style={cardSizeStyle}>
                   {revealedCards.includes(0) ? (
                     <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
                       <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
@@ -293,7 +297,7 @@ export default function WACCCardGame() {
                     </div>
                   )}
                 </div>
-                <div className="relative" style={{ width: "200px", height: "280px" }}>
+                <div className="relative" style={cardSizeStyle}>
                   {revealedCards.includes(1) ? (
                     <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
                       <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
@@ -314,7 +318,7 @@ export default function WACCCardGame() {
                     </div>
                   )}
                 </div>
-                <div className="relative" style={{ width: "200px", height: "280px" }}>
+                <div className="relative" style={cardSizeStyle}>
                   {revealedCards.includes(2) ? (
                     <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
                       <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
@@ -353,25 +357,34 @@ export default function WACCCardGame() {
           <div className="flex gap-6 items-center justify-center">
             {player && (
               <>
-                <div className="relative" style={{ width: "200px", height: "280px" }}>
+                <div className="relative" style={cardSizeStyle}>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50" style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}>
+                    <div
+                      className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50"
+                      style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}
+                    >
                       <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
                       <div className="text-3xl font-bold text-gray-900">{player.costEquity}%</div>
                     </div>
                   </div>
                 </div>
-                <div className="relative" style={{ width: "200px", height: "280px" }}>
+                <div className="relative" style={cardSizeStyle}>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50" style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}>
+                    <div
+                      className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50"
+                      style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}
+                    >
                       <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
                       <div className="text-3xl font-bold text-gray-900">{player.costDebt}%</div>
                     </div>
                   </div>
                 </div>
-                <div className="relative" style={{ width: "200px", height: "280px" }}>
+                <div className="relative" style={cardSizeStyle}>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50" style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}>
+                    <div
+                      className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50"
+                      style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}
+                    >
                       <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
                       <div className="text-3xl font-bold text-gray-900">{player.shareEquity}%</div>
                     </div>
