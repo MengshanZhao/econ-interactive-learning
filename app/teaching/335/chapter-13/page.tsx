@@ -340,7 +340,7 @@ export default function WACCCardGame() {
           </div>
           {opp && (
             <div className="text-white font-semibold text-lg mt-2" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
-              Opponent WACC: <span className="text-2xl">{revealedCards.length === 3 ? `${opp.wacc}%` : "?"}</span>
+              Bet who has the smallest WACC
             </div>
           )}
         </div>
@@ -354,21 +354,27 @@ export default function WACCCardGame() {
             {player && (
               <>
                 <div className="relative" style={{ width: "200px", height: "280px" }}>
-                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                    <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
-                    <div className="text-3xl font-bold text-gray-900">{player.costEquity}%</div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50" style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}>
+                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
+                      <div className="text-3xl font-bold text-gray-900">{player.costEquity}%</div>
+                    </div>
                   </div>
                 </div>
                 <div className="relative" style={{ width: "200px", height: "280px" }}>
-                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                    <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
-                    <div className="text-3xl font-bold text-gray-900">{player.costDebt}%</div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50" style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}>
+                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
+                      <div className="text-3xl font-bold text-gray-900">{player.costDebt}%</div>
+                    </div>
                   </div>
                 </div>
                 <div className="relative" style={{ width: "200px", height: "280px" }}>
-                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                    <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
-                    <div className="text-3xl font-bold text-gray-900">{player.shareEquity}%</div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50" style={{ width: "fit-content", maxWidth: "100%", maxHeight: "100%" }}>
+                      <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
+                      <div className="text-3xl font-bold text-gray-900">{player.shareEquity}%</div>
+                    </div>
                   </div>
                 </div>
               </>
