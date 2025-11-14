@@ -282,9 +282,9 @@ export default function WACCCardGame() {
           <div className="flex gap-6 items-center justify-center">
             {opp && (
               <>
-                <div className="relative" style={cardSizeStyle}>
+                <div className="relative flex items-center justify-center" style={cardSizeStyle}>
                   {revealedCards.includes(0) ? (
-                    <div className="relative w-full h-full" style={dataCardSizeStyle}>
+                    <div className="relative" style={dataCardSizeStyle}>
                       <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
                         <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
                         <div className="text-3xl font-bold text-gray-900">{opp.costEquity}%</div>
@@ -305,9 +305,9 @@ export default function WACCCardGame() {
                     </div>
                   )}
                 </div>
-                <div className="relative" style={cardSizeStyle}>
+                <div className="relative flex items-center justify-center" style={cardSizeStyle}>
                   {revealedCards.includes(1) ? (
-                    <div className="relative w-full h-full" style={dataCardSizeStyle}>
+                    <div className="relative" style={dataCardSizeStyle}>
                       <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
                         <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
                         <div className="text-3xl font-bold text-gray-900">{opp.costDebt}%</div>
@@ -328,9 +328,9 @@ export default function WACCCardGame() {
                     </div>
                   )}
                 </div>
-                <div className="relative" style={cardSizeStyle}>
+                <div className="relative flex items-center justify-center" style={cardSizeStyle}>
                   {revealedCards.includes(2) ? (
-                    <div className="relative w-full h-full" style={dataCardSizeStyle}>
+                    <div className="relative" style={dataCardSizeStyle}>
                       <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
                         <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
                         <div className="text-3xl font-bold text-gray-900">{opp.shareEquity}%</div>
@@ -356,7 +356,7 @@ export default function WACCCardGame() {
           </div>
           {opp && (
             <div className="text-white font-semibold text-lg mt-2" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
-              Bet who has the smallest WACC
+              Bet who has the smallest WACC!
             </div>
           )}
         </div>
@@ -369,22 +369,28 @@ export default function WACCCardGame() {
             <div className="flex gap-6 items-center justify-center">
               {player && (
                 <>
-                  <div className="relative" style={dataCardSizeStyle}>
-                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
-                      <div className="text-3xl font-bold text-gray-900">{player.costEquity}%</div>
+                  <div className="relative flex items-center justify-center" style={cardSizeStyle}>
+                    <div className="relative" style={dataCardSizeStyle}>
+                      <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                        <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
+                        <div className="text-3xl font-bold text-gray-900">{player.costEquity}%</div>
+                      </div>
                     </div>
                   </div>
-                  <div className="relative" style={dataCardSizeStyle}>
-                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
-                      <div className="text-3xl font-bold text-gray-900">{player.costDebt}%</div>
+                  <div className="relative flex items-center justify-center" style={cardSizeStyle}>
+                    <div className="relative" style={dataCardSizeStyle}>
+                      <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                        <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
+                        <div className="text-3xl font-bold text-gray-900">{player.costDebt}%</div>
+                      </div>
                     </div>
                   </div>
-                  <div className="relative" style={dataCardSizeStyle}>
-                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                      <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
-                      <div className="text-3xl font-bold text-gray-900">{player.shareEquity}%</div>
+                  <div className="relative flex items-center justify-center" style={cardSizeStyle}>
+                    <div className="relative" style={dataCardSizeStyle}>
+                      <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                        <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
+                        <div className="text-3xl font-bold text-gray-900">{player.shareEquity}%</div>
+                      </div>
                     </div>
                   </div>
                 </>
