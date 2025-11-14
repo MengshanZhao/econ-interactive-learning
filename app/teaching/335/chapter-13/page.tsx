@@ -180,7 +180,7 @@ export default function WACCCardGame() {
 
   return (
     <div
-      className="min-h-screen w-full relative"
+      className="min-h-screen w-full relative flex flex-col items-center justify-center"
       style={{
         backgroundImage: "url('/images/table_background.jpg')",
         backgroundSize: "cover",
@@ -200,268 +200,273 @@ export default function WACCCardGame() {
         />
       </div>
 
-      <div className="relative z-10 min-h-screen py-8 px-4 md:px-8">
-        {/* Intro Modal */}
-        {showIntro && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-8 max-w-2xl w-[90%] shadow-2xl border-4 border-amber-800">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-amber-900">
-                Welcome to the WACC Card Game!
-              </h1>
-              <p className="text-lg mb-4 text-amber-900">
-                You are the CFO of a firm. Each round you receive <b>three cards</b>:
-              </p>
-              <ul className="list-disc list-inside mb-4 space-y-2 text-amber-900">
-                <li><b>Cost of Equity:</b> 0–15%</li>
-                <li><b>Cost of Debt:</b> 3–7%</li>
-                <li><b>Equity Share:</b> 0–100%</li>
-              </ul>
-              <p className="text-lg mb-4 text-amber-900">
-                Your opponent gets three <b>hidden</b> cards.
-              </p>
-              <p className="text-lg mb-4 text-amber-900">
-                You bet on who will have the <b>lower WACC</b>.
-              </p>
-              <p className="text-lg mb-4 text-amber-900">You can:</p>
-              <ul className="list-disc list-inside mb-6 space-y-2 text-amber-900">
-                <li>Place an initial bet to see 1 opponent card</li>
-                <li>Add more money to see more information</li>
-                <li>Fold at any time before showdown</li>
-              </ul>
-              <button
-                onClick={() => setShowIntro(false)}
-                className="w-full py-3 px-6 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold text-lg shadow-lg hover:from-amber-700 hover:to-amber-800 transition-all transform hover:scale-105"
-              >
-                Start Game
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Top Bar */}
-        <div className="flex justify-between items-center mb-6 bg-black/40 backdrop-blur-sm rounded-2xl px-6 py-4 text-white font-bold text-lg shadow-xl border-2 border-amber-600">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">💰</span>
-            <span>Bankroll: ${bankroll.toFixed(2)}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🪙</span>
-            <span>Pot: ${pot.toFixed(2)}</span>
+      {/* Intro Modal */}
+      {showIntro && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-8 max-w-2xl w-[90%] shadow-2xl border-4 border-amber-800">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-amber-900">
+              Welcome to the WACC Card Game!
+            </h1>
+            <p className="text-lg mb-4 text-amber-900">
+              You are the CFO of a firm. Each round you receive <b>three cards</b>:
+            </p>
+            <ul className="list-disc list-inside mb-4 space-y-2 text-amber-900">
+              <li><b>Cost of Equity:</b> 0–15%</li>
+              <li><b>Cost of Debt:</b> 3–7%</li>
+              <li><b>Equity Share:</b> 0–100%</li>
+            </ul>
+            <p className="text-lg mb-4 text-amber-900">
+              Your opponent gets three <b>hidden</b> cards.
+            </p>
+            <p className="text-lg mb-4 text-amber-900">
+              You bet on who will have the <b>lower WACC</b>.
+            </p>
+            <p className="text-lg mb-4 text-amber-900">You can:</p>
+            <ul className="list-disc list-inside mb-6 space-y-2 text-amber-900">
+              <li>Place an initial bet to see 1 opponent card</li>
+              <li>Add more money to see more information</li>
+              <li>Fold at any time before showdown</li>
+            </ul>
+            <button
+              onClick={() => setShowIntro(false)}
+              className="w-full py-3 px-6 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold text-lg shadow-lg hover:from-amber-700 hover:to-amber-800 transition-all transform hover:scale-105"
+            >
+              Start Game
+            </button>
           </div>
         </div>
+      )}
 
-        {/* Cards Area */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Player Cards */}
-          <div className="bg-gradient-to-br from-amber-50/95 to-amber-100/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border-4 border-amber-700">
-            <h2 className="text-2xl font-bold mb-4 text-amber-900">Your Firm</h2>
-            <div className="flex gap-4 flex-wrap mb-4">
-              {player && (
-                <>
-                  <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl p-4 border-3 border-blue-500 shadow-lg text-center flex flex-col justify-center" style={{ width: "140px", height: "200px" }}>
-                    <div className="text-sm opacity-80 text-blue-900 mb-2">Cost of Equity</div>
-                    <div className="text-2xl font-bold text-blue-900">{player.costEquity}%</div>
-                  </div>
-                  <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-xl p-4 border-3 border-green-500 shadow-lg text-center flex flex-col justify-center" style={{ width: "140px", height: "200px" }}>
-                    <div className="text-sm opacity-80 text-green-900 mb-2">Cost of Debt</div>
-                    <div className="text-2xl font-bold text-green-900">{player.costDebt}%</div>
-                  </div>
-                  <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl p-4 border-3 border-purple-500 shadow-lg text-center flex flex-col justify-center" style={{ width: "140px", height: "200px" }}>
-                    <div className="text-sm opacity-80 text-purple-900 mb-2">Equity Share</div>
-                    <div className="text-2xl font-bold text-purple-900">{player.shareEquity}%</div>
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="text-lg font-semibold text-amber-900">
-              Your WACC: <span className="text-2xl">{player ? `${player.wacc}%` : "?"}</span>
-            </div>
-          </div>
+      {/* Top Bar - Transparent */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 flex gap-8 text-white font-bold text-lg" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">💰</span>
+          <span>Bankroll: ${bankroll.toFixed(2)}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">🪙</span>
+          <span>Pot: ${pot.toFixed(2)}</span>
+        </div>
+      </div>
 
-          {/* Opponent Cards */}
-          <div className="bg-gradient-to-br from-amber-50/95 to-amber-100/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border-4 border-amber-700">
-            <h2 className="text-2xl font-bold mb-4 text-amber-900">Opponent</h2>
-            <div className="flex gap-4 flex-wrap mb-4">
-              {opp && (
-                <>
-                  <div className="relative" style={{ width: "140px", height: "200px" }}>
-                    {revealedCards.includes(0) ? (
-                      <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl p-4 border-3 border-blue-500 shadow-lg w-full h-full text-center flex flex-col justify-center">
-                        <div className="text-sm opacity-80 text-blue-900 mb-2">Cost of Equity</div>
-                        <div className="text-2xl font-bold text-blue-900">{opp.costEquity}%</div>
-                      </div>
-                    ) : (
-                      <div className="relative w-full h-full">
-                        <Image
-                          src="/images/card_1.png"
-                          alt="Hidden card 1"
-                          fill
-                          className="rounded-xl shadow-lg border-4 border-amber-800 object-cover"
-                          style={{ objectFit: "cover" }}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl">
-                          <span className="text-5xl font-bold text-white drop-shadow-lg">?</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="relative" style={{ width: "140px", height: "200px" }}>
-                    {revealedCards.includes(1) ? (
-                      <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-xl p-4 border-3 border-green-500 shadow-lg w-full h-full text-center flex flex-col justify-center">
-                        <div className="text-sm opacity-80 text-green-900 mb-2">Cost of Debt</div>
-                        <div className="text-2xl font-bold text-green-900">{opp.costDebt}%</div>
-                      </div>
-                    ) : (
-                      <div className="relative w-full h-full">
-                        <Image
-                          src="/images/card_2.png"
-                          alt="Hidden card 2"
-                          fill
-                          className="rounded-xl shadow-lg border-4 border-amber-800 object-cover"
-                          style={{ objectFit: "cover" }}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl">
-                          <span className="text-5xl font-bold text-white drop-shadow-lg">?</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="relative" style={{ width: "140px", height: "200px" }}>
-                    {revealedCards.includes(2) ? (
-                      <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl p-4 border-3 border-purple-500 shadow-lg w-full h-full text-center flex flex-col justify-center">
-                        <div className="text-sm opacity-80 text-purple-900 mb-2">Equity Share</div>
-                        <div className="text-2xl font-bold text-purple-900">{opp.shareEquity}%</div>
-                      </div>
-                    ) : (
-                      <div className="relative w-full h-full">
-                        <Image
-                          src="/images/card_3.png"
-                          alt="Hidden card 3"
-                          fill
-                          className="rounded-xl shadow-lg border-4 border-amber-800 object-cover"
-                          style={{ objectFit: "cover" }}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl">
-                          <span className="text-5xl font-bold text-white drop-shadow-lg">?</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="text-lg font-semibold text-amber-900">
-              Opponent WACC: <span className="text-2xl">{opp && revealedCards.length === 3 ? `${opp.wacc}%` : "?"}</span>
-            </div>
+      {/* Cards Layout - Opponent on top, Player on bottom */}
+      <div className="relative z-10 flex flex-col items-center justify-center gap-12 py-20">
+        {/* Opponent Cards - Top */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="text-white font-bold text-xl mb-2" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
+            Opponent
           </div>
+          <div className="flex gap-6 items-center justify-center">
+            {opp && (
+              <>
+                <div className="relative" style={{ width: "160px", height: "220px" }}>
+                  {revealedCards.includes(0) ? (
+                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
+                      <div className="text-3xl font-bold text-gray-900">{opp.costEquity}%</div>
+                    </div>
+                  ) : (
+                    <div className="relative w-full h-full">
+                      <Image
+                        src="/images/card_1.png"
+                        alt="Hidden card 1"
+                        fill
+                        className="rounded-lg shadow-2xl object-cover"
+                        style={{ objectFit: "cover" }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+                        <span className="text-6xl font-bold text-white drop-shadow-2xl">?</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="relative" style={{ width: "160px", height: "220px" }}>
+                  {revealedCards.includes(1) ? (
+                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
+                      <div className="text-3xl font-bold text-gray-900">{opp.costDebt}%</div>
+                    </div>
+                  ) : (
+                    <div className="relative w-full h-full">
+                      <Image
+                        src="/images/card_2.png"
+                        alt="Hidden card 2"
+                        fill
+                        className="rounded-lg shadow-2xl object-cover"
+                        style={{ objectFit: "cover" }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+                        <span className="text-6xl font-bold text-white drop-shadow-2xl">?</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="relative" style={{ width: "160px", height: "220px" }}>
+                  {revealedCards.includes(2) ? (
+                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                      <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
+                      <div className="text-3xl font-bold text-gray-900">{opp.shareEquity}%</div>
+                    </div>
+                  ) : (
+                    <div className="relative w-full h-full">
+                      <Image
+                        src="/images/card_3.png"
+                        alt="Hidden card 3"
+                        fill
+                        className="rounded-lg shadow-2xl object-cover"
+                        style={{ objectFit: "cover" }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+                        <span className="text-6xl font-bold text-white drop-shadow-2xl">?</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+          {opp && (
+            <div className="text-white font-semibold text-lg mt-2" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
+              Opponent WACC: <span className="text-2xl">{revealedCards.length === 3 ? `${opp.wacc}%` : "?"}</span>
+            </div>
+          )}
         </div>
 
-        {/* Controls */}
-        <div className="bg-gradient-to-br from-amber-50/95 to-amber-100/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border-4 border-amber-700">
-          <h3 className="text-xl font-bold mb-4 text-amber-900">Round Controls</h3>
+        {/* Player Cards - Bottom, aligned with opponent */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="text-white font-bold text-xl mb-2" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
+            Your Firm
+          </div>
+          <div className="flex gap-6 items-center justify-center">
+            {player && (
+              <>
+                <div className="relative" style={{ width: "160px", height: "220px" }}>
+                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                    <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
+                    <div className="text-3xl font-bold text-gray-900">{player.costEquity}%</div>
+                  </div>
+                </div>
+                <div className="relative" style={{ width: "160px", height: "220px" }}>
+                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                    <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
+                    <div className="text-3xl font-bold text-gray-900">{player.costDebt}%</div>
+                  </div>
+                </div>
+                <div className="relative" style={{ width: "160px", height: "220px" }}>
+                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                    <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
+                    <div className="text-3xl font-bold text-gray-900">{player.shareEquity}%</div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+          {player && (
+            <div className="text-white font-semibold text-lg mt-2" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
+              Your WACC: <span className="text-2xl">{player.wacc}%</span>
+            </div>
+          )}
+        </div>
+      </div>
 
+      {/* Controls - Transparent, at bottom */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-4xl px-4">
+        <div className="bg-black/30 backdrop-blur-md rounded-2xl p-6 border border-white/20">
           {/* Step 1 */}
           {state === "initial" && (
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-4">
-                <span className="text-amber-900 font-semibold">Initial bet:</span>
-                <input
-                  type="number"
-                  id="initial-bet"
-                  defaultValue={10}
-                  min={1}
-                  className="px-4 py-2 rounded-xl border-2 border-amber-600 bg-white text-amber-900 font-semibold w-32"
-                />
-                <button
-                  onClick={handlePlaceBet}
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105"
-                >
-                  Place Bet & Reveal 1st Card
-                </button>
-              </div>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <span className="text-white font-semibold">Initial bet:</span>
+              <input
+                type="number"
+                id="initial-bet"
+                defaultValue={10}
+                min={1}
+                className="px-4 py-2 rounded-lg border-2 border-white/30 bg-white/90 text-gray-900 font-semibold w-32"
+              />
+              <button
+                onClick={handlePlaceBet}
+                className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all"
+              >
+                Place Bet & Reveal 1st Card
+              </button>
             </div>
           )}
 
           {/* Step 2 */}
           {state === "afterFirst" && (
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-4">
-                <span className="text-amber-900 font-semibold">Extra bet:</span>
-                <input
-                  type="number"
-                  id="extra-bet"
-                  defaultValue={5}
-                  min={0}
-                  className="px-4 py-2 rounded-xl border-2 border-amber-600 bg-white text-amber-900 font-semibold w-32"
-                />
-                <button
-                  onClick={handleExtraBet}
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105"
-                >
-                  Add & Reveal 2nd Card
-                </button>
-                <button
-                  onClick={handleGiveUp}
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-red-600 to-red-700 text-white font-bold shadow-lg hover:from-red-700 hover:to-red-800 transition-all transform hover:scale-105"
-                >
-                  Fold
-                </button>
-              </div>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <span className="text-white font-semibold">Extra bet:</span>
+              <input
+                type="number"
+                id="extra-bet"
+                defaultValue={5}
+                min={0}
+                className="px-4 py-2 rounded-lg border-2 border-white/30 bg-white/90 text-gray-900 font-semibold w-32"
+              />
+              <button
+                onClick={handleExtraBet}
+                className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all"
+              >
+                Add & Reveal 2nd Card
+              </button>
+              <button
+                onClick={handleGiveUp}
+                className="px-6 py-3 rounded-lg bg-red-500/90 text-white font-bold shadow-lg hover:bg-red-600 transition-all"
+              >
+                Fold
+              </button>
             </div>
           )}
 
           {/* Step 3 */}
           {state === "afterSecond" && (
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-4">
-                <span className="text-amber-900 font-semibold">Add more before showdown (optional):</span>
-                <input
-                  type="number"
-                  id="extra-bet-2"
-                  defaultValue={0}
-                  min={0}
-                  className="px-4 py-2 rounded-xl border-2 border-amber-600 bg-white text-amber-900 font-semibold w-32"
-                />
-                <button
-                  onClick={handleExtraBet2}
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105"
-                >
-                  Add
-                </button>
-                <button
-                  onClick={handleShowdown}
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-green-600 to-green-700 text-white font-bold shadow-lg hover:from-green-700 hover:to-green-800 transition-all transform hover:scale-105"
-                >
-                  Final Showdown
-                </button>
-                <button
-                  onClick={handleFoldLate}
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-red-600 to-red-700 text-white font-bold shadow-lg hover:from-red-700 hover:to-red-800 transition-all transform hover:scale-105"
-                >
-                  Fold
-                </button>
-              </div>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <span className="text-white font-semibold">Add more (optional):</span>
+              <input
+                type="number"
+                id="extra-bet-2"
+                defaultValue={0}
+                min={0}
+                className="px-4 py-2 rounded-lg border-2 border-white/30 bg-white/90 text-gray-900 font-semibold w-32"
+              />
+              <button
+                onClick={handleExtraBet2}
+                className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all"
+              >
+                Add
+              </button>
+              <button
+                onClick={handleShowdown}
+                className="px-6 py-3 rounded-lg bg-green-500/90 text-white font-bold shadow-lg hover:bg-green-600 transition-all"
+              >
+                Final Showdown
+              </button>
+              <button
+                onClick={handleFoldLate}
+                className="px-6 py-3 rounded-lg bg-red-500/90 text-white font-bold shadow-lg hover:bg-red-600 transition-all"
+              >
+                Fold
+              </button>
             </div>
           )}
 
           {/* New Round */}
           {state === "roundOver" && (
-            <div>
+            <div className="flex justify-center">
               <button
                 onClick={handleNewRound}
-                className="px-6 py-3 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold shadow-lg hover:from-amber-700 hover:to-amber-800 transition-all transform hover:scale-105"
+                className="px-6 py-3 rounded-lg bg-white/90 text-gray-900 font-bold shadow-lg hover:bg-white transition-all"
               >
                 New Round
               </button>
             </div>
           )}
 
-          <div className="mt-6 p-4 bg-white/80 rounded-xl border-2 border-amber-600 min-h-[60px]">
-            <div className="text-amber-900 font-semibold" dangerouslySetInnerHTML={{ __html: status }} />
+          <div className="mt-4 text-center">
+            <div className="text-white font-semibold text-sm" style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.8)" }} dangerouslySetInnerHTML={{ __html: status }} />
           </div>
         </div>
       </div>
     </div>
   );
 }
-
