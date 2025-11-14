@@ -24,9 +24,15 @@ function opponentContinues(pot: number, oppWacc: number) {
 }
 
 export default function WACCCardGame() {
-  const CARD_WIDTH = Math.round(220 * 0.885); // ~195px
-  const CARD_HEIGHT = Math.round(220 * (3976 / 2552) * 0.936); // ~320px
+  // Flipped cards (PNG with transparent boundary) keep original size
+  const CARD_WIDTH = 220;
+  const CARD_HEIGHT = Math.round(CARD_WIDTH * (3976 / 2552)); // ~342px
   const cardSizeStyle = { width: `${CARD_WIDTH}px`, height: `${CARD_HEIGHT}px` };
+  
+  // Revealed data cards (white background) are scaled down
+  const DATA_CARD_WIDTH = Math.round(220 * 0.885); // ~195px
+  const DATA_CARD_HEIGHT = Math.round(220 * (3976 / 2552) * 0.936); // ~320px
+  const dataCardSizeStyle = { width: `${DATA_CARD_WIDTH}px`, height: `${DATA_CARD_HEIGHT}px` };
 
   const [showIntro, setShowIntro] = useState(true);
   const [bankroll, setBankroll] = useState(100);
@@ -278,9 +284,11 @@ export default function WACCCardGame() {
               <>
                 <div className="relative" style={cardSizeStyle}>
                   {revealedCards.includes(0) ? (
-                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
-                      <div className="text-3xl font-bold text-gray-900">{opp.costEquity}%</div>
+                    <div className="relative w-full h-full" style={dataCardSizeStyle}>
+                      <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                        <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
+                        <div className="text-3xl font-bold text-gray-900">{opp.costEquity}%</div>
+                      </div>
                     </div>
                   ) : (
                     <div className="relative w-full h-full">
@@ -299,9 +307,11 @@ export default function WACCCardGame() {
                 </div>
                 <div className="relative" style={cardSizeStyle}>
                   {revealedCards.includes(1) ? (
-                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
-                      <div className="text-3xl font-bold text-gray-900">{opp.costDebt}%</div>
+                    <div className="relative w-full h-full" style={dataCardSizeStyle}>
+                      <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                        <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
+                        <div className="text-3xl font-bold text-gray-900">{opp.costDebt}%</div>
+                      </div>
                     </div>
                   ) : (
                     <div className="relative w-full h-full">
@@ -320,9 +330,11 @@ export default function WACCCardGame() {
                 </div>
                 <div className="relative" style={cardSizeStyle}>
                   {revealedCards.includes(2) ? (
-                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                      <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
-                      <div className="text-3xl font-bold text-gray-900">{opp.shareEquity}%</div>
+                    <div className="relative w-full h-full" style={dataCardSizeStyle}>
+                      <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                        <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
+                        <div className="text-3xl font-bold text-gray-900">{opp.shareEquity}%</div>
+                      </div>
                     </div>
                   ) : (
                     <div className="relative w-full h-full">
@@ -354,30 +366,30 @@ export default function WACCCardGame() {
           <div className="text-white font-bold text-xl mb-2" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
             Your Firm
           </div>
-          <div className="flex gap-6 items-center justify-center">
-            {player && (
-              <>
-                <div className="relative" style={cardSizeStyle}>
-                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                    <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
-                    <div className="text-3xl font-bold text-gray-900">{player.costEquity}%</div>
+            <div className="flex gap-6 items-center justify-center">
+              {player && (
+                <>
+                  <div className="relative" style={dataCardSizeStyle}>
+                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Equity</div>
+                      <div className="text-3xl font-bold text-gray-900">{player.costEquity}%</div>
+                    </div>
                   </div>
-                </div>
-                <div className="relative" style={cardSizeStyle}>
-                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                    <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
-                    <div className="text-3xl font-bold text-gray-900">{player.costDebt}%</div>
+                  <div className="relative" style={dataCardSizeStyle}>
+                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                      <div className="text-xs opacity-70 mb-2 text-gray-800">Cost of Debt</div>
+                      <div className="text-3xl font-bold text-gray-900">{player.costDebt}%</div>
+                    </div>
                   </div>
-                </div>
-                <div className="relative" style={cardSizeStyle}>
-                  <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
-                    <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
-                    <div className="text-3xl font-bold text-gray-900">{player.shareEquity}%</div>
+                  <div className="relative" style={dataCardSizeStyle}>
+                    <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center flex flex-col justify-center shadow-2xl border-2 border-white/50">
+                      <div className="text-xs opacity-70 mb-2 text-gray-800">Equity Share</div>
+                      <div className="text-3xl font-bold text-gray-900">{player.shareEquity}%</div>
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
-          </div>
+                </>
+              )}
+            </div>
           {player && (
             <div className="text-white font-semibold text-lg mt-2" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
               Your WACC: <span className="text-2xl">{player.wacc}%</span>
