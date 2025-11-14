@@ -24,8 +24,8 @@ function opponentContinues(pot: number, oppWacc: number) {
 }
 
 export default function WACCCardGame() {
-  const CARD_WIDTH = 220;
-  const CARD_HEIGHT = Math.round(CARD_WIDTH * (3976 / 2552)); // ~342px
+  const CARD_WIDTH = Math.round(220 * 0.885); // ~195px
+  const CARD_HEIGHT = Math.round(220 * (3976 / 2552) * 0.936); // ~320px
   const cardSizeStyle = { width: `${CARD_WIDTH}px`, height: `${CARD_HEIGHT}px` };
 
   const [showIntro, setShowIntro] = useState(true);
