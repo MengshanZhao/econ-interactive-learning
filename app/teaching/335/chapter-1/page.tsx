@@ -519,7 +519,7 @@ export default function TaxStairsGamePage() {
   )
 
   // Initial current offer
-  const initialOffer: PackageOption = { id: "A", label: "Current Job", earnings: 6000, personalTax: 0.2, corporateTax: 0.1 }
+  const initialOffer: PackageOption = { id: "A", label: "TechCorp Solutions", earnings: 6000, personalTax: 0.2, corporateTax: 0.1 }
 
   const [roundIndex, setRoundIndex] = useState(0)
 
@@ -545,6 +545,7 @@ export default function TaxStairsGamePage() {
 
   const [stepIndex, setStepIndex] = useState(0)
   const [showIntro, setShowIntro] = useState(true)
+  const [showExample, setShowExample] = useState(false)
 
   const [wrongPulse, setWrongPulse] = useState(0)
 
@@ -637,7 +638,7 @@ export default function TaxStairsGamePage() {
               <h2 className="text-4xl font-bold font-vt323 text-orange-600 mb-4">Welcome to Your Career Journey!</h2>
               <div className="text-lg font-vt323 text-gray-700 space-y-4 leading-relaxed">
                 <p>
-                  You've just graduated and found your first full-time work at <span className="font-bold text-orange-600">Current Job</span>!
+                  You've just graduated and found your first full-time work at <span className="font-bold text-orange-600">TechCorp Solutions</span>!
                 </p>
                 <p>
                   But in the meantime, you're still looking for better opportunities...
@@ -646,30 +647,85 @@ export default function TaxStairsGamePage() {
                   Please pick the highest after-tax offer to climb on the mountain!
                 </p>
               </div>
-              <Button 
-                onClick={() => setShowIntro(false)}
-                className="mt-6 font-vt323 text-lg bg-orange-500 hover:bg-orange-600 text-white px-8 py-3"
-                size="lg"
-              >
-                Start Game
-              </Button>
+
+              {/* Example calculation popup */}
+              {showExample && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-4 bg-blue-50 border-2 border-blue-300 rounded-lg p-6 text-left"
+                >
+                  <div className="text-lg font-bold font-vt323 text-blue-700 mb-3">Example Calculation:</div>
+                  <div className="text-base font-vt323 text-gray-800 space-y-2">
+                    <p>Let's say you have an offer with:</p>
+                    <ul className="list-disc list-inside ml-4 space-y-1">
+                      <li>Earnings (gross): $6,000</li>
+                      <li>Corporate tax: 10%</li>
+                      <li>Personal tax: 20%</li>
+                    </ul>
+                    <p className="mt-3 font-semibold">After-tax calculation:</p>
+                    <p className="font-mono bg-white p-2 rounded border">
+                      $6,000 × (1 - 0.10) × (1 - 0.20) = $6,000 × 0.90 × 0.80 = $4,320
+                    </p>
+                    <p className="mt-2 text-sm text-gray-600">
+                      So your after-tax income would be <span className="font-bold text-blue-700">$4,320</span>
+                    </p>
+                      </div>
+                </motion.div>
+              )}
+
+              {/* Game style buttons */}
+              <div className="flex gap-4 justify-center mt-6">
+                {/* Blue button - Give me an example */}
+                <button
+                  onClick={() => setShowExample(!showExample)}
+                  className="group relative cursor-pointer"
+                  style={{ perspective: '1000px' }}
+                >
+                  <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(-5deg)' }}>
+                    <div className="relative transform transition-all duration-300 group-hover:scale-110 group-active:scale-95">
+                      <div className="relative w-40 h-12 bg-blue-500 rounded shadow-xl" style={{ 
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
+                        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                      }}>
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-blue-300 rounded-t opacity-60"></div>
+                        <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-base font-bold">
+                          Give me an example
+                        </div>
+                      </div>
+                      <div className="absolute left-1 top-1 w-40 h-12 bg-blue-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Red button - Start Game */}
+                <button
+                  onClick={() => setShowIntro(false)}
+                  className="group relative cursor-pointer"
+                  style={{ perspective: '1000px' }}
+                >
+                  <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(5deg)' }}>
+                    <div className="relative transform transition-all duration-300 group-hover:scale-110 group-active:scale-95">
+                      <div className="relative w-40 h-12 bg-red-500 rounded shadow-xl" style={{ 
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
+                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                      }}>
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-red-300 rounded-t opacity-60"></div>
+                        <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-base font-bold">
+                          Start Game
+                              </div>
+                      </div>
+                      <div className="absolute left-1 top-1 w-40 h-12 bg-red-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>
       )}
 
       <div className="container mx-auto px-4 py-8">
-
-        {/* Top: Simple instruction */}
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold font-vt323 mb-2">Pick the highest after tax offer to climb on the mountain!</h1>
-          <div className="flex items-center justify-center gap-4 mt-4">
-            <Badge variant="secondary" className="font-vt323 text-base">Step {stepIndex}/3</Badge>
-            <Button variant="outline" onClick={restart} className="font-vt323 text-base">
-              Restart
-            </Button>
-          </div>
-        </div>
 
         {/* Game area - single 3D scene with all UI inside */}
         <div className="max-w-6xl mx-auto">
@@ -681,8 +737,8 @@ export default function TaxStairsGamePage() {
               <div className="absolute top-4 left-4 z-20">
                 <Badge variant="secondary" className="font-vt323 text-lg bg-white/90 backdrop-blur-sm shadow-lg px-4 py-2">
                   Step {stepIndex}/3
-                </Badge>
-              </div>
+                            </Badge>
+                          </div>
 
               {/* Round title - top center */}
               {!result && (
@@ -690,8 +746,8 @@ export default function TaxStairsGamePage() {
                   <div className="bg-white/90 backdrop-blur-sm rounded-lg px-8 py-4 shadow-lg border-2 border-orange-200">
                     <div className="text-base text-muted-foreground font-vt323 mb-2">{round.title}</div>
                     <div className="text-2xl font-bold font-vt323">A new job offer arrives!</div>
-                  </div>
-                </div>
+                              </div>
+                            </div>
               )}
 
               {/* Current offer display - bottom right corner */}
@@ -704,16 +760,16 @@ export default function TaxStairsGamePage() {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Earnings (gross)</span>
                         <span className="font-semibold text-lg">${money(currentOffer.earnings)}</span>
-                      </div>
+                              </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Personal tax</span>
                         <span className="font-medium text-lg">{pct(currentOffer.personalTax)}</span>
-                      </div>
+                            </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Corporate tax</span>
                         <span className="font-medium text-lg">{pct(currentOffer.corporateTax)}</span>
-                      </div>
-                    </div>
+                          </div>
+                            </div>
                   </div>
                 </div>
               )}
@@ -728,7 +784,7 @@ export default function TaxStairsGamePage() {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Earnings (gross)</span>
                         <span className="font-semibold text-lg">${money(round.newOffer.earnings)}</span>
-                      </div>
+                            </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Personal tax</span>
                         <span className="font-medium text-lg">{pct(round.newOffer.personalTax)}</span>
@@ -742,12 +798,12 @@ export default function TaxStairsGamePage() {
                 </div>
               )}
 
-              {/* 3D Arrow buttons - center bottom (switched directions) */}
+              {/* 3D Arrow buttons - center bottom (fixed directions) */}
               {!result && (
                 <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-12 items-center">
-                  {/* Left arrow - Stay with Current Job */}
+                  {/* Left arrow - Switch to New Offer (points left to new offer box) */}
                   <button
-                    onClick={() => evaluate("stay")}
+                    onClick={() => evaluate("switch")}
                     className="group relative cursor-pointer"
                     style={{ perspective: '1000px' }}
                   >
@@ -757,37 +813,11 @@ export default function TaxStairsGamePage() {
                         <div className="absolute left-0 top-0 w-0 h-0" style={{ 
                           borderTop: '20px solid transparent',
                           borderBottom: '20px solid transparent',
-                          borderLeft: '28px solid #f97316',
+                          borderLeft: '28px solid #3b82f6',
                           filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
                         }}></div>
                         {/* Arrow shaft - main body */}
-                        <div className="relative left-28 w-32 h-10 bg-orange-500 rounded shadow-xl" style={{ 
-                          boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
-                          background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
-                        }}>
-                          {/* Top highlight */}
-                          <div className="absolute top-0 left-0 right-0 h-1 bg-orange-300 rounded-t opacity-60"></div>
-                          {/* Text */}
-                          <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-sm font-bold">
-                            Stay with Current Job
-                          </div>
-                        </div>
-                        {/* 3D depth shadow */}
-                        <div className="absolute left-29 top-1 w-32 h-10 bg-orange-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* Right arrow - Switch to New Offer */}
-                  <button
-                    onClick={() => evaluate("switch")}
-                    className="group relative cursor-pointer"
-                    style={{ perspective: '1000px' }}
-                  >
-                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(15deg)' }}>
-                      <div className="relative transform transition-all duration-300 group-hover:scale-110 group-hover:-translate-x-2 group-active:scale-95">
-                        {/* Arrow shaft - main body */}
-                        <div className="relative w-32 h-10 bg-blue-500 rounded shadow-xl" style={{ 
+                        <div className="relative left-28 w-32 h-10 bg-blue-500 rounded shadow-xl" style={{ 
                           boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
                           background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
                         }}>
@@ -798,15 +828,41 @@ export default function TaxStairsGamePage() {
                             Switch to New Offer
                           </div>
                         </div>
+                        {/* 3D depth shadow */}
+                        <div className="absolute left-29 top-1 w-32 h-10 bg-blue-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Right arrow - Stay with Current Job (points right to current job box) */}
+                  <button
+                    onClick={() => evaluate("stay")}
+                    className="group relative cursor-pointer"
+                    style={{ perspective: '1000px' }}
+                  >
+                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(15deg)' }}>
+                      <div className="relative transform transition-all duration-300 group-hover:scale-110 group-hover:-translate-x-2 group-active:scale-95">
+                        {/* Arrow shaft - main body */}
+                        <div className="relative w-32 h-10 bg-orange-500 rounded shadow-xl" style={{ 
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
+                          background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
+                        }}>
+                          {/* Top highlight */}
+                          <div className="absolute top-0 left-0 right-0 h-1 bg-orange-300 rounded-t opacity-60"></div>
+                          {/* Text */}
+                          <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-sm font-bold">
+                            Stay with Current Job
+                          </div>
+                        </div>
                         {/* Arrow head - right pointing */}
                         <div className="absolute right-0 top-0 w-0 h-0" style={{ 
                           borderTop: '20px solid transparent',
                           borderBottom: '20px solid transparent',
-                          borderRight: '28px solid #3b82f6',
+                          borderRight: '28px solid #f97316',
                           filter: 'drop-shadow(-2px 2px 4px rgba(0,0,0,0.3))'
                         }}></div>
                         {/* 3D depth shadow */}
-                        <div className="absolute left-1 top-1 w-32 h-10 bg-blue-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
+                        <div className="absolute left-1 top-1 w-32 h-10 bg-orange-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
                       </div>
                     </div>
                   </button>
@@ -837,7 +893,7 @@ export default function TaxStairsGamePage() {
                     >
                       {isLast ? "Play Again" : "Next Round"}
                     </Button>
-                  </motion.div>
+                </motion.div>
                               </div>
               )}
 
@@ -870,7 +926,7 @@ export default function TaxStairsGamePage() {
                         <div className="text-lg font-bold text-orange-600 mt-1">
                           = ${money(result.currentAfterTax)}
                             </div>
-                              </div>
+          </div>
 
                       <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-200">
                         <div className="font-semibold mb-1">New Offer Calculation:</div>
@@ -891,7 +947,7 @@ export default function TaxStairsGamePage() {
                       >
                         {isLast ? "Play Again" : "Next Round"}
                       </Button>
-                          </div>
+              </div>
                       </motion.div>
                 </div>
               )}
