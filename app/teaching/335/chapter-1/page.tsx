@@ -141,9 +141,12 @@ function WaterPool({ position }: { position: [number, number, number] }) {
   )
 }
 
-function LittleAvatar({ stepIndex, wrongPulse }: { stepIndex: number; wrongPulse: number }) {
+function LittleAvatar({ stepIndex, wrongPulse, correctPulse }: { stepIndex: number; wrongPulse: number; correctPulse: number }) {
   const group = useRef<THREE.Group>(null)
+  const headRef = useRef<THREE.Group>(null)
+  const bodyRef = useRef<THREE.Group>(null)
   const wrongAnim = useRef({ active: false, start: 0 })
+  const correctAnim = useRef({ active: false, start: 0 })
   
   // Target position: move forward in Z space, step up
   const targetZ = -stepIndex * 1.5
@@ -155,56 +158,91 @@ function LittleAvatar({ stepIndex, wrongPulse }: { stepIndex: number; wrongPulse
     }
   }, [wrongPulse])
   
+  useEffect(() => {
+    if (correctPulse > 0) {
+      correctAnim.current = { active: true, start: performance.now() }
+    }
+  }, [correctPulse])
+  
   useFrame((_, dt) => {
-    if (!group.current) return
+    if (!group.current || !headRef.current || !bodyRef.current) return
     
     // Smooth movement to target
     group.current.position.lerp(new THREE.Vector3(0, targetY, targetZ), 1 - Math.pow(0.05, dt))
     
     // Idle bob
-    group.current.rotation.y = Math.sin(Date.now() * 0.001) * 0.1
+    if (!wrongAnim.current.active && !correctAnim.current.active) {
+      group.current.rotation.y = Math.sin(Date.now() * 0.001) * 0.1
+      headRef.current.rotation.x = 0
+      bodyRef.current.rotation.x = 0
+    }
     
-    // Wrong animation: shake
+    // Wrong animation: annoyed - head shake, body slump
     if (wrongAnim.current.active) {
       const elapsed = (performance.now() - wrongAnim.current.start) / 1000
-      if (elapsed < 0.5) {
-        const shake = Math.sin(elapsed * 20) * 0.15
-        group.current.position.x = shake
-        group.current.rotation.z = shake * 0.5
+      if (elapsed < 1.2) {
+        const shake = Math.sin(elapsed * 25) * 0.2
+        const slump = Math.sin(elapsed * 8) * 0.3
+        group.current.position.x = shake * 0.3
+        group.current.rotation.z = shake * 0.3
+        headRef.current.rotation.x = slump * 0.5 // Head droops
+        bodyRef.current.rotation.x = slump * 0.3 // Body slumps
+        bodyRef.current.position.y = -Math.abs(slump) * 0.1 // Slight crouch
       } else {
         wrongAnim.current.active = false
         group.current.rotation.z = 0
         group.current.position.x = 0
+        headRef.current.rotation.x = 0
+        bodyRef.current.rotation.x = 0
+        bodyRef.current.position.y = 0
+      }
+    }
+    
+    // Correct animation: happy - slight bounce
+    if (correctAnim.current.active) {
+      const elapsed = (performance.now() - correctAnim.current.start) / 1000
+      if (elapsed < 0.8) {
+        const bounce = Math.sin(elapsed * 15) * 0.15
+        group.current.position.y = targetY + bounce * 0.2
+        headRef.current.rotation.x = -bounce * 0.2 // Head tilts up
+      } else {
+        correctAnim.current.active = false
+        group.current.position.y = targetY
+        headRef.current.rotation.x = 0
       }
     }
   })
   
   return (
     <group ref={group} position={[0, 0.6, 0]}>
-      {/* Body - dark blue matching photo */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[0.4, 0.5, 0.3]} />
-        <meshBasicMaterial color="#2E4A6B" />
-      </mesh>
+      <group ref={bodyRef}>
+        {/* Body - dark blue matching photo */}
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[0.4, 0.5, 0.3]} />
+          <meshBasicMaterial color="#2E4A6B" />
+        </mesh>
+        {/* Legs - darker blue */}
+        <mesh position={[-0.1, -0.3, 0]}>
+          <boxGeometry args={[0.15, 0.3, 0.2]} />
+          <meshBasicMaterial color="#1E3A5B" />
+        </mesh>
+        <mesh position={[0.1, -0.3, 0]}>
+          <boxGeometry args={[0.15, 0.3, 0.2]} />
+          <meshBasicMaterial color="#1E3A5B" />
+        </mesh>
+        {/* Backpack - dark brown */}
+        <mesh position={[-0.25, 0, 0]}>
+          <boxGeometry args={[0.15, 0.25, 0.2]} />
+          <meshBasicMaterial color="#3A2A1F" />
+        </mesh>
+      </group>
       {/* Head - light pink/purple matching photo */}
-      <mesh position={[0, 0.4, 0]}>
-        <boxGeometry args={[0.32, 0.32, 0.32]} />
-        <meshBasicMaterial color="#E8A5C4" />
-      </mesh>
-      {/* Legs - darker blue */}
-      <mesh position={[-0.1, -0.3, 0]}>
-        <boxGeometry args={[0.15, 0.3, 0.2]} />
-        <meshBasicMaterial color="#1E3A5B" />
-      </mesh>
-      <mesh position={[0.1, -0.3, 0]}>
-        <boxGeometry args={[0.15, 0.3, 0.2]} />
-        <meshBasicMaterial color="#1E3A5B" />
-      </mesh>
-      {/* Backpack - dark brown */}
-      <mesh position={[-0.25, 0, 0]}>
-        <boxGeometry args={[0.15, 0.25, 0.2]} />
-        <meshBasicMaterial color="#3A2A1F" />
-      </mesh>
+      <group ref={headRef} position={[0, 0.4, 0]}>
+        <mesh>
+          <boxGeometry args={[0.32, 0.32, 0.32]} />
+          <meshBasicMaterial color="#E8A5C4" />
+        </mesh>
+      </group>
     </group>
   )
 }
@@ -300,6 +338,7 @@ function Simple3DScene({
       style={{ width: '100%', height: '100%', background: `linear-gradient(to bottom, ${skyColor}, #FF8C69)` }}
     >
       <ambientLight intensity={1.1} />
+      <directionalLight position={[10, 10, 5]} intensity={0.5} />
       
       {/* Ground plane - brown/terra-cotta matching photo */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, -12]}>
@@ -323,7 +362,7 @@ function Simple3DScene({
       <VoxelStairs stepIndex={stepIndex} />
       
       {/* Character */}
-      <LittleAvatar stepIndex={stepIndex} wrongPulse={wrongPulse} />
+      <LittleAvatar stepIndex={stepIndex} wrongPulse={wrongPulse} correctPulse={correctPulse} />
       
       {/* Confetti - originates from character position */}
       <Confetti trigger={correctPulse} originZ={characterZ} />
@@ -607,19 +646,10 @@ export default function TaxStairsGamePage() {
           </div>
         </div>
 
-        {/* Game area */}
-        <div className="grid lg:grid-cols-2 gap-6 items-start">
-
-          {/* LEFT: Game controls */}
-          <div className="flex flex-col gap-6">
-
-            <AnimatePresence mode="wait">
-
-              {!result ? (
-
-                <motion.div
-
-                  key="round"
+        {/* Game area - single 3D scene with all UI inside */}
+        <div className="max-w-6xl mx-auto">
+          <Card className="overflow-hidden relative min-h-[700px] shadow-xl" style={{ borderRadius: 12 }}>
+            <div className="h-[700px] w-full relative">
 
                   initial={{ opacity: 0, y: 10 }}
 
@@ -765,39 +795,155 @@ export default function TaxStairsGamePage() {
 
                 </motion.div>
 
-              )}
-
-            </AnimatePresence>
-
-          </div>
-
-          {/* RIGHT: 3D game scene */}
-          <Card className="overflow-hidden relative min-h-[600px] shadow-xl" style={{ borderRadius: 12 }}>
-
-            <div className="h-[600px] w-full relative">
+            </div>
 
               <Simple3DScene stepIndex={stepIndex} wrongPulse={wrongPulse} correctPulse={correctPulse} currentOffer={currentOffer} />
 
-              {/* Current offer display - bottom right corner, on top of mountain */}
-              {currentOffer && (
+              {/* Step indicator - top left */}
+              <div className="absolute top-4 left-4 z-20">
+                <Badge variant="secondary" className="font-vt323 text-base bg-white/90 backdrop-blur-sm shadow-lg px-4 py-2">
+                  Step {stepIndex}/9
+                </Badge>
+              </div>
+
+              {/* Round title - top center */}
+              {!result && (
+                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg border-2 border-orange-200">
+                    <div className="text-sm text-muted-foreground font-vt323 mb-1">{round.title}</div>
+                    <div className="text-xl font-bold font-vt323">A new job offer arrives!</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Current offer display - bottom right corner */}
+              {currentOffer && !result && (
                 <div className="absolute bottom-6 right-6 z-20">
-                  <Card className="p-4 bg-white/95 shadow-xl border-2 border-orange-200 min-w-[200px]">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-xl border-2 border-orange-300 min-w-[200px]">
                     <div className="text-xs text-muted-foreground font-vt323 mb-1">Current Job</div>
                     <div className="text-lg font-bold font-vt323 mb-2">{currentOffer.label}</div>
                     <div className="text-2xl font-bold font-vt323 text-orange-600">
                       ${money(afterTax(currentOffer))}
                     </div>
                     <div className="text-xs text-muted-foreground font-vt323 mt-1">after-tax</div>
-                  </Card>
+                  </div>
                 </div>
               )}
 
-              {/* Step indicator - top left */}
-              <div className="absolute top-4 left-4 z-20">
-                <Badge variant="secondary" className="font-vt323 text-base bg-white/95 shadow-lg px-4 py-2">
-                  Step {stepIndex}/9
-                </Badge>
-              </div>
+              {/* New offer display - bottom left corner */}
+              {!result && (
+                <div className="absolute bottom-6 left-6 z-20">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-xl border-2 border-blue-300 min-w-[200px]">
+                    <div className="text-xs text-muted-foreground font-vt323 mb-1">New Offer</div>
+                    <div className="text-lg font-bold font-vt323 mb-2">{round.newOffer.label}</div>
+                    <div className="text-2xl font-bold font-vt323 text-blue-600">
+                      ${money(afterTax(round.newOffer))}
+                    </div>
+                    <div className="text-xs text-muted-foreground font-vt323 mt-1">after-tax</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Choice buttons - center bottom */}
+              {!result && (
+                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-4">
+                  <Button 
+                    onClick={() => evaluate("stay")}
+                    className="font-vt323 text-base bg-orange-500 hover:bg-orange-600 text-white shadow-lg px-8 py-3"
+                    size="lg"
+                  >
+                    Stay with Current Job
+                  </Button>
+                  <Button 
+                    onClick={() => evaluate("switch")}
+                    className="font-vt323 text-base bg-blue-500 hover:bg-blue-600 text-white shadow-lg px-8 py-3"
+                    size="lg"
+                  >
+                    Switch to New Offer
+                  </Button>
+                </div>
+              )}
+
+              {/* Result display - center */}
+              {result && result.correct && (
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-2xl border-4 border-green-400 min-w-[300px] text-center"
+                  >
+                    <div className="text-5xl mb-3">✅</div>
+                    <div className="text-2xl font-bold font-vt323 mb-2 text-green-600">Correct! Step up!</div>
+                    <div className="text-sm text-muted-foreground font-vt323 mb-4">
+                      {result.shouldSwitch 
+                        ? "The new offer has higher after-tax pay."
+                        : "Your current job has higher after-tax pay."
+                      }
+                    </div>
+                    <Button 
+                      onClick={isLast ? restart : nextRound}
+                      className="font-vt323 text-base bg-green-500 hover:bg-green-600 text-white"
+                      size="lg"
+                    >
+                      {isLast ? "Play Again" : "Next Round"}
+                    </Button>
+                  </motion.div>
+                </div>
+              )}
+
+              {/* Wrong answer popup with calculation - center */}
+              {result && !result.correct && (
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-2xl border-4 border-red-400 min-w-[400px] max-w-[500px]"
+                  >
+                    <div className="text-center mb-4">
+                      <div className="text-5xl mb-3">❌</div>
+                      <div className="text-2xl font-bold font-vt323 mb-2 text-red-600">Not quite!</div>
+                      <div className="text-sm text-muted-foreground font-vt323">
+                        {result.shouldSwitch 
+                          ? "The new offer has higher after-tax pay. You should switch!"
+                          : "Your current job has higher after-tax pay. You should stay!"
+                        }
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 mb-4 text-sm font-vt323">
+                      <div className="bg-orange-50 rounded-lg p-3 border-2 border-orange-200">
+                        <div className="font-semibold mb-1">Current Job Calculation:</div>
+                        <div className="text-xs text-muted-foreground">
+                          ${money(currentOffer.earnings)} × (1 − {pct(currentOffer.personalTax)}) × (1 − {pct(currentOffer.corporateTax)})
+                        </div>
+                        <div className="text-lg font-bold text-orange-600 mt-1">
+                          = ${money(result.currentAfterTax)}
+                        </div>
+                      </div>
+
+                      <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-200">
+                        <div className="font-semibold mb-1">New Offer Calculation:</div>
+                        <div className="text-xs text-muted-foreground">
+                          ${money(round.newOffer.earnings)} × (1 − {pct(round.newOffer.personalTax)}) × (1 − {pct(round.newOffer.corporateTax)})
+                        </div>
+                        <div className="text-lg font-bold text-blue-600 mt-1">
+                          = ${money(result.newAfterTax)}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-center">
+                      <Button 
+                        onClick={isLast ? restart : nextRound}
+                        className="font-vt323 text-base bg-red-500 hover:bg-red-600 text-white"
+                        size="lg"
+                      >
+                        {isLast ? "Play Again" : "Next Round"}
+                      </Button>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
 
             </div>
 
