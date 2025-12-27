@@ -2,6 +2,10 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react"
 
+import { Canvas, useFrame } from "@react-three/fiber"
+
+import * as THREE from "three"
+
 import { motion, AnimatePresence } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
@@ -62,233 +66,161 @@ function pct(x: number) {
 
 }
 
-/** -------- PIXEL ART STYLES -------- */
-const pixelStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-  
-  .pixel-art-container {
-    image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: crisp-edges;
-    font-family: 'VT323', monospace;
-  }
-  
-  .pixel-field {
-    background: #87CEEB;
-    position: relative;
-    overflow: hidden;
-    image-rendering: pixelated;
-  }
-  
-  .pixel-sky {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 60%;
-    background: #87CEEB;
-    image-rendering: pixelated;
-  }
-  
-  .pixel-ground {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40%;
-    background: #B8E0D2;
-    border-top: 2px solid #98D8E8;
-    image-rendering: pixelated;
-  }
-  
-  .pixel-grid {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-      repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(0,0,0,0.05) 15px, rgba(0,0,0,0.05) 16px),
-      repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(0,0,0,0.05) 15px, rgba(0,0,0,0.05) 16px);
-    image-rendering: pixelated;
-    pointer-events: none;
-  }
-  
-  .pixel-stairs {
-    display: flex;
-    align-items: flex-end;
-    height: 100%;
-    padding-bottom: 20px;
-    gap: 8px;
-  }
-  
-  .pixel-step {
-    width: 40px;
-    height: 30px;
-    background: #d08a6a;
-    border: 2px solid #c77f60;
-    border-radius: 0;
-    box-shadow: 
-      2px 2px 0 #b87256,
-      inset -2px -2px 0 rgba(0,0,0,0.1);
-    image-rendering: pixelated;
-  }
-  
-  .pixel-step:nth-child(even) {
-    background: #c77f60;
-    border-color: #b87256;
-  }
-  
-  .pixel-character {
-    position: absolute;
-    bottom: 20px;
-    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease;
-    image-rendering: pixelated;
-  }
-  
-  .pixel-character.stepping {
-    animation: pixelStep 0.5s ease-out;
-  }
-  
-  .pixel-character.wrong {
-    animation: pixelWrong 0.5s ease-out;
-  }
-  
-  @keyframes pixelStep {
-    0% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-20px) scale(1.1); }
-    100% { transform: translateY(0) scale(1); }
-  }
-  
-  @keyframes pixelWrong {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-15px) rotate(-5deg); }
-    75% { transform: translateX(5px) rotate(5deg); }
-  }
-  
-  .pixel-avatar {
-    width: 32px;
-    height: 40px;
-    position: relative;
-    image-rendering: pixelated;
-  }
-  
-  .pixel-head {
-    width: 24px;
-    height: 24px;
-    background: #ffb48a;
-    border: 2px solid #e89f7a;
-    border-radius: 0;
-    margin: 0 auto;
-    position: relative;
-    image-rendering: pixelated;
-  }
-  
-  .pixel-body {
-    width: 20px;
-    height: 20px;
-    background: #4b74ff;
-    border: 2px solid #3a5fd9;
-    border-radius: 0;
-    margin: 2px auto 0;
-    position: relative;
-    image-rendering: pixelated;
-  }
-  
-  .pixel-backpack {
-    width: 8px;
-    height: 12px;
-    background: #2a2a2f;
-    border: 1px solid #1a1a1f;
-    border-radius: 0;
-    position: absolute;
-    left: -4px;
-    top: 8px;
-    image-rendering: pixelated;
-  }
-  
-  .pixel-confetti {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: #ffd15a;
-    border: 1px solid #e6ba3d;
-    border-radius: 0;
-    image-rendering: pixelated;
-  }
-  
-  .pixel-ui-text {
-    font-family: 'VT323', monospace;
-    font-size: 16px;
-    image-rendering: pixelated;
-    text-rendering: optimizeSpeed;
-    -webkit-font-smoothing: none;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  .pixel-ui-card {
-    background: rgba(255, 255, 255, 0.95);
-    border: 3px solid #333;
-    border-radius: 0;
-    image-rendering: pixelated;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
-  }
-  
-  .pixel-ui-button {
-    border-radius: 0;
-    border: 2px solid #333;
-    image-rendering: pixelated;
-    font-family: 'VT323', monospace;
-    text-transform: none;
-    letter-spacing: 0;
-  }
-  
-  .pixel-confetti-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-  }
-  
-  .pixel-button {
-    border-radius: 0;
-    border: 2px solid;
-    image-rendering: pixelated;
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
-  }
-  
-  .pixel-button:hover {
-    transform: translate(1px, 1px);
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
-  }
-  
-  .pixel-button:active {
-    transform: translate(2px, 2px);
-    box-shadow: none;
-  }
-`;
+/** -------- 3D SCENE -------- */
 
-function usePixelStyles() {
-  useEffect(() => {
-    const styleId = 'pixel-art-styles'
-    if (document.getElementById(styleId)) return
-    
-    const style = document.createElement('style')
-    style.id = styleId
-    style.textContent = pixelStyles
-    document.head.appendChild(style)
-    
-    return () => {
-      const existing = document.getElementById(styleId)
-      if (existing) existing.remove()
-    }
-  }, [])
+// Background colors that change with each step
+const backgroundColors = [
+  { sky: '#87CEEB', ground: '#B8E0D2' }, // Step 0 - light blue/green
+  { sky: '#98D8E8', ground: '#A8D5BA' }, // Step 1
+  { sky: '#A9E3F5', ground: '#98C9A8' }, // Step 2
+  { sky: '#B5E8FF', ground: '#88BD96' }, // Step 3
+  { sky: '#C1EDFF', ground: '#78B184' }, // Step 4
+  { sky: '#CDF2FF', ground: '#68A572' }, // Step 5
+  { sky: '#D9F7FF', ground: '#589960' }, // Step 6
+  { sky: '#E5FCFF', ground: '#488D4E' }, // Step 7
+  { sky: '#F1FFFF', ground: '#38813C' }, // Step 8
+  { sky: '#FDFFFF', ground: '#28752A' }, // Step 9 - lightest
+]
+
+function SimpleStairs({ stepIndex }: { stepIndex: number }) {
+  const stepGeo = useMemo(() => new THREE.BoxGeometry(1.5, 0.3, 1.0), [])
+  
+  return (
+    <group position={[0, -1, 0]}>
+      {Array.from({ length: 10 }).map((_, i) => {
+        const z = -i * 1.2 // Move back in Z
+        const y = i * 0.3  // Step height
+        const color = i % 2 === 0 ? '#d08a6a' : '#c77f60'
+        
+        return (
+          <mesh key={i} geometry={stepGeo} position={[0, y, z]}>
+            <meshBasicMaterial color={color} />
+          </mesh>
+        )
+      })}
+    </group>
+  )
 }
 
-/** -------- PIXEL ART SCENE -------- */
+function LittleAvatar({ stepIndex, wrongPulse }: { stepIndex: number; wrongPulse: number }) {
+  const group = useRef<THREE.Group>(null)
+  const wrongAnim = useRef({ active: false, start: 0 })
+  
+  // Target position: move forward in Z space, step up
+  const targetZ = -stepIndex * 1.2
+  const targetY = stepIndex * 0.3 + 0.5
+  
+  useEffect(() => {
+    if (wrongPulse > 0) {
+      wrongAnim.current = { active: true, start: performance.now() }
+    }
+  }, [wrongPulse])
+  
+  useFrame((_, dt) => {
+    if (!group.current) return
+    
+    // Smooth movement to target
+    group.current.position.lerp(new THREE.Vector3(0, targetY, targetZ), 1 - Math.pow(0.05, dt))
+    
+    // Wrong animation: shake
+    if (wrongAnim.current.active) {
+      const elapsed = (performance.now() - wrongAnim.current.start) / 1000
+      if (elapsed < 0.5) {
+        const shake = Math.sin(elapsed * 20) * 0.1
+        group.current.position.x = shake
+        group.current.rotation.z = shake * 0.5
+      } else {
+        wrongAnim.current.active = false
+        group.current.rotation.z = 0
+        group.current.position.x = 0
+      }
+    }
+  })
+  
+  return (
+    <group ref={group} position={[0, 0.5, 0]}>
+      {/* Body */}
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[0.4, 0.5, 0.3]} />
+        <meshBasicMaterial color="#4b74ff" />
+      </mesh>
+      {/* Head */}
+      <mesh position={[0, 0.4, 0]}>
+        <boxGeometry args={[0.3, 0.3, 0.3]} />
+        <meshBasicMaterial color="#ffb48a" />
+      </mesh>
+      {/* Backpack */}
+      <mesh position={[-0.25, 0, 0]}>
+        <boxGeometry args={[0.15, 0.25, 0.2]} />
+        <meshBasicMaterial color="#2a2a2f" />
+      </mesh>
+    </group>
+  )
+}
 
-function PixelField({
+function Confetti({ trigger }: { trigger: number }) {
+  const group = useRef<THREE.Group>(null)
+  const particles = useMemo(() => {
+    return Array.from({ length: 15 }).map(() => ({
+      position: new THREE.Vector3(0, 1, 0),
+      velocity: new THREE.Vector3(
+        (Math.random() - 0.5) * 2,
+        2 + Math.random() * 1,
+        (Math.random() - 0.5) * 1
+      ),
+    }))
+  }, [])
+  
+  const active = useRef(false)
+  const start = useRef(0)
+  
+  useEffect(() => {
+    if (trigger > 0) {
+      particles.forEach((p) => {
+        p.position.set(0, 1, 0)
+        p.velocity.set(
+          (Math.random() - 0.5) * 2,
+          2 + Math.random() * 1,
+          (Math.random() - 0.5) * 1
+        )
+      })
+      active.current = true
+      start.current = performance.now()
+    }
+  }, [trigger, particles])
+  
+  useFrame((_, dt) => {
+    if (!group.current || !active.current) return
+    const elapsed = (performance.now() - start.current) / 1000
+    if (elapsed > 1.0) {
+      active.current = false
+      return
+    }
+    
+    particles.forEach((p, i) => {
+      p.velocity.y -= 8 * dt
+      p.position.addScaledVector(p.velocity, dt)
+      const mesh = group.current!.children[i] as THREE.Mesh
+      if (mesh) {
+        mesh.position.copy(p.position)
+        mesh.rotation.y += dt * 5
+      }
+    })
+  })
+  
+  return (
+    <group ref={group}>
+      {particles.map((_, i) => (
+        <mesh key={i} position={[0, 1, 0]}>
+          <boxGeometry args={[0.1, 0.08, 0.02]} />
+          <meshBasicMaterial color="#ffd15a" />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function Simple3DScene({
   stepIndex,
   wrongPulse,
   correctPulse,
@@ -297,105 +229,46 @@ function PixelField({
   wrongPulse: number
   correctPulse: number
 }) {
-  usePixelStyles()
-  const [animating, setAnimating] = useState(false)
-  const [wrongAnimating, setWrongAnimating] = useState(false)
-  const confettiRef = useRef<HTMLDivElement>(null)
-  const prevStepIndex = useRef(stepIndex)
-  
-  useEffect(() => {
-    if (stepIndex > prevStepIndex.current) {
-      setAnimating(true)
-      setTimeout(() => setAnimating(false), 500)
-    }
-    prevStepIndex.current = stepIndex
-  }, [stepIndex])
-  
-  useEffect(() => {
-    if (wrongPulse > 0) {
-      setWrongAnimating(true)
-      setTimeout(() => setWrongAnimating(false), 500)
-    }
-  }, [wrongPulse])
-  
-  useEffect(() => {
-    if (correctPulse > 0 && confettiRef.current) {
-      // Create confetti particles
-      for (let i = 0; i < 12; i++) {
-        const confetti = document.createElement('div')
-        confetti.className = 'pixel-confetti'
-        const startX = 50 + (Math.random() - 0.5) * 30
-        const startY = 30
-        confetti.style.left = `${startX}%`
-        confetti.style.top = `${startY}%`
-        confetti.style.setProperty('--dx', `${(Math.random() - 0.5) * 200}px`)
-        confetti.style.setProperty('--dy', `${-100 - Math.random() * 100}px`)
-        confetti.style.animation = `pixelConfetti 0.8s ease-out forwards`
-        confettiRef.current.appendChild(confetti)
-        
-        setTimeout(() => confetti.remove(), 800)
-      }
-    }
-  }, [correctPulse])
-  
-  // Calculate character position (left percentage based on step)
-  const characterLeft = 15 + (stepIndex * 8.5)
+  const bgColors = backgroundColors[Math.min(stepIndex, backgroundColors.length - 1)]
   
   return (
-    <div className="pixel-art-container pixel-field" style={{ width: '100%', height: '100%', position: 'relative' }}>
-      <style>{`
-        @keyframes pixelConfetti {
-          to {
-            transform: translate(var(--dx), var(--dy)) rotate(360deg);
-            opacity: 0;
-          }
-        }
-      `}</style>
+    <Canvas 
+      camera={{ position: [4, 3, 8], fov: 50 }}
+      style={{ width: '100%', height: '100%', background: bgColors.sky }}
+    >
+      <ambientLight intensity={1.0} />
       
-      {/* Sky layer */}
-      <div className="pixel-sky" />
+      {/* Ground plane - extends far back */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -10]}>
+        <planeGeometry args={[30, 40]} />
+        <meshBasicMaterial color={bgColors.ground} />
+      </mesh>
       
-      {/* Ground layer */}
-      <div className="pixel-ground" />
+      {/* Sky backdrop - changes color with steps */}
+      <mesh position={[0, 4, -15]}>
+        <planeGeometry args={[40, 20]} />
+        <meshBasicMaterial color={bgColors.sky} />
+      </mesh>
       
-      {/* Pixel grid overlay */}
-      <div className="pixel-grid" />
+      {/* Side walls for depth perception */}
+      <mesh rotation={[0, Math.PI / 2, 0]} position={[-8, 0, -10]}>
+        <planeGeometry args={[30, 15]} />
+        <meshBasicMaterial color={bgColors.sky} transparent opacity={0.3} />
+      </mesh>
+      <mesh rotation={[0, -Math.PI / 2, 0]} position={[8, 0, -10]}>
+        <planeGeometry args={[30, 15]} />
+        <meshBasicMaterial color={bgColors.sky} transparent opacity={0.3} />
+      </mesh>
       
       {/* Stairs */}
-      <div className="pixel-stairs" style={{ paddingLeft: '10%', position: 'relative', zIndex: 2 }}>
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="pixel-step" />
-        ))}
-      </div>
+      <SimpleStairs stepIndex={stepIndex} />
       
       {/* Character */}
-      <div 
-        className={`pixel-character ${animating ? 'stepping' : ''} ${wrongAnimating ? 'wrong' : ''}`}
-        style={{ left: `${characterLeft}%`, zIndex: 3 }}
-      >
-        <div className="pixel-avatar">
-          <div className="pixel-head">
-            {/* Eyes */}
-            <div style={{
-              position: 'absolute',
-              width: '3px',
-              height: '3px',
-              background: '#000',
-              left: '6px',
-              top: '8px',
-              boxShadow: '6px 0 0 #000',
-              imageRendering: 'pixelated'
-            }} />
-          </div>
-          <div className="pixel-body">
-            <div className="pixel-backpack" />
-          </div>
-        </div>
-      </div>
+      <LittleAvatar stepIndex={stepIndex} wrongPulse={wrongPulse} />
       
-      {/* Confetti container */}
-      <div ref={confettiRef} className="pixel-confetti-container" style={{ zIndex: 4 }} />
-    </div>
+      {/* Confetti */}
+      <Confetti trigger={correctPulse} />
+    </Canvas>
   )
 }
 
@@ -683,11 +556,11 @@ export default function TaxStairsGamePage() {
 
                 >
 
-                  <Card className="p-6 pixel-ui-card" style={{ borderRadius: 0, border: '3px solid #333' }}>
+                  <Card className="p-6">
 
-                    <h2 className="text-xl font-bold mb-2 pixel-ui-text" style={{ fontSize: '20px' }}>How to play</h2>
+                    <h2 className="text-xl font-bold mb-2 font-vt323">How to play</h2>
 
-                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground pixel-ui-text" style={{ fontSize: '16px' }}>
+                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground font-vt323">
 
                       <li>You'll see two packages (A vs B).</li>
 
@@ -699,7 +572,7 @@ export default function TaxStairsGamePage() {
 
                     </ol>
 
-                    <div className="mt-4 p-4 bg-muted/40 text-sm pixel-ui-text" style={{ borderRadius: 0, border: '2px solid #666', fontSize: '14px' }}>
+                    <div className="mt-4 p-4 rounded-lg bg-muted/40 text-sm font-vt323">
 
                       <div className="font-semibold mb-1">After-tax (teaching version)</div>
 
@@ -713,7 +586,7 @@ export default function TaxStairsGamePage() {
 
                     <div className="mt-5 flex justify-end">
 
-                      <Button onClick={() => setShowInstructions(false)} className="pixel-ui-button font-vt323 text-base" style={{ borderRadius: 0, border: '2px solid #333' }}>Start (Practice First)</Button>
+                      <Button onClick={() => setShowInstructions(false)} className="font-vt323 text-base">Start (Practice First)</Button>
 
                     </div>
 
@@ -885,19 +758,19 @@ export default function TaxStairsGamePage() {
 
           </div>
 
-          {/* RIGHT: pixel art game scene */}
+          {/* RIGHT: 3D game scene */}
 
-          <Card className="overflow-hidden relative min-h-[520px] border-0" style={{ background: '#87CEEB', borderRadius: 0, border: '3px solid #333' }}>
+          <Card className="overflow-hidden relative min-h-[520px]" style={{ borderRadius: 0 }}>
 
             <div className="h-[520px] w-full relative">
 
-              <PixelField stepIndex={stepIndex} wrongPulse={wrongPulse} correctPulse={correctPulse} />
+              <Simple3DScene stepIndex={stepIndex} wrongPulse={wrongPulse} correctPulse={correctPulse} />
 
-              {/* Pixel UI Overlay */}
+              {/* UI Overlay */}
               <div className="absolute top-4 left-4 z-20">
-                <div className="pixel-ui-card px-3 py-1 pixel-ui-text" style={{ fontSize: '14px', background: 'rgba(255,255,255,0.9)' }}>
-                  STEP {stepIndex}
-                </div>
+                <Badge variant="secondary" className="font-vt323 text-base bg-white/90">
+                  Step {stepIndex}
+                </Badge>
               </div>
 
             </div>
