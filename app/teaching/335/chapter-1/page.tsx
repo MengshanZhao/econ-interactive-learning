@@ -452,7 +452,6 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
               key={`cloud-${i}`}
               position={[x, y, z]}
               center
-              transform
               style={{ pointerEvents: 'none' }}
             >
               <div style={{ 
@@ -476,7 +475,6 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
         <Html
           position={[5, 6, -20]}
           center
-          transform
           style={{ pointerEvents: 'none' }}
         >
           <div style={{ 
@@ -515,7 +513,6 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
               key={`star-${i}`}
               position={[pos.x, pos.y, pos.z]}
               center
-              transform
               style={{ pointerEvents: 'none' }}
             >
               <div style={{ 
@@ -1120,7 +1117,7 @@ export default function TaxStairsGamePage() {
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 1.5, duration: 0.5 }}
+                    transition={{ delay: 2.5, duration: 0.5 }}
                     className="bg-white/95 backdrop-blur-sm rounded-lg p-8 shadow-2xl border-4 border-yellow-400 min-w-[400px] text-center"
                     style={{ 
                       transformStyle: 'preserve-3d',
