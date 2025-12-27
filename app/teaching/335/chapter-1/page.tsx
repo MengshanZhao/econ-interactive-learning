@@ -672,13 +672,23 @@ export default function TaxStairsGamePage() {
               {/* Current offer display - bottom right corner */}
               {currentOffer && !result && (
                 <div className="absolute bottom-6 right-6 z-20">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-xl border-2 border-orange-300 min-w-[200px]">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-xl border-2 border-orange-300 min-w-[220px]">
                     <div className="text-xs text-muted-foreground font-vt323 mb-1">Current Job</div>
-                    <div className="text-lg font-bold font-vt323 mb-2">{currentOffer.label}</div>
-                    <div className="text-2xl font-bold font-vt323 text-orange-600">
-                      ${money(afterTax(currentOffer))}
+                    <div className="text-lg font-bold font-vt323 mb-3">{currentOffer.label}</div>
+                    <div className="space-y-2 text-sm font-vt323">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Earnings (gross)</span>
+                        <span className="font-semibold">${money(currentOffer.earnings)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Personal tax</span>
+                        <span className="font-medium">{pct(currentOffer.personalTax)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Corporate tax</span>
+                        <span className="font-medium">{pct(currentOffer.corporateTax)}</span>
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground font-vt323 mt-1">after-tax</div>
                   </div>
                 </div>
               )}
@@ -686,43 +696,105 @@ export default function TaxStairsGamePage() {
               {/* New offer display - bottom left corner */}
               {!result && (
                 <div className="absolute bottom-6 left-6 z-20">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-xl border-2 border-blue-300 min-w-[200px]">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-xl border-2 border-blue-300 min-w-[220px]">
                     <div className="text-xs text-muted-foreground font-vt323 mb-1">New Offer</div>
-                    <div className="text-lg font-bold font-vt323 mb-2">{round.newOffer.label}</div>
-                    <div className="text-2xl font-bold font-vt323 text-blue-600">
-                      ${money(afterTax(round.newOffer))}
+                    <div className="text-lg font-bold font-vt323 mb-3">{round.newOffer.label}</div>
+                    <div className="space-y-2 text-sm font-vt323">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Earnings (gross)</span>
+                        <span className="font-semibold">${money(round.newOffer.earnings)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Personal tax</span>
+                        <span className="font-medium">{pct(round.newOffer.personalTax)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Corporate tax</span>
+                        <span className="font-medium">{pct(round.newOffer.corporateTax)}</span>
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground font-vt323 mt-1">after-tax</div>
                   </div>
                 </div>
               )}
 
-              {/* Choice buttons - center bottom */}
+              {/* 3D Arrow buttons - center bottom */}
               {!result && (
-                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-4">
-                  <Button 
-                    onClick={() => evaluate("stay")}
-                    className="font-vt323 text-base bg-orange-500 hover:bg-orange-600 text-white shadow-lg px-8 py-3"
-                    size="lg"
-                  >
-                    Stay with Current Job
-                  </Button>
-                  <Button 
+                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-12 items-center">
+                  {/* Left arrow - Switch to New Offer */}
+                  <button
                     onClick={() => evaluate("switch")}
-                    className="font-vt323 text-base bg-blue-500 hover:bg-blue-600 text-white shadow-lg px-8 py-3"
-                    size="lg"
+                    className="group relative cursor-pointer"
+                    style={{ perspective: '1000px' }}
                   >
-                    Switch to New Offer
-                  </Button>
+                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(-15deg)' }}>
+                      <div className="relative transform transition-all duration-300 group-hover:scale-110 group-hover:translate-x-2 group-active:scale-95">
+                        {/* Arrow shaft - main body */}
+                        <div className="relative w-28 h-8 bg-blue-500 rounded shadow-xl" style={{ 
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
+                          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                        }}>
+                          {/* Top highlight */}
+                          <div className="absolute top-0 left-0 right-0 h-1 bg-blue-300 rounded-t opacity-60"></div>
+                          {/* Text */}
+                          <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-xs font-bold">
+                            Switch to New Offer
+                          </div>
+                        </div>
+                        {/* Arrow head - left pointing */}
+                        <div className="absolute left-28 top-0 w-0 h-0" style={{ 
+                          borderTop: '16px solid transparent',
+                          borderBottom: '16px solid transparent',
+                          borderLeft: '24px solid #3b82f6',
+                          filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+                        }}></div>
+                        {/* 3D depth shadow */}
+                        <div className="absolute left-1 top-1 w-28 h-8 bg-blue-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Right arrow - Stay with Current Job */}
+                  <button
+                    onClick={() => evaluate("stay")}
+                    className="group relative cursor-pointer"
+                    style={{ perspective: '1000px' }}
+                  >
+                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(15deg)' }}>
+                      <div className="relative transform transition-all duration-300 group-hover:scale-110 group-hover:-translate-x-2 group-active:scale-95">
+                        {/* Arrow head - right pointing */}
+                        <div className="absolute right-28 top-0 w-0 h-0" style={{ 
+                          borderTop: '16px solid transparent',
+                          borderBottom: '16px solid transparent',
+                          borderRight: '24px solid #f97316',
+                          filter: 'drop-shadow(-2px 2px 4px rgba(0,0,0,0.3))'
+                        }}></div>
+                        {/* Arrow shaft - main body */}
+                        <div className="relative w-28 h-8 bg-orange-500 rounded shadow-xl" style={{ 
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
+                          background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
+                        }}>
+                          {/* Top highlight */}
+                          <div className="absolute top-0 left-0 right-0 h-1 bg-orange-300 rounded-t opacity-60"></div>
+                          {/* Text */}
+                          <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-xs font-bold">
+                            Stay with Current Job
+                          </div>
+                        </div>
+                        {/* 3D depth shadow */}
+                        <div className="absolute right-1 top-1 w-28 h-8 bg-orange-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
+                      </div>
+                    </div>
+                  </button>
                 </div>
               )}
 
-              {/* Result display - center */}
+              {/* Result display - center (delayed animation) */}
               {result && result.correct && (
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 1.2, duration: 0.5 }}
                     className="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-2xl border-4 border-green-400 min-w-[300px] text-center"
                   >
                     <div className="text-5xl mb-3">✅</div>
@@ -744,12 +816,13 @@ export default function TaxStairsGamePage() {
                 </div>
               )}
 
-              {/* Wrong answer popup with calculation - center */}
+              {/* Wrong answer popup with calculation - center (delayed animation) */}
               {result && !result.correct && (
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 1.5, duration: 0.5 }}
                     className="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-2xl border-4 border-red-400 min-w-[400px] max-w-[500px]"
                   >
                     <div className="text-center mb-4">
