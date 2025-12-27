@@ -68,29 +68,30 @@ function pct(x: number) {
 
 /** -------- 3D SCENE -------- */
 
-// Background colors that change with each step
-const backgroundColors = [
-  { sky: '#87CEEB', ground: '#B8E0D2' }, // Step 0 - light blue/green
-  { sky: '#98D8E8', ground: '#A8D5BA' }, // Step 1
-  { sky: '#A9E3F5', ground: '#98C9A8' }, // Step 2
-  { sky: '#B5E8FF', ground: '#88BD96' }, // Step 3
-  { sky: '#C1EDFF', ground: '#78B184' }, // Step 4
-  { sky: '#CDF2FF', ground: '#68A572' }, // Step 5
-  { sky: '#D9F7FF', ground: '#589960' }, // Step 6
-  { sky: '#E5FCFF', ground: '#488D4E' }, // Step 7
-  { sky: '#F1FFFF', ground: '#38813C' }, // Step 8
-  { sky: '#FDFFFF', ground: '#28752A' }, // Step 9 - lightest
+// Sky colors that change with each step - warm orange/peach gradients
+const skyColors = [
+  '#FFE4CC', // Step 0 - light peach
+  '#FFD9B3', // Step 1
+  '#FFCF9A', // Step 2
+  '#FFC481', // Step 3
+  '#FFBA68', // Step 4
+  '#FFB04F', // Step 5
+  '#FFA636', // Step 6
+  '#FF9C1D', // Step 7
+  '#FF9204', // Step 8
+  '#FF8800', // Step 9 - deep orange
 ]
 
-function SimpleStairs({ stepIndex }: { stepIndex: number }) {
-  const stepGeo = useMemo(() => new THREE.BoxGeometry(1.5, 0.3, 1.0), [])
+function VoxelStairs({ stepIndex }: { stepIndex: number }) {
+  const stepGeo = useMemo(() => new THREE.BoxGeometry(2.0, 0.4, 1.2), [])
   
   return (
     <group position={[0, -1, 0]}>
       {Array.from({ length: 10 }).map((_, i) => {
-        const z = -i * 1.2 // Move back in Z
-        const y = i * 0.3  // Step height
-        const color = i % 2 === 0 ? '#d08a6a' : '#c77f60'
+        const z = -i * 1.5 // Move back in Z
+        const y = i * 0.4  // Step height
+        const colors = ['#d08a6a', '#c77f60', '#b87256']
+        const color = colors[i % 3]
         
         return (
           <mesh key={i} geometry={stepGeo} position={[0, y, z]}>
@@ -102,13 +103,55 @@ function SimpleStairs({ stepIndex }: { stepIndex: number }) {
   )
 }
 
+function VoxelMountain({ position, size = 1 }: { position: [number, number, number]; size?: number }) {
+  const layers = 8
+  const layersRef = useRef<THREE.Group>(null)
+  
+  return (
+    <group ref={layersRef} position={position}>
+      {Array.from({ length: layers }).map((_, i) => {
+        const width = (layers - i) * 0.6 * size
+        const height = 0.5
+        const y = i * 0.5
+        const z = -i * 0.3
+        const colors = ['#d08a6a', '#c77f60', '#b87256', '#a8654d']
+        const color = colors[i % 4]
+        
+        return (
+          <mesh key={i} position={[0, y, z]}>
+            <boxGeometry args={[width, height, width * 0.8]} />
+            <meshBasicMaterial color={color} />
+          </mesh>
+        )
+      })}
+    </group>
+  )
+}
+
+function WaterPool({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      {/* Water surface */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[4, 12]} />
+        <meshBasicMaterial color="#9BB5C0" transparent opacity={0.6} />
+      </mesh>
+      {/* Water base */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
+        <planeGeometry args={[4, 12]} />
+        <meshBasicMaterial color="#7A9BA8" />
+      </mesh>
+    </group>
+  )
+}
+
 function LittleAvatar({ stepIndex, wrongPulse }: { stepIndex: number; wrongPulse: number }) {
   const group = useRef<THREE.Group>(null)
   const wrongAnim = useRef({ active: false, start: 0 })
   
   // Target position: move forward in Z space, step up
-  const targetZ = -stepIndex * 1.2
-  const targetY = stepIndex * 0.3 + 0.5
+  const targetZ = -stepIndex * 1.5
+  const targetY = stepIndex * 0.4 + 0.6
   
   useEffect(() => {
     if (wrongPulse > 0) {
@@ -122,11 +165,14 @@ function LittleAvatar({ stepIndex, wrongPulse }: { stepIndex: number; wrongPulse
     // Smooth movement to target
     group.current.position.lerp(new THREE.Vector3(0, targetY, targetZ), 1 - Math.pow(0.05, dt))
     
+    // Idle bob
+    group.current.rotation.y = Math.sin(Date.now() * 0.001) * 0.1
+    
     // Wrong animation: shake
     if (wrongAnim.current.active) {
       const elapsed = (performance.now() - wrongAnim.current.start) / 1000
       if (elapsed < 0.5) {
-        const shake = Math.sin(elapsed * 20) * 0.1
+        const shake = Math.sin(elapsed * 20) * 0.15
         group.current.position.x = shake
         group.current.rotation.z = shake * 0.5
       } else {
@@ -138,7 +184,7 @@ function LittleAvatar({ stepIndex, wrongPulse }: { stepIndex: number; wrongPulse
   })
   
   return (
-    <group ref={group} position={[0, 0.5, 0]}>
+    <group ref={group} position={[0, 0.6, 0]}>
       {/* Body */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[0.4, 0.5, 0.3]} />
@@ -146,8 +192,17 @@ function LittleAvatar({ stepIndex, wrongPulse }: { stepIndex: number; wrongPulse
       </mesh>
       {/* Head */}
       <mesh position={[0, 0.4, 0]}>
-        <boxGeometry args={[0.3, 0.3, 0.3]} />
+        <boxGeometry args={[0.32, 0.32, 0.32]} />
         <meshBasicMaterial color="#ffb48a" />
+      </mesh>
+      {/* Legs */}
+      <mesh position={[-0.1, -0.3, 0]}>
+        <boxGeometry args={[0.15, 0.3, 0.2]} />
+        <meshBasicMaterial color="#3a5fd9" />
+      </mesh>
+      <mesh position={[0.1, -0.3, 0]}>
+        <boxGeometry args={[0.15, 0.3, 0.2]} />
+        <meshBasicMaterial color="#3a5fd9" />
       </mesh>
       {/* Backpack */}
       <mesh position={[-0.25, 0, 0]}>
@@ -158,15 +213,20 @@ function LittleAvatar({ stepIndex, wrongPulse }: { stepIndex: number; wrongPulse
   )
 }
 
-function Confetti({ trigger }: { trigger: number }) {
+function Confetti({ trigger, originZ }: { trigger: number; originZ: number }) {
   const group = useRef<THREE.Group>(null)
   const particles = useMemo(() => {
-    return Array.from({ length: 15 }).map(() => ({
+    return Array.from({ length: 20 }).map(() => ({
       position: new THREE.Vector3(0, 1, 0),
       velocity: new THREE.Vector3(
-        (Math.random() - 0.5) * 2,
-        2 + Math.random() * 1,
-        (Math.random() - 0.5) * 1
+        (Math.random() - 0.5) * 3,
+        2.5 + Math.random() * 1.5,
+        (Math.random() - 0.5) * 1.5
+      ),
+      rotation: new THREE.Vector3(
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+        Math.random() * Math.PI
       ),
     }))
   }, [])
@@ -177,33 +237,37 @@ function Confetti({ trigger }: { trigger: number }) {
   useEffect(() => {
     if (trigger > 0) {
       particles.forEach((p) => {
-        p.position.set(0, 1, 0)
+        p.position.set(0, 1.5, originZ)
         p.velocity.set(
-          (Math.random() - 0.5) * 2,
-          2 + Math.random() * 1,
-          (Math.random() - 0.5) * 1
+          (Math.random() - 0.5) * 3,
+          2.5 + Math.random() * 1.5,
+          (Math.random() - 0.5) * 1.5
         )
       })
       active.current = true
       start.current = performance.now()
     }
-  }, [trigger, particles])
+  }, [trigger, particles, originZ])
   
   useFrame((_, dt) => {
     if (!group.current || !active.current) return
     const elapsed = (performance.now() - start.current) / 1000
-    if (elapsed > 1.0) {
+    if (elapsed > 1.2) {
       active.current = false
       return
     }
     
     particles.forEach((p, i) => {
-      p.velocity.y -= 8 * dt
+      p.velocity.y -= 7 * dt
       p.position.addScaledVector(p.velocity, dt)
+      p.rotation.x += dt * 6
+      p.rotation.y += dt * 7
+      p.rotation.z += dt * 5
+      
       const mesh = group.current!.children[i] as THREE.Mesh
       if (mesh) {
         mesh.position.copy(p.position)
-        mesh.rotation.y += dt * 5
+        mesh.rotation.set(p.rotation.x, p.rotation.y, p.rotation.z)
       }
     })
   })
@@ -211,8 +275,8 @@ function Confetti({ trigger }: { trigger: number }) {
   return (
     <group ref={group}>
       {particles.map((_, i) => (
-        <mesh key={i} position={[0, 1, 0]}>
-          <boxGeometry args={[0.1, 0.08, 0.02]} />
+        <mesh key={i} position={[0, 1.5, 0]}>
+          <boxGeometry args={[0.12, 0.1, 0.02]} />
           <meshBasicMaterial color="#ffd15a" />
         </mesh>
       ))}
@@ -229,45 +293,42 @@ function Simple3DScene({
   wrongPulse: number
   correctPulse: number
 }) {
-  const bgColors = backgroundColors[Math.min(stepIndex, backgroundColors.length - 1)]
+  const skyColor = skyColors[Math.min(stepIndex, skyColors.length - 1)]
+  const characterZ = -stepIndex * 1.5
   
   return (
     <Canvas 
-      camera={{ position: [4, 3, 8], fov: 50 }}
-      style={{ width: '100%', height: '100%', background: bgColors.sky }}
+      camera={{ position: [5, 4, 10], fov: 55 }}
+      style={{ width: '100%', height: '100%', background: `linear-gradient(to bottom, ${skyColor}, #FFB366)` }}
     >
-      <ambientLight intensity={1.0} />
+      <ambientLight intensity={1.1} />
       
       {/* Ground plane - extends far back */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -10]}>
-        <planeGeometry args={[30, 40]} />
-        <meshBasicMaterial color={bgColors.ground} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, -12]}>
+        <planeGeometry args={[40, 50]} />
+        <meshBasicMaterial color="#B8E0D2" />
       </mesh>
       
-      {/* Sky backdrop - changes color with steps */}
-      <mesh position={[0, 4, -15]}>
-        <planeGeometry args={[40, 20]} />
-        <meshBasicMaterial color={bgColors.sky} />
-      </mesh>
+      {/* Left mountain - terraced voxel style */}
+      <VoxelMountain position={[-6, -1.5, -8]} size={1.2} />
       
-      {/* Side walls for depth perception */}
-      <mesh rotation={[0, Math.PI / 2, 0]} position={[-8, 0, -10]}>
-        <planeGeometry args={[30, 15]} />
-        <meshBasicMaterial color={bgColors.sky} transparent opacity={0.3} />
-      </mesh>
-      <mesh rotation={[0, -Math.PI / 2, 0]} position={[8, 0, -10]}>
-        <planeGeometry args={[30, 15]} />
-        <meshBasicMaterial color={bgColors.sky} transparent opacity={0.3} />
-      </mesh>
+      {/* Right mountain - partially visible */}
+      <VoxelMountain position={[6, -1.5, -10]} size={1.0} />
       
-      {/* Stairs */}
-      <SimpleStairs stepIndex={stepIndex} />
+      {/* Far mountain */}
+      <VoxelMountain position={[-4, -1.5, -18]} size={0.8} />
+      
+      {/* Water pool to the left */}
+      <WaterPool position={[-4, -1.4, -6]} />
+      
+      {/* Voxel path/stairs */}
+      <VoxelStairs stepIndex={stepIndex} />
       
       {/* Character */}
       <LittleAvatar stepIndex={stepIndex} wrongPulse={wrongPulse} />
       
-      {/* Confetti */}
-      <Confetti trigger={correctPulse} />
+      {/* Confetti - originates from character position */}
+      <Confetti trigger={correctPulse} originZ={characterZ} />
     </Canvas>
   )
 }
