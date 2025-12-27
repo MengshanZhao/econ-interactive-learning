@@ -461,116 +461,56 @@ function Fireworks({ trigger, originZ }: { trigger: number; originZ: number }) {
   )
 }
 
-// Star-shaped geometry helper
-function StarShape({ position, rotation }: { position: [number, number, number], rotation: number }) {
-  const geometry = useMemo(() => {
-    const shape = new THREE.Shape()
-    const outerRadius = 0.12
-    const innerRadius = 0.06
-    const points = 5
-    const angleStep = (Math.PI * 2) / (points * 2)
-    
-    for (let i = 0; i < points * 2; i++) {
-      const angle = i * angleStep - Math.PI / 2
-      const radius = i % 2 === 0 ? outerRadius : innerRadius
-      const x = Math.cos(angle) * radius
-      const y = Math.sin(angle) * radius
-      
-      if (i === 0) {
-        shape.moveTo(x, y)
-      } else {
-        shape.lineTo(x, y)
-      }
-    }
-    shape.closePath()
-    
-    return new THREE.ShapeGeometry(shape)
-  }, [])
-  
-  return (
-    <mesh position={position} rotation={[0, 0, rotation]}>
-      <primitive object={geometry} />
-      <meshBasicMaterial color="#FFFFFF" />
-    </mesh>
-  )
-}
-
-function PixelatedSky({ stepIndex }: { stepIndex: number }) {
+// Emoji-based sky background component
+function EmojiSky({ stepIndex }: { stepIndex: number }) {
   if (stepIndex === 0) {
     // Step 0: Single color
     return null
   } else if (stepIndex === 1) {
-    // Step 1: Pixel blue sky with smaller pixels
-    const blueColors = ['#87CEEB', '#B0E0E6', '#ADD8E6', '#E0F6FF']
-    const pixelSize = 0.3 // Much smaller pixels
+    // Step 1: Blue sky with clouds ☁️
     return (
       <group position={[0, 10, -20]}>
-        {Array.from({ length: 100 }).map((_, x) =>
-          Array.from({ length: 60 }).map((_, y) => {
-            const color = blueColors[Math.floor(Math.random() * blueColors.length)]
-            return (
-              <mesh
-                key={`sky-${x}-${y}`}
-                position={[(x - 50) * pixelSize, (y - 30) * pixelSize, 0]}
-              >
-                <boxGeometry args={[pixelSize, pixelSize, 0.1]} />
-                <meshBasicMaterial color={color} />
-              </mesh>
-            )
-          })
-        )}
+        {/* Clouds positioned across the sky */}
+        {Array.from({ length: 15 }).map((_, i) => {
+          const x = (Math.random() - 0.5) * 45
+          const y = (Math.random() - 0.5) * 20 + 5
+          const z = -20 + Math.random() * 3
+          const scale = 0.5 + Math.random() * 0.5
+          return (
+            <mesh key={`cloud-${i}`} position={[x, y, z]} scale={[scale, scale, 0.1]}>
+              <boxGeometry args={[2, 1, 0.1]} />
+              <meshBasicMaterial color="#FFFFFF" opacity={0.8} transparent />
+            </mesh>
+          )
+        })}
       </group>
     )
   } else if (stepIndex === 2) {
-    // Step 2: Pixel sunset with smaller pixels
-    const sunsetColors = ['#FF6347', '#FF8C69', '#FFA07A', '#FFB347', '#FFD700']
-    const pixelSize = 0.3 // Much smaller pixels
+    // Step 2: Red-purple sunset with sun ☀️
     return (
       <group position={[0, 10, -20]}>
-        {Array.from({ length: 100 }).map((_, x) =>
-          Array.from({ length: 60 }).map((_, y) => {
-            const color = sunsetColors[Math.floor(Math.random() * sunsetColors.length)]
-            return (
-              <mesh
-                key={`sunset-${x}-${y}`}
-                position={[(x - 50) * pixelSize, (y - 30) * pixelSize, 0]}
-              >
-                <boxGeometry args={[pixelSize, pixelSize, 0.1]} />
-                <meshBasicMaterial color={color} />
-              </mesh>
-            )
-          })
-        )}
+        {/* Sun */}
+        <mesh position={[8, 8, -20]}>
+          <sphereGeometry args={[1.5, 16, 16]} />
+          <meshBasicMaterial color="#FFD700" />
+        </mesh>
       </group>
     )
   } else {
-    // Step 3: Pixel star night with smaller pixels and star-shaped stars
-    const nightColors = ['#1a1a2e', '#16213e', '#0f3460', '#533483']
-    const pixelSize = 0.3 // Much smaller pixels
+    // Step 3: Dark night with stars ⭐️
     return (
       <group position={[0, 10, -20]}>
-        {Array.from({ length: 100 }).map((_, x) =>
-          Array.from({ length: 60 }).map((_, y) => {
-            const color = nightColors[Math.floor(Math.random() * nightColors.length)]
-            return (
-              <mesh
-                key={`night-${x}-${y}`}
-                position={[(x - 50) * pixelSize, (y - 30) * pixelSize, 0]}
-              >
-                <boxGeometry args={[pixelSize, pixelSize, 0.1]} />
-                <meshBasicMaterial color={color} />
-              </mesh>
-            )
-          })
-        )}
-        {/* Star-shaped stars */}
-        {Array.from({ length: 80 }).map((_, i) => {
+        {/* Stars as small bright points */}
+        {Array.from({ length: 100 }).map((_, i) => {
           const x = (Math.random() - 0.5) * 45
           const y = (Math.random() - 0.5) * 30 + 5
           const z = -20 + Math.random() * 5
-          const rotation = Math.random() * Math.PI * 2
+          const size = 0.1 + Math.random() * 0.15
           return (
-            <StarShape key={`star-${i}`} position={[x, y, z]} rotation={rotation} />
+            <mesh key={`star-${i}`} position={[x, y, z]}>
+              <sphereGeometry args={[size, 8, 8]} />
+              <meshBasicMaterial color="#FFFFFF" />
+            </mesh>
           )
         })}
       </group>
@@ -606,16 +546,28 @@ function Simple3DScene({
     ] as [number, number, number]
   }, [stepIndex])
   
+  // Background colors for each step
+  const backgroundColor = useMemo(() => {
+    if (stepIndex === 0) return skyColor // Single color
+    if (stepIndex === 1) return '#87CEEB' // Blue sky for daylight
+    if (stepIndex === 2) return '#8B3A8B' // Red-purple for sunset
+    return '#1a1a2e' // Dark night
+  }, [stepIndex, skyColor])
+  
   return (
     <Canvas 
       camera={{ position: cameraPosition, fov: 55 }}
-      style={{ width: '100%', height: '100%', background: stepIndex === 0 ? skyColor : '#000000' }}
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        background: backgroundColor 
+      }}
     >
       <ambientLight intensity={stepIndex >= 3 ? 0.6 : 1.1} />
       <directionalLight position={[10, 10, 5]} intensity={stepIndex >= 3 ? 0.3 : 0.5} />
       
-      {/* Pixelated sky background */}
-      <PixelatedSky stepIndex={stepIndex} />
+      {/* Emoji-based sky background */}
+      <EmojiSky stepIndex={stepIndex} />
       
       {/* Ground plane - pixelated grass */}
       <PixelatedGrass />
@@ -1073,15 +1025,15 @@ export default function TaxStairsGamePage() {
               {/* 3D Arrow buttons - center bottom */}
               {!result && (
                 <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-8 items-center">
-                  {/* Left side - Arrow (outside left) + Switch to New Offer button */}
+                  {/* Left side - Arrow (outside left, pointing left away) + Switch to New Offer button */}
                   <div className="flex items-center gap-2">
-                    {/* Arrow pointing left (outside, on the left of the button) */}
+                    {/* Arrow pointing left (away from button, pointing outward) */}
                     <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(-10deg)' }}>
                       <div className="w-0 h-0" style={{ 
                         borderTop: '18px solid transparent',
                         borderBottom: '18px solid transparent',
-                        borderLeft: '24px solid #3b82f6',
-                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+                        borderRight: '24px solid #3b82f6',
+                        filter: 'drop-shadow(-2px 2px 4px rgba(0,0,0,0.3))'
                       }}></div>
                     </div>
                     {/* Switch button */}
@@ -1107,7 +1059,7 @@ export default function TaxStairsGamePage() {
                     </button>
                   </div>
 
-                  {/* Right side - Stay with Current Job button + Arrow (outside right) */}
+                  {/* Right side - Stay with Current Job button + Arrow (outside right, pointing right away) */}
                   <div className="flex items-center gap-2">
                     {/* Stay button */}
                     <button
@@ -1130,13 +1082,13 @@ export default function TaxStairsGamePage() {
                         </div>
                       </div>
                     </button>
-                    {/* Arrow pointing right (outside, on the right of the button) */}
+                    {/* Arrow pointing right (away from button, pointing outward) */}
                     <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(10deg)' }}>
                       <div className="w-0 h-0" style={{ 
                         borderTop: '18px solid transparent',
                         borderBottom: '18px solid transparent',
-                        borderRight: '24px solid #f97316',
-                        filter: 'drop-shadow(-2px 2px 4px rgba(0,0,0,0.3))'
+                        borderLeft: '24px solid #f97316',
+                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
                       }}></div>
                     </div>
                   </div>
