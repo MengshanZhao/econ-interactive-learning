@@ -472,15 +472,15 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
     // Step 2: Sunset with sun ☀️
     return (
       <group position={[0, 10, -20]}>
-        {/* Sun as large emoji text */}
+        {/* Sun as large emoji text - more visible position */}
         <Html
-          position={[8, 8, -20]}
+          position={[5, 6, -20]}
           center
           transform
           style={{ pointerEvents: 'none' }}
         >
           <div style={{ 
-            fontSize: '200px', 
+            fontSize: '250px', 
             lineHeight: '1',
             userSelect: 'none',
             filter: 'drop-shadow(4px 4px 8px rgba(0,0,0,0.4))'
@@ -491,20 +491,29 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
       </group>
     )
   } else {
-    // Step 3: Dark night with stars ⭐️ - fewer stars, distributed across entire sky
+    // Step 3: Dark night with stars ⭐️ - only 6-7 stars, distributed on both sides
+    const starPositions = [
+      // Left side stars
+      { x: -15, y: 8, z: -20 },
+      { x: -18, y: 12, z: -19 },
+      { x: -12, y: 5, z: -21 },
+      // Right side stars
+      { x: 15, y: 10, z: -20 },
+      { x: 18, y: 7, z: -19 },
+      { x: 12, y: 13, z: -21 },
+      // One in the middle
+      { x: 0, y: 9, z: -20 },
+    ]
+    
     return (
       <group position={[0, 10, -20]}>
-        {/* Stars as large emoji text - reduced count, distributed across entire sky */}
-        {Array.from({ length: 40 }).map((_, i) => {
-          // Distribute stars across entire sky width (-25 to +25)
-          const x = (Math.random() - 0.5) * 50
-          const y = (Math.random() - 0.5) * 30 + 5
-          const z = -20 + Math.random() * 5
-          const size = 60 + Math.random() * 80 // Large stars, 60-140px
+        {/* Stars as large emoji text - only 6-7 stars, explicitly placed on both sides */}
+        {starPositions.map((pos, i) => {
+          const size = 80 + Math.random() * 60 // Large stars, 80-140px
           return (
             <Html
               key={`star-${i}`}
-              position={[x, y, z]}
+              position={[pos.x, pos.y, pos.z]}
               center
               transform
               style={{ pointerEvents: 'none' }}
@@ -576,10 +585,10 @@ function Simple3DScene({
       {/* Emoji-based sky background */}
       <EmojiSky stepIndex={stepIndex} />
       
-      {/* Ground plane - brown/darker green */}
+      {/* Ground plane - original brown */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, -12]}>
         <planeGeometry args={[40, 50]} />
-        <meshBasicMaterial color="#6B8E23" />
+        <meshBasicMaterial color="#c77f60" />
       </mesh>
       
       {/* Left mountain - terraced voxel style */}
@@ -1113,6 +1122,10 @@ export default function TaxStairsGamePage() {
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 1.5, duration: 0.5 }}
                     className="bg-white/95 backdrop-blur-sm rounded-lg p-8 shadow-2xl border-4 border-yellow-400 min-w-[400px] text-center"
+                    style={{ 
+                      transformStyle: 'preserve-3d',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.5), 0 0 0 4px #FCD34D, inset 0 1px 0 rgba(255,255,255,0.5)'
+                    }}
                   >
                     <div className="text-6xl mb-4">👑</div>
                     <div className="text-3xl font-bold font-vt323 mb-3 text-yellow-600">Congratulations!</div>
@@ -1139,6 +1152,10 @@ export default function TaxStairsGamePage() {
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 1.2, duration: 0.5 }}
                     className="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-2xl border-4 border-green-400 min-w-[300px] text-center"
+                    style={{ 
+                      transformStyle: 'preserve-3d',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.5), 0 0 0 4px #4ADE80, inset 0 1px 0 rgba(255,255,255,0.5)'
+                    }}
                   >
                     <div className="text-5xl mb-3">✅</div>
                     <div className="text-2xl font-bold font-vt323 mb-2 text-green-600">Correct! Step up!</div>
@@ -1167,6 +1184,10 @@ export default function TaxStairsGamePage() {
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 1.5, duration: 0.5 }}
                     className="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-2xl border-4 border-red-400 min-w-[400px] max-w-[500px]"
+                    style={{ 
+                      transformStyle: 'preserve-3d',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.5), 0 0 0 4px #F87171, inset 0 1px 0 rgba(255,255,255,0.5)'
+                    }}
                   >
                     <div className="text-center mb-4">
                       <div className="text-5xl mb-3">❌</div>
