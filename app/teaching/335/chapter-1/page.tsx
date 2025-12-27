@@ -74,10 +74,10 @@ function VoxelStairs({ stepIndex }: { stepIndex: number }) {
   const stepGeo = useMemo(() => new THREE.BoxGeometry(2.0, 0.4, 1.2), [])
   
   return (
-    <group position={[0, -1, 0]}>
-      {Array.from({ length: 3 }).map((_, i) => {
+    <group position={[0, -1.2, 0]}>
+      {Array.from({ length: 4 }).map((_, i) => {
         const z = -i * 1.5 // Move back in Z
-        const y = i * 0.4  // Step height
+        const y = i * 0.4  // Step height (step 0 at y=0, step 1 at y=0.4, etc.)
         // Darker browns matching photo
         const colors = ['#8B5A3C', '#7A4F35', '#6B452E', '#5C3A27']
         const color = colors[i % 4]
@@ -143,8 +143,9 @@ function LittleAvatar({ stepIndex, wrongPulse, correctPulse }: { stepIndex: numb
   const correctAnim = useRef({ active: false, start: 0 })
   
   // Target position: move forward in Z space, step up
+  // Start at ground level (step 0), climb to step 3
   const targetZ = -stepIndex * 1.5
-  const targetY = stepIndex * 0.4 + 0.6
+  const targetY = stepIndex * 0.4 - 0.2  // Start at ground level (-0.2), climb up (step 0: -0.2, step 1: 0.2, step 2: 0.6, step 3: 1.0)
   
   useEffect(() => {
     if (wrongPulse > 0) {
@@ -207,8 +208,11 @@ function LittleAvatar({ stepIndex, wrongPulse, correctPulse }: { stepIndex: numb
     }
   })
   
+  // Check if character reached the top (step 3)
+  const isAtTop = stepIndex >= 3
+  
   return (
-    <group ref={group} position={[0, 0.6, 0]}>
+    <group ref={group} position={[0, -0.2, 0]}>
       <group ref={bodyRef}>
         {/* Body - dark blue matching photo */}
       <mesh position={[0, 0, 0]}>
@@ -236,6 +240,28 @@ function LittleAvatar({ stepIndex, wrongPulse, correctPulse }: { stepIndex: numb
           <boxGeometry args={[0.32, 0.32, 0.32]} />
           <meshBasicMaterial color="#E8A5C4" />
         </mesh>
+        {/* Crown when at the top */}
+        {isAtTop && (
+          <group position={[0, 0.25, 0]}>
+            {/* Crown base */}
+            <mesh position={[0, 0, 0]}>
+              <boxGeometry args={[0.4, 0.15, 0.25]} />
+              <meshBasicMaterial color="#FFD700" />
+            </mesh>
+            {/* Crown spikes */}
+            {[0, 1, 2, 3, 4].map((i) => (
+              <mesh key={i} position={[-0.15 + i * 0.075, 0.1, 0]}>
+                <boxGeometry args={[0.05, 0.15, 0.05]} />
+                <meshBasicMaterial color="#FFA500" />
+              </mesh>
+            ))}
+            {/* Crown jewel */}
+            <mesh position={[0, 0.15, 0.1]}>
+              <boxGeometry args={[0.1, 0.1, 0.05]} />
+              <meshBasicMaterial color="#FF0000" />
+            </mesh>
+          </group>
+        )}
       </group>
     </group>
   )
@@ -312,16 +338,110 @@ function Confetti({ trigger, originZ }: { trigger: number; originZ: number }) {
   )
 }
 
+function Fireworks({ trigger, originZ }: { trigger: number; originZ: number }) {
+  const group = useRef<THREE.Group>(null)
+  const particles = useMemo(() => {
+    const allParticles: Array<{
+      position: THREE.Vector3
+      velocity: THREE.Vector3
+      color: string
+      origin: THREE.Vector3
+      startTime: number
+    }> = []
+    
+    // Create 5 firework bursts
+    for (let fw = 0; fw < 5; fw++) {
+      const origin = new THREE.Vector3(
+        (Math.random() - 0.5) * 8,
+        3 + Math.random() * 2,
+        originZ + (Math.random() - 0.5) * 3
+      )
+      const startTime = fw * 0.3
+      const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500']
+      
+      for (let i = 0; i < 30; i++) {
+        allParticles.push({
+          position: origin.clone(),
+          velocity: new THREE.Vector3(
+            (Math.random() - 0.5) * 4,
+            (Math.random() - 0.5) * 4,
+            (Math.random() - 0.5) * 4
+          ),
+          color: colors[Math.floor(Math.random() * colors.length)],
+          origin: origin.clone(),
+          startTime,
+        })
+      }
+    }
+    return allParticles
+  }, [originZ])
+  
+  const active = useRef(false)
+  const start = useRef(0)
+  
+  useEffect(() => {
+    if (trigger > 0) {
+      particles.forEach((p) => {
+        p.position.copy(p.origin)
+        p.velocity.set(
+          (Math.random() - 0.5) * 4,
+          (Math.random() - 0.5) * 4,
+          (Math.random() - 0.5) * 4
+        )
+      })
+      active.current = true
+      start.current = performance.now()
+    }
+  }, [trigger, particles])
+  
+  useFrame((_, dt) => {
+    if (!group.current || !active.current) return
+    const elapsed = (performance.now() - start.current) / 1000
+    if (elapsed > 3) {
+      active.current = false
+      return
+    }
+    
+    particles.forEach((p, i) => {
+      const localElapsed = elapsed - p.startTime
+      if (localElapsed < 0 || localElapsed > 1.5) return
+      
+      p.velocity.y -= 5 * dt
+      p.position.addScaledVector(p.velocity, dt)
+      
+      const mesh = group.current!.children[i] as THREE.Mesh
+      if (mesh) {
+        mesh.position.copy(p.position)
+        const scale = Math.max(0, 1 - localElapsed * 0.8)
+        mesh.scale.set(scale, scale, scale)
+      }
+    })
+  })
+  
+  return (
+    <group ref={group}>
+      {particles.map((p, i) => (
+        <mesh key={i} position={[0, 0, 0]}>
+          <boxGeometry args={[0.08, 0.08, 0.08]} />
+          <meshBasicMaterial color={p.color} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 function Simple3DScene({
   stepIndex,
   wrongPulse,
   correctPulse,
   currentOffer,
+  allComplete,
 }: {
   stepIndex: number
   wrongPulse: number
   correctPulse: number
   currentOffer: PackageOption | null
+  allComplete: boolean
 }) {
   const skyColor = skyColors[Math.min(stepIndex, skyColors.length - 1)]
   const characterZ = -stepIndex * 1.5
@@ -372,6 +492,9 @@ function Simple3DScene({
       
       {/* Confetti - originates from character position */}
       <Confetti trigger={correctPulse} originZ={characterZ} />
+      
+      {/* Fireworks when all complete */}
+      {allComplete && <Fireworks trigger={1} originZ={characterZ} />}
     </Canvas>
   )
 }
@@ -618,6 +741,7 @@ export default function TaxStairsGamePage() {
   }
 
   const isLast = roundIndex === rounds.length - 1
+  const allComplete = stepIndex >= 3
 
   return (
 
@@ -714,9 +838,9 @@ export default function TaxStairsGamePage() {
                         <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-base font-bold">
                           Start Game
                               </div>
-                      </div>
+                              </div>
                       <div className="absolute left-1 top-1 w-40 h-12 bg-red-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
-                    </div>
+                            </div>
                   </div>
                 </button>
               </div>
@@ -731,7 +855,7 @@ export default function TaxStairsGamePage() {
         <div className="max-w-6xl mx-auto">
           <Card className="overflow-hidden relative min-h-[700px] shadow-xl" style={{ borderRadius: 12 }}>
             <div className="h-[700px] w-full relative">
-              <Simple3DScene stepIndex={stepIndex} wrongPulse={wrongPulse} correctPulse={correctPulse} currentOffer={currentOffer} />
+              <Simple3DScene stepIndex={stepIndex} wrongPulse={wrongPulse} correctPulse={correctPulse} currentOffer={currentOffer} allComplete={allComplete || false} />
 
               {/* Step indicator - top left */}
               <div className="absolute top-4 left-4 z-20">
@@ -869,8 +993,34 @@ export default function TaxStairsGamePage() {
                 </div>
               )}
 
+              {/* Completion message - all 3 rounds correct */}
+              {allComplete && (
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 1.5, duration: 0.5 }}
+                    className="bg-white/95 backdrop-blur-sm rounded-lg p-8 shadow-2xl border-4 border-yellow-400 min-w-[400px] text-center"
+                  >
+                    <div className="text-6xl mb-4">👑</div>
+                    <div className="text-3xl font-bold font-vt323 mb-3 text-yellow-600">Congratulations!</div>
+                    <div className="text-xl font-bold font-vt323 mb-2 text-green-600">You've Reached the Top!</div>
+                    <div className="text-base text-muted-foreground font-vt323 mb-6">
+                      You successfully completed all 3 rounds and climbed to the top of the mountain!
+                    </div>
+                    <Button 
+                      onClick={restart}
+                      className="font-vt323 text-lg bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3"
+                      size="lg"
+                    >
+                      Play Again
+                    </Button>
+                  </motion.div>
+                </div>
+              )}
+
               {/* Result display - center (delayed animation) */}
-              {result && result.correct && (
+              {result && result.correct && !allComplete && (
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
                       <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
