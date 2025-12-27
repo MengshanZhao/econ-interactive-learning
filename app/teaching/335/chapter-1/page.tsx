@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 
 import { Canvas, useFrame } from "@react-three/fiber"
+import { Html } from "@react-three/drei"
 
 import * as THREE from "three"
 
@@ -70,36 +71,6 @@ const skyColors = [
   '#1a1a2e', // Step 3 - dark blue (pixel star night)
 ]
 
-function PixelatedGrass() {
-  const grassColors = ['#2d5016', '#3a6b1f', '#4a7c2a'] // dark, middle, light green
-  const tileSize = 2.5 // Much bigger pixels to reduce loading time
-  const width = 40
-  const depth = 50
-  
-  return (
-    <group>
-      {Array.from({ length: Math.floor(width / tileSize) }).map((_, x) =>
-        Array.from({ length: Math.floor(depth / tileSize) }).map((_, z) => {
-          const color = grassColors[Math.floor(Math.random() * grassColors.length)]
-          return (
-            <mesh
-              key={`${x}-${z}`}
-              rotation={[-Math.PI / 2, 0, 0]}
-              position={[
-                (x - width / 2 / tileSize) * tileSize,
-                -1.5,
-                (z - depth / 2 / tileSize) * tileSize - 12
-              ]}
-            >
-              <boxGeometry args={[tileSize, 0.1, tileSize]} />
-              <meshBasicMaterial color={color} />
-            </mesh>
-          )
-        })
-      )}
-    </group>
-  )
-}
 
 function VoxelStairs({ stepIndex }: { stepIndex: number }) {
   const stepGeo = useMemo(() => new THREE.BoxGeometry(2.0, 0.4, 1.2), [])
@@ -461,7 +432,7 @@ function Fireworks({ trigger, originZ }: { trigger: number; originZ: number }) {
   )
 }
 
-// Emoji-based sky background component
+// Emoji-based sky background component using actual emoji text
 function EmojiSky({ stepIndex }: { stepIndex: number }) {
   if (stepIndex === 0) {
     // Step 0: Single color
@@ -470,17 +441,28 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
     // Step 1: Blue sky with clouds ☁️
     return (
       <group position={[0, 10, -20]}>
-        {/* Clouds positioned across the sky - more and larger */}
+        {/* Clouds as large emoji text */}
         {Array.from({ length: 30 }).map((_, i) => {
           const x = (Math.random() - 0.5) * 45
           const y = (Math.random() - 0.5) * 20 + 5
           const z = -20 + Math.random() * 3
-          const scale = 1.5 + Math.random() * 1.5 // Much larger clouds
           return (
-            <mesh key={`cloud-${i}`} position={[x, y, z]} scale={[scale, scale, 0.1]}>
-              <boxGeometry args={[2, 1, 0.1]} />
-              <meshBasicMaterial color="#FFFFFF" opacity={0.8} transparent />
-            </mesh>
+            <Html
+              key={`cloud-${i}`}
+              position={[x, y, z]}
+              center
+              transform
+              style={{ pointerEvents: 'none' }}
+            >
+              <div style={{ 
+                fontSize: '120px', 
+                lineHeight: '1',
+                userSelect: 'none',
+                filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+              }}>
+                ☁️
+              </div>
+            </Html>
           )
         })}
       </group>
@@ -489,28 +471,51 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
     // Step 2: Red-purple sunset with sun ☀️
     return (
       <group position={[0, 10, -20]}>
-        {/* Sun - much larger */}
-        <mesh position={[8, 8, -20]}>
-          <sphereGeometry args={[4.0, 16, 16]} />
-          <meshBasicMaterial color="#FFD700" />
-        </mesh>
+        {/* Sun as large emoji text */}
+        <Html
+          position={[8, 8, -20]}
+          center
+          transform
+          style={{ pointerEvents: 'none' }}
+        >
+          <div style={{ 
+            fontSize: '200px', 
+            lineHeight: '1',
+            userSelect: 'none',
+            filter: 'drop-shadow(4px 4px 8px rgba(0,0,0,0.4))'
+          }}>
+            ☀️
+          </div>
+        </Html>
       </group>
     )
   } else {
     // Step 3: Dark night with stars ⭐️
     return (
       <group position={[0, 10, -20]}>
-        {/* Stars as much larger bright points */}
+        {/* Stars as large emoji text */}
         {Array.from({ length: 100 }).map((_, i) => {
           const x = (Math.random() - 0.5) * 45
           const y = (Math.random() - 0.5) * 30 + 5
           const z = -20 + Math.random() * 5
-          const size = 0.5 + Math.random() * 0.5 // Much larger stars
+          const size = 60 + Math.random() * 80 // Large stars, 60-140px
           return (
-            <mesh key={`star-${i}`} position={[x, y, z]}>
-              <sphereGeometry args={[size, 8, 8]} />
-              <meshBasicMaterial color="#FFFFFF" />
-            </mesh>
+            <Html
+              key={`star-${i}`}
+              position={[x, y, z]}
+              center
+              transform
+              style={{ pointerEvents: 'none' }}
+            >
+              <div style={{ 
+                fontSize: `${size}px`, 
+                lineHeight: '1',
+                userSelect: 'none',
+                filter: 'drop-shadow(2px 2px 4px rgba(255,255,255,0.5))'
+              }}>
+                ⭐️
+              </div>
+            </Html>
           )
         })}
       </group>
@@ -569,8 +574,11 @@ function Simple3DScene({
       {/* Emoji-based sky background */}
       <EmojiSky stepIndex={stepIndex} />
       
-      {/* Ground plane - pixelated grass */}
-      <PixelatedGrass />
+      {/* Ground plane - original simple version */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, -12]}>
+        <planeGeometry args={[40, 50]} />
+        <meshBasicMaterial color="#B8E0D2" />
+      </mesh>
       
       {/* Left mountain - terraced voxel style */}
       <VoxelMountain position={[-6, -1.5, -8]} size={1.2} />
