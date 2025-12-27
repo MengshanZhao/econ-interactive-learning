@@ -64,11 +64,42 @@ function pct(x: number) {
 
 // Sky colors matching photo - reddish-pink to orange gradient
 const skyColors = [
-  '#FFB6C1', // Step 0 - light pink
-  '#FF8C69', // Step 1
-  '#FF6347', // Step 2 - tomato
-  '#FF331F', // Step 3 - deep red-orange
+  '#FFB6C1', // Step 0 - light pink (single color)
+  '#87CEEB', // Step 1 - sky blue (pixel blue sky)
+  '#FF6347', // Step 2 - tomato (pixel sunset)
+  '#1a1a2e', // Step 3 - dark blue (pixel star night)
 ]
+
+function PixelatedGrass() {
+  const grassColors = ['#2d5016', '#3a6b1f', '#4a7c2a'] // dark, middle, light green
+  const tileSize = 1.0
+  const width = 40
+  const depth = 50
+  
+  return (
+    <group>
+      {Array.from({ length: Math.floor(width / tileSize) }).map((_, x) =>
+        Array.from({ length: Math.floor(depth / tileSize) }).map((_, z) => {
+          const color = grassColors[Math.floor(Math.random() * grassColors.length)]
+          return (
+            <mesh
+              key={`${x}-${z}`}
+              rotation={[-Math.PI / 2, 0, 0]}
+              position={[
+                (x - width / 2 / tileSize) * tileSize,
+                -1.5,
+                (z - depth / 2 / tileSize) * tileSize - 12
+              ]}
+            >
+              <boxGeometry args={[tileSize, 0.1, tileSize]} />
+              <meshBasicMaterial color={color} />
+            </mesh>
+          )
+        })
+      )}
+    </group>
+  )
+}
 
 function VoxelStairs({ stepIndex }: { stepIndex: number }) {
   const stepGeo = useMemo(() => new THREE.BoxGeometry(2.0, 0.4, 1.2), [])
@@ -430,6 +461,88 @@ function Fireworks({ trigger, originZ }: { trigger: number; originZ: number }) {
   )
 }
 
+function PixelatedSky({ stepIndex }: { stepIndex: number }) {
+  if (stepIndex === 0) {
+    // Step 0: Single color
+    return null
+  } else if (stepIndex === 1) {
+    // Step 1: Pixel blue sky
+    const blueColors = ['#87CEEB', '#B0E0E6', '#ADD8E6', '#E0F6FF']
+    return (
+      <group position={[0, 10, -20]}>
+        {Array.from({ length: 30 }).map((_, x) =>
+          Array.from({ length: 20 }).map((_, y) => {
+            const color = blueColors[Math.floor(Math.random() * blueColors.length)]
+            return (
+              <mesh
+                key={`sky-${x}-${y}`}
+                position={[(x - 15) * 1.5, (y - 10) * 1.5, 0]}
+              >
+                <boxGeometry args={[1.5, 1.5, 0.1]} />
+                <meshBasicMaterial color={color} />
+              </mesh>
+            )
+          })
+        )}
+      </group>
+    )
+  } else if (stepIndex === 2) {
+    // Step 2: Pixel sunset
+    const sunsetColors = ['#FF6347', '#FF8C69', '#FFA07A', '#FFB347', '#FFD700']
+    return (
+      <group position={[0, 10, -20]}>
+        {Array.from({ length: 30 }).map((_, x) =>
+          Array.from({ length: 20 }).map((_, y) => {
+            const color = sunsetColors[Math.floor(Math.random() * sunsetColors.length)]
+            return (
+              <mesh
+                key={`sunset-${x}-${y}`}
+                position={[(x - 15) * 1.5, (y - 10) * 1.5, 0]}
+              >
+                <boxGeometry args={[1.5, 1.5, 0.1]} />
+                <meshBasicMaterial color={color} />
+              </mesh>
+            )
+          })
+        )}
+      </group>
+    )
+  } else {
+    // Step 3: Pixel star night
+    const nightColors = ['#1a1a2e', '#16213e', '#0f3460', '#533483']
+    return (
+      <group position={[0, 10, -20]}>
+        {Array.from({ length: 30 }).map((_, x) =>
+          Array.from({ length: 20 }).map((_, y) => {
+            const color = nightColors[Math.floor(Math.random() * nightColors.length)]
+            return (
+              <mesh
+                key={`night-${x}-${y}`}
+                position={[(x - 15) * 1.5, (y - 10) * 1.5, 0]}
+              >
+                <boxGeometry args={[1.5, 1.5, 0.1]} />
+                <meshBasicMaterial color={color} />
+              </mesh>
+            )
+          })
+        )}
+        {/* Stars */}
+        {Array.from({ length: 50 }).map((_, i) => {
+          const x = (Math.random() - 0.5) * 45
+          const y = (Math.random() - 0.5) * 30 + 5
+          const z = -20 + Math.random() * 5
+          return (
+            <mesh key={`star-${i}`} position={[x, y, z]}>
+              <boxGeometry args={[0.2, 0.2, 0.2]} />
+              <meshBasicMaterial color="#FFFFFF" />
+            </mesh>
+          )
+        })}
+      </group>
+    )
+  }
+}
+
 function Simple3DScene({
   stepIndex,
   wrongPulse,
@@ -461,16 +574,16 @@ function Simple3DScene({
   return (
     <Canvas 
       camera={{ position: cameraPosition, fov: 55 }}
-      style={{ width: '100%', height: '100%', background: `linear-gradient(to bottom, ${skyColor}, #FF8C69)` }}
+      style={{ width: '100%', height: '100%', background: stepIndex === 0 ? skyColor : '#000000' }}
     >
-      <ambientLight intensity={1.1} />
-      <directionalLight position={[10, 10, 5]} intensity={0.5} />
+      <ambientLight intensity={stepIndex >= 3 ? 0.6 : 1.1} />
+      <directionalLight position={[10, 10, 5]} intensity={stepIndex >= 3 ? 0.3 : 0.5} />
       
-      {/* Ground plane - brown/terra-cotta matching photo */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, -12]}>
-        <planeGeometry args={[40, 50]} />
-        <meshBasicMaterial color="#9B7A5A" />
-      </mesh>
+      {/* Pixelated sky background */}
+      <PixelatedSky stepIndex={stepIndex} />
+      
+      {/* Ground plane - pixelated grass */}
+      <PixelatedGrass />
       
       {/* Left mountain - terraced voxel style */}
       <VoxelMountain position={[-6, -1.5, -8]} size={1.2} />
@@ -925,17 +1038,8 @@ export default function TaxStairsGamePage() {
               {/* 3D Arrow buttons - center bottom */}
               {!result && (
                 <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-8 items-center">
-                  {/* Left side - Arrow pointing left + Switch to New Offer button */}
+                  {/* Left side - Switch to New Offer button + Arrow pointing right (opposite direction) */}
                   <div className="flex items-center gap-2">
-                    {/* Arrow pointing left (to new offer box) */}
-                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(-10deg)' }}>
-                      <div className="w-0 h-0" style={{ 
-                        borderTop: '18px solid transparent',
-                        borderBottom: '18px solid transparent',
-                        borderLeft: '24px solid #3b82f6',
-                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
-                      }}></div>
-                    </div>
                     {/* Switch button */}
                     <button
                       onClick={() => evaluate("switch")}
@@ -957,10 +1061,28 @@ export default function TaxStairsGamePage() {
                         </div>
                       </div>
                     </button>
+                    {/* Arrow pointing right (opposite direction - points away from button) */}
+                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(10deg)' }}>
+                      <div className="w-0 h-0" style={{ 
+                        borderTop: '18px solid transparent',
+                        borderBottom: '18px solid transparent',
+                        borderRight: '24px solid #3b82f6',
+                        filter: 'drop-shadow(-2px 2px 4px rgba(0,0,0,0.3))'
+                      }}></div>
+                    </div>
                   </div>
 
-                  {/* Right side - Stay with Current Job button + Arrow pointing right */}
+                  {/* Right side - Arrow pointing left (opposite direction) + Stay with Current Job button */}
                   <div className="flex items-center gap-2">
+                    {/* Arrow pointing left (opposite direction - points away from button) */}
+                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(-10deg)' }}>
+                      <div className="w-0 h-0" style={{ 
+                        borderTop: '18px solid transparent',
+                        borderBottom: '18px solid transparent',
+                        borderLeft: '24px solid #f97316',
+                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+                      }}></div>
+                    </div>
                     {/* Stay button */}
                     <button
                       onClick={() => evaluate("stay")}
@@ -982,15 +1104,6 @@ export default function TaxStairsGamePage() {
                         </div>
                       </div>
                     </button>
-                    {/* Arrow pointing right (to current job box) */}
-                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(10deg)' }}>
-                      <div className="w-0 h-0" style={{ 
-                        borderTop: '18px solid transparent',
-                        borderBottom: '18px solid transparent',
-                        borderRight: '24px solid #f97316',
-                        filter: 'drop-shadow(-2px 2px 4px rgba(0,0,0,0.3))'
-                      }}></div>
-                    </div>
                   </div>
                 </div>
               )}
@@ -1017,7 +1130,7 @@ export default function TaxStairsGamePage() {
                     >
                       Play Again
                     </Button>
-                  </motion.div>
+                      </motion.div>
                 </div>
               )}
 
