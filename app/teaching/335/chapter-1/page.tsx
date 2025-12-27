@@ -472,7 +472,7 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
     // Step 2: Sunset with sun ☀️
     return (
       <group position={[0, 10, -20]}>
-        {/* Sun as large emoji text - more visible position */}
+        {/* Sun as large emoji text - much larger since we only have one */}
         <Html
           position={[5, 6, -20]}
           center
@@ -480,7 +480,7 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
           style={{ pointerEvents: 'none' }}
         >
           <div style={{ 
-            fontSize: '250px', 
+            fontSize: '400px', 
             lineHeight: '1',
             userSelect: 'none',
             filter: 'drop-shadow(4px 4px 8px rgba(0,0,0,0.4))'
@@ -493,23 +493,23 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
   } else {
     // Step 3: Dark night with stars ⭐️ - only 6-7 stars, distributed on both sides
     const starPositions = [
-      // Left side stars
-      { x: -15, y: 8, z: -20 },
-      { x: -18, y: 12, z: -19 },
-      { x: -12, y: 5, z: -21 },
+      // Left side stars - adjusted positions relative to group
+      { x: -15, y: -2, z: 0 },
+      { x: -18, y: 2, z: 1 },
+      { x: -12, y: -5, z: -1 },
       // Right side stars
-      { x: 15, y: 10, z: -20 },
-      { x: 18, y: 7, z: -19 },
-      { x: 12, y: 13, z: -21 },
+      { x: 15, y: 0, z: 0 },
+      { x: 18, y: -3, z: 1 },
+      { x: 12, y: 3, z: -1 },
       // One in the middle
-      { x: 0, y: 9, z: -20 },
+      { x: 0, y: -1, z: 0 },
     ]
     
     return (
       <group position={[0, 10, -20]}>
         {/* Stars as large emoji text - only 6-7 stars, explicitly placed on both sides */}
         {starPositions.map((pos, i) => {
-          const size = 80 + Math.random() * 60 // Large stars, 80-140px
+          const size = 100 + Math.random() * 80 // Large stars, 100-180px
           return (
             <Html
               key={`star-${i}`}
