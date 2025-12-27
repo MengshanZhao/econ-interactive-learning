@@ -61,6 +61,44 @@ function pct(x: number) {
 
 }
 
+/** -------- RANDOM GENERATION -------- */
+
+// Normal distribution generator using Box-Muller transform
+function normalRandom(mean: number, stdDev: number): number {
+  let u = 0, v = 0
+  while (u === 0) u = Math.random() // Converting [0,1) to (0,1)
+  while (v === 0) v = Math.random()
+  const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v)
+  return z * stdDev + mean
+}
+
+// Generate a random tax rate between 10% and 30%
+function randomTaxRate(): number {
+  // Uniform distribution between 0.1 and 0.3
+  return 0.1 + Math.random() * 0.2
+}
+
+// Generate a random income around 7000 using normal distribution
+function randomIncome(): number {
+  const mean = 7000
+  const stdDev = 1000 // Standard deviation of 1000
+  let income = normalRandom(mean, stdDev)
+  // Clamp to reasonable range (4000-10000)
+  income = Math.max(4000, Math.min(10000, Math.round(income)))
+  return income
+}
+
+// Generate a random offer
+function generateRandomOffer(id: "A" | "B", label: string): PackageOption {
+  return {
+    id,
+    label,
+    earnings: randomIncome(),
+    personalTax: randomTaxRate(),
+    corporateTax: randomTaxRate(),
+  }
+}
+
 /** -------- 3D SCENE -------- */
 
 // Sky colors matching photo - reddish-pink to orange gradient
@@ -727,7 +765,7 @@ export default function TaxStairsGamePage() {
 
         title: "Round 1",
 
-        newOffer: { id: "A", label: "Tech Startup", earnings: 7200, personalTax: 0.22, corporateTax: 0.12 },
+        newOffer: generateRandomOffer("A", "Tech Startup"),
 
       },
 
@@ -737,7 +775,7 @@ export default function TaxStairsGamePage() {
 
         title: "Round 2",
 
-        newOffer: { id: "B", label: "Finance Corp", earnings: 7600, personalTax: 0.30, corporateTax: 0.10 },
+        newOffer: generateRandomOffer("B", "Finance Corp"),
 
       },
 
@@ -747,7 +785,7 @@ export default function TaxStairsGamePage() {
 
         title: "Round 3",
 
-        newOffer: { id: "A", label: "Consulting Firm", earnings: 8200, personalTax: 0.26, corporateTax: 0.18 },
+        newOffer: generateRandomOffer("A", "Consulting Firm"),
 
       },
 
@@ -757,8 +795,11 @@ export default function TaxStairsGamePage() {
 
   )
 
-  // Initial current offer
-  const initialOffer: PackageOption = { id: "A", label: "TechCorp Solutions", earnings: 6000, personalTax: 0.2, corporateTax: 0.1 }
+  // Initial current offer - also randomly generated
+  const initialOffer: PackageOption = useMemo(
+    () => generateRandomOffer("A", "TechCorp Solutions"),
+    []
+  )
 
   const [roundIndex, setRoundIndex] = useState(0)
 
