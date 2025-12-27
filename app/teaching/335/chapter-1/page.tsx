@@ -922,18 +922,18 @@ export default function TaxStairsGamePage() {
                 </div>
               )}
 
-              {/* 3D Arrow buttons - center bottom (fixed directions) */}
+              {/* 3D Arrow buttons - center bottom */}
               {!result && (
                 <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-12 items-center">
-                  {/* Left arrow - Switch to New Offer (points left to new offer box) */}
+                  {/* Left side - Switch to New Offer (arrow points left to new offer box) */}
                   <button
                     onClick={() => evaluate("switch")}
                     className="group relative cursor-pointer"
                     style={{ perspective: '1000px' }}
                   >
                     <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(-15deg)' }}>
-                      <div className="relative transform transition-all duration-300 group-hover:scale-110 group-hover:translate-x-2 group-active:scale-95">
-                        {/* Arrow head - left pointing */}
+                      <div className="relative transform transition-all duration-300 group-hover:scale-110 group-hover:-translate-x-2 group-active:scale-95">
+                        {/* Arrow head - left pointing (on the left side) */}
                         <div className="absolute left-0 top-0 w-0 h-0" style={{ 
                           borderTop: '20px solid transparent',
                           borderBottom: '20px solid transparent',
@@ -958,14 +958,14 @@ export default function TaxStairsGamePage() {
                     </div>
                   </button>
 
-                  {/* Right arrow - Stay with Current Job (points right to current job box) */}
+                  {/* Right side - Stay with Current Job (arrow points right to current job box) */}
                   <button
                     onClick={() => evaluate("stay")}
                     className="group relative cursor-pointer"
                     style={{ perspective: '1000px' }}
                   >
                     <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(15deg)' }}>
-                      <div className="relative transform transition-all duration-300 group-hover:scale-110 group-hover:-translate-x-2 group-active:scale-95">
+                      <div className="relative transform transition-all duration-300 group-hover:scale-110 group-hover:translate-x-2 group-active:scale-95">
                         {/* Arrow shaft - main body */}
                         <div className="relative w-32 h-10 bg-orange-500 rounded shadow-xl" style={{ 
                           boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
@@ -978,7 +978,7 @@ export default function TaxStairsGamePage() {
                             Stay with Current Job
                           </div>
                         </div>
-                        {/* Arrow head - right pointing */}
+                        {/* Arrow head - right pointing (on the right side) */}
                         <div className="absolute right-0 top-0 w-0 h-0" style={{ 
                           borderTop: '20px solid transparent',
                           borderBottom: '20px solid transparent',
