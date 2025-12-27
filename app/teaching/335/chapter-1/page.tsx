@@ -924,72 +924,74 @@ export default function TaxStairsGamePage() {
 
               {/* 3D Arrow buttons - center bottom */}
               {!result && (
-                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-12 items-center">
-                  {/* Left side - Switch to New Offer (arrow points left to new offer box) */}
-                  <button
-                    onClick={() => evaluate("switch")}
-                    className="group relative cursor-pointer"
-                    style={{ perspective: '1000px' }}
-                  >
-                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(-15deg)' }}>
-                      <div className="relative transform transition-all duration-300 group-hover:scale-110 group-hover:-translate-x-2 group-active:scale-95">
-                        {/* Arrow head - left pointing (on the left side) */}
-                        <div className="absolute left-0 top-0 w-0 h-0" style={{ 
-                          borderTop: '20px solid transparent',
-                          borderBottom: '20px solid transparent',
-                          borderLeft: '28px solid #3b82f6',
-                          filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
-                        }}></div>
-                        {/* Arrow shaft - main body */}
-                        <div className="relative left-28 w-32 h-10 bg-blue-500 rounded shadow-xl" style={{ 
-                          boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
-                          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
-                        }}>
-                          {/* Top highlight */}
-                          <div className="absolute top-0 left-0 right-0 h-1 bg-blue-300 rounded-t opacity-60"></div>
-                          {/* Text */}
-                          <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-sm font-bold">
-                            Switch to New Offer
-                          </div>
-                        </div>
-                        {/* 3D depth shadow */}
-                        <div className="absolute left-29 top-1 w-32 h-10 bg-blue-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
-                      </div>
+                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-8 items-center">
+                  {/* Left side - Arrow pointing left + Switch to New Offer button */}
+                  <div className="flex items-center gap-2">
+                    {/* Arrow pointing left (to new offer box) */}
+                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(-10deg)' }}>
+                      <div className="w-0 h-0" style={{ 
+                        borderTop: '18px solid transparent',
+                        borderBottom: '18px solid transparent',
+                        borderLeft: '24px solid #3b82f6',
+                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+                      }}></div>
                     </div>
-                  </button>
+                    {/* Switch button */}
+                    <button
+                      onClick={() => evaluate("switch")}
+                      className="group relative cursor-pointer"
+                      style={{ perspective: '1000px' }}
+                    >
+                      <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(-5deg)' }}>
+                        <div className="relative transform transition-all duration-300 group-hover:scale-110 group-active:scale-95">
+                          <div className="relative w-36 h-10 bg-blue-500 rounded shadow-xl" style={{ 
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
+                            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                          }}>
+                            <div className="absolute top-0 left-0 right-0 h-1 bg-blue-300 rounded-t opacity-60"></div>
+                            <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-sm font-bold">
+                              Switch to New Offer
+                            </div>
+                          </div>
+                          <div className="absolute left-1 top-1 w-36 h-10 bg-blue-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
 
-                  {/* Right side - Stay with Current Job (arrow points right to current job box) */}
-                  <button
-                    onClick={() => evaluate("stay")}
-                    className="group relative cursor-pointer"
-                    style={{ perspective: '1000px' }}
-                  >
-                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(15deg)' }}>
-                      <div className="relative transform transition-all duration-300 group-hover:scale-110 group-hover:translate-x-2 group-active:scale-95">
-                        {/* Arrow shaft - main body */}
-                        <div className="relative w-32 h-10 bg-orange-500 rounded shadow-xl" style={{ 
-                          boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
-                          background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
-                        }}>
-                          {/* Top highlight */}
-                          <div className="absolute top-0 left-0 right-0 h-1 bg-orange-300 rounded-t opacity-60"></div>
-                          {/* Text */}
-                          <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-sm font-bold">
-                            Stay with Current Job
+                  {/* Right side - Stay with Current Job button + Arrow pointing right */}
+                  <div className="flex items-center gap-2">
+                    {/* Stay button */}
+                    <button
+                      onClick={() => evaluate("stay")}
+                      className="group relative cursor-pointer"
+                      style={{ perspective: '1000px' }}
+                    >
+                      <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(5deg)' }}>
+                        <div className="relative transform transition-all duration-300 group-hover:scale-110 group-active:scale-95">
+                          <div className="relative w-36 h-10 bg-orange-500 rounded shadow-xl" style={{ 
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
+                            background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
+                          }}>
+                            <div className="absolute top-0 left-0 right-0 h-1 bg-orange-300 rounded-t opacity-60"></div>
+                            <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-sm font-bold">
+                              Stay with Current Job
+                            </div>
                           </div>
+                          <div className="absolute left-1 top-1 w-36 h-10 bg-orange-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
                         </div>
-                        {/* Arrow head - right pointing (on the right side) */}
-                        <div className="absolute right-0 top-0 w-0 h-0" style={{ 
-                          borderTop: '20px solid transparent',
-                          borderBottom: '20px solid transparent',
-                          borderRight: '28px solid #f97316',
-                          filter: 'drop-shadow(-2px 2px 4px rgba(0,0,0,0.3))'
-                        }}></div>
-                        {/* 3D depth shadow */}
-                        <div className="absolute left-1 top-1 w-32 h-10 bg-orange-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
                       </div>
+                    </button>
+                    {/* Arrow pointing right (to current job box) */}
+                    <div className="relative" style={{ transformStyle: 'preserve-3d', transform: 'rotateY(10deg)' }}>
+                      <div className="w-0 h-0" style={{ 
+                        borderTop: '18px solid transparent',
+                        borderBottom: '18px solid transparent',
+                        borderRight: '24px solid #f97316',
+                        filter: 'drop-shadow(-2px 2px 4px rgba(0,0,0,0.3))'
+                      }}></div>
                     </div>
-                  </button>
+                  </div>
                 </div>
               )}
 
