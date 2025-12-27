@@ -438,12 +438,13 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
     // Step 0: Single color
     return null
   } else if (stepIndex === 1) {
-    // Step 1: Blue sky with clouds ☁️
+    // Step 1: Blue sky with clouds ☁️ - distributed on both sides
     return (
       <group position={[0, 10, -20]}>
-        {/* Clouds as large emoji text */}
+        {/* Clouds as large emoji text - distributed across entire sky */}
         {Array.from({ length: 30 }).map((_, i) => {
-          const x = (Math.random() - 0.5) * 45
+          // Distribute clouds across entire sky width (-25 to +25)
+          const x = (Math.random() - 0.5) * 50
           const y = (Math.random() - 0.5) * 20 + 5
           const z = -20 + Math.random() * 3
           return (
@@ -468,7 +469,7 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
       </group>
     )
   } else if (stepIndex === 2) {
-    // Step 2: Red-purple sunset with sun ☀️
+    // Step 2: Sunset with sun ☀️
     return (
       <group position={[0, 10, -20]}>
         {/* Sun as large emoji text */}
@@ -490,12 +491,13 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
       </group>
     )
   } else {
-    // Step 3: Dark night with stars ⭐️
+    // Step 3: Dark night with stars ⭐️ - fewer stars, distributed across entire sky
     return (
       <group position={[0, 10, -20]}>
-        {/* Stars as large emoji text */}
-        {Array.from({ length: 100 }).map((_, i) => {
-          const x = (Math.random() - 0.5) * 45
+        {/* Stars as large emoji text - reduced count, distributed across entire sky */}
+        {Array.from({ length: 40 }).map((_, i) => {
+          // Distribute stars across entire sky width (-25 to +25)
+          const x = (Math.random() - 0.5) * 50
           const y = (Math.random() - 0.5) * 30 + 5
           const z = -20 + Math.random() * 5
           const size = 60 + Math.random() * 80 // Large stars, 60-140px
@@ -555,7 +557,7 @@ function Simple3DScene({
   const backgroundColor = useMemo(() => {
     if (stepIndex === 0) return skyColor // Single color
     if (stepIndex === 1) return '#87CEEB' // Blue sky for daylight
-    if (stepIndex === 2) return '#8B3A8B' // Red-purple for sunset
+    if (stepIndex === 2) return '#FF6347' // Sunset color (orange/red)
     return '#1a1a2e' // Dark night
   }, [stepIndex, skyColor])
   
@@ -574,10 +576,10 @@ function Simple3DScene({
       {/* Emoji-based sky background */}
       <EmojiSky stepIndex={stepIndex} />
       
-      {/* Ground plane - original simple version */}
+      {/* Ground plane - brown/darker green */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, -12]}>
         <planeGeometry args={[40, 50]} />
-        <meshBasicMaterial color="#B8E0D2" />
+        <meshBasicMaterial color="#6B8E23" />
       </mesh>
       
       {/* Left mountain - terraced voxel style */}
