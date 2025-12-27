@@ -507,9 +507,9 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
     
     return (
       <group position={[0, 10, -20]}>
-        {/* Stars as large emoji text - only 6-7 stars, explicitly placed on both sides */}
+        {/* Stars as emoji text - 6-7 stars, smaller size */}
         {starPositions.map((pos, i) => {
-          const size = 100 + Math.random() * 80 // Large stars, 100-180px
+          const size = 50 + Math.random() * 30 // Smaller stars, 50-80px
           return (
             <Html
               key={`star-${i}`}
