@@ -34,13 +34,7 @@ type Round = {
 
   title: string
 
-  prompt: string
-
-  isPractice?: boolean
-
-  A: PackageOption
-
-  B: PackageOption
+  newOffer: PackageOption
 
 }
 
@@ -68,18 +62,18 @@ function pct(x: number) {
 
 /** -------- 3D SCENE -------- */
 
-// Sky colors that change with each step - warm orange/peach gradients
+// Sky colors matching photo - reddish-pink to orange gradient
 const skyColors = [
-  '#FFE4CC', // Step 0 - light peach
-  '#FFD9B3', // Step 1
-  '#FFCF9A', // Step 2
-  '#FFC481', // Step 3
-  '#FFBA68', // Step 4
-  '#FFB04F', // Step 5
-  '#FFA636', // Step 6
-  '#FF9C1D', // Step 7
-  '#FF9204', // Step 8
-  '#FF8800', // Step 9 - deep orange
+  '#FFB6C1', // Step 0 - light pink
+  '#FFA07A', // Step 1 - light salmon
+  '#FF8C69', // Step 2
+  '#FF7F50', // Step 3 - coral
+  '#FF6B47', // Step 4
+  '#FF6347', // Step 5 - tomato
+  '#FF5A3D', // Step 6
+  '#FF4D33', // Step 7
+  '#FF4029', // Step 8
+  '#FF331F', // Step 9 - deep red-orange
 ]
 
 function VoxelStairs({ stepIndex }: { stepIndex: number }) {
@@ -90,8 +84,9 @@ function VoxelStairs({ stepIndex }: { stepIndex: number }) {
       {Array.from({ length: 10 }).map((_, i) => {
         const z = -i * 1.5 // Move back in Z
         const y = i * 0.4  // Step height
-        const colors = ['#d08a6a', '#c77f60', '#b87256']
-        const color = colors[i % 3]
+        // Darker browns matching photo
+        const colors = ['#8B5A3C', '#7A4F35', '#6B452E', '#5C3A27']
+        const color = colors[i % 4]
         
         return (
           <mesh key={i} geometry={stepGeo} position={[0, y, z]}>
@@ -114,8 +109,9 @@ function VoxelMountain({ position, size = 1 }: { position: [number, number, numb
         const height = 0.5
         const y = i * 0.5
         const z = -i * 0.3
-        const colors = ['#d08a6a', '#c77f60', '#b87256', '#a8654d']
-        const color = colors[i % 4]
+        // Darker browns matching photo - terra-cotta/brown tones
+        const colors = ['#8B5A3C', '#7A4F35', '#6B452E', '#5C3A27', '#4D2F20']
+        const color = colors[i % 5]
         
         return (
           <mesh key={i} position={[0, y, z]}>
@@ -131,15 +127,15 @@ function VoxelMountain({ position, size = 1 }: { position: [number, number, numb
 function WaterPool({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
-      {/* Water surface */}
+      {/* Water surface - darker blue-gray matching photo */}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[4, 12]} />
-        <meshBasicMaterial color="#9BB5C0" transparent opacity={0.6} />
+        <meshBasicMaterial color="#5A7A8A" transparent opacity={0.7} />
       </mesh>
       {/* Water base */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
         <planeGeometry args={[4, 12]} />
-        <meshBasicMaterial color="#7A9BA8" />
+        <meshBasicMaterial color="#4A6A7A" />
       </mesh>
     </group>
   )
@@ -185,29 +181,29 @@ function LittleAvatar({ stepIndex, wrongPulse }: { stepIndex: number; wrongPulse
   
   return (
     <group ref={group} position={[0, 0.6, 0]}>
-      {/* Body */}
+      {/* Body - dark blue matching photo */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[0.4, 0.5, 0.3]} />
-        <meshBasicMaterial color="#4b74ff" />
+        <meshBasicMaterial color="#2E4A6B" />
       </mesh>
-      {/* Head */}
+      {/* Head - light pink/purple matching photo */}
       <mesh position={[0, 0.4, 0]}>
         <boxGeometry args={[0.32, 0.32, 0.32]} />
-        <meshBasicMaterial color="#ffb48a" />
+        <meshBasicMaterial color="#E8A5C4" />
       </mesh>
-      {/* Legs */}
+      {/* Legs - darker blue */}
       <mesh position={[-0.1, -0.3, 0]}>
         <boxGeometry args={[0.15, 0.3, 0.2]} />
-        <meshBasicMaterial color="#3a5fd9" />
+        <meshBasicMaterial color="#1E3A5B" />
       </mesh>
       <mesh position={[0.1, -0.3, 0]}>
         <boxGeometry args={[0.15, 0.3, 0.2]} />
-        <meshBasicMaterial color="#3a5fd9" />
+        <meshBasicMaterial color="#1E3A5B" />
       </mesh>
-      {/* Backpack */}
+      {/* Backpack - dark brown */}
       <mesh position={[-0.25, 0, 0]}>
         <boxGeometry args={[0.15, 0.25, 0.2]} />
-        <meshBasicMaterial color="#2a2a2f" />
+        <meshBasicMaterial color="#3A2A1F" />
       </mesh>
     </group>
   )
@@ -288,10 +284,12 @@ function Simple3DScene({
   stepIndex,
   wrongPulse,
   correctPulse,
+  currentOffer,
 }: {
   stepIndex: number
   wrongPulse: number
   correctPulse: number
+  currentOffer: PackageOption | null
 }) {
   const skyColor = skyColors[Math.min(stepIndex, skyColors.length - 1)]
   const characterZ = -stepIndex * 1.5
@@ -299,14 +297,14 @@ function Simple3DScene({
   return (
     <Canvas 
       camera={{ position: [5, 4, 10], fov: 55 }}
-      style={{ width: '100%', height: '100%', background: `linear-gradient(to bottom, ${skyColor}, #FFB366)` }}
+      style={{ width: '100%', height: '100%', background: `linear-gradient(to bottom, ${skyColor}, #FF8C69)` }}
     >
       <ambientLight intensity={1.1} />
       
-      {/* Ground plane - extends far back */}
+      {/* Ground plane - brown/terra-cotta matching photo */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, -12]}>
         <planeGeometry args={[40, 50]} />
-        <meshBasicMaterial color="#B8E0D2" />
+        <meshBasicMaterial color="#9B7A5A" />
       </mesh>
       
       {/* Left mountain - terraced voxel style */}
@@ -335,45 +333,49 @@ function Simple3DScene({
 
 /** -------- UI + GAME LOGIC -------- */
 
-function PackageCard({
+function OfferCard({
 
-  p,
+  offer,
 
-  onPick,
+  label,
+
+  onChoose,
+
+  disabled,
 
 }: {
 
-  p: PackageOption
+  offer: PackageOption
 
-  onPick: (id: "A" | "B") => void
+  label: string
+
+  onChoose: () => void
+
+  disabled?: boolean
 
 }) {
 
+  const afterTaxAmount = afterTax(offer)
+
   return (
 
-    <Card className="p-5 bg-card shadow-md hover:shadow-xl transition-shadow">
+    <Card className="p-6 bg-card shadow-lg hover:shadow-xl transition-all border-2">
 
-      <div className="flex items-start justify-between gap-3">
+      <div className="mb-4">
 
-        <div>
+        <div className="text-sm text-muted-foreground font-vt323 mb-1">{label}</div>
 
-          <div className="text-sm text-muted-foreground font-vt323">Package {p.id}</div>
-
-          <div className="text-xl font-bold font-vt323">{p.label}</div>
-
-        </div>
-
-        <Badge variant="secondary" className="font-vt323">Choose</Badge>
+        <div className="text-2xl font-bold font-vt323">{offer.label}</div>
 
       </div>
 
-      <div className="mt-4 space-y-2 text-sm font-vt323">
+      <div className="space-y-3 text-sm font-vt323 mb-6">
 
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center">
 
           <span className="text-muted-foreground">Earnings (gross)</span>
 
-          <span className="font-medium">${money(p.earnings)}</span>
+          <span className="font-semibold text-lg">${money(offer.earnings)}</span>
 
         </div>
 
@@ -381,7 +383,7 @@ function PackageCard({
 
           <span className="text-muted-foreground">Personal tax</span>
 
-          <span className="font-medium">{pct(p.personalTax)}</span>
+          <span className="font-medium">{pct(offer.personalTax)}</span>
 
         </div>
 
@@ -389,15 +391,37 @@ function PackageCard({
 
           <span className="text-muted-foreground">Corporate tax</span>
 
-          <span className="font-medium">{pct(p.corporateTax)}</span>
+          <span className="font-medium">{pct(offer.corporateTax)}</span>
+
+        </div>
+
+        <div className="pt-2 border-t">
+
+          <div className="flex justify-between items-center">
+
+            <span className="text-muted-foreground">After-tax</span>
+
+            <span className="font-bold text-xl text-primary">${money(afterTaxAmount)}</span>
+
+          </div>
 
         </div>
 
       </div>
 
-      <Button className="w-full mt-4 font-vt323 text-base" onClick={() => onPick(p.id)}>
+      <Button 
 
-        Pick Package {p.id}
+        className="w-full font-vt323 text-base h-12" 
+
+        onClick={onChoose}
+
+        disabled={disabled}
+
+        size="lg"
+
+      >
+
+        {label}
 
       </Button>
 
@@ -415,33 +439,11 @@ export default function TaxStairsGamePage() {
 
       {
 
-        id: "practice",
-
-        title: "Practice Round",
-
-        prompt:
-
-          "Pick the package that gives the higher AFTER-TAX income. (We'll reveal the math right after you choose.)",
-
-        isPractice: true,
-
-        A: { id: "A", label: "Stable Salary", earnings: 6000, personalTax: 0.2, corporateTax: 0.1 },
-
-        B: { id: "B", label: "Higher Gross (but taxed more)", earnings: 6800, personalTax: 0.28, corporateTax: 0.18 },
-
-      },
-
-      {
-
         id: "r1",
 
         title: "Round 1",
 
-        prompt: "Same task: choose the package with higher AFTER-TAX income.",
-
-        A: { id: "A", label: "Offer A", earnings: 7200, personalTax: 0.22, corporateTax: 0.12 },
-
-        B: { id: "B", label: "Offer B", earnings: 7600, personalTax: 0.30, corporateTax: 0.10 },
+        newOffer: { id: "A", label: "Tech Startup", earnings: 7200, personalTax: 0.22, corporateTax: 0.12 },
 
       },
 
@@ -451,11 +453,7 @@ export default function TaxStairsGamePage() {
 
         title: "Round 2",
 
-        prompt: "Now it's getting close — trust the take-home, not the gross.",
-
-        A: { id: "A", label: "Offer A", earnings: 8200, personalTax: 0.26, corporateTax: 0.18 },
-
-        B: { id: "B", label: "Offer B", earnings: 7800, personalTax: 0.22, corporateTax: 0.08 },
+        newOffer: { id: "B", label: "Finance Corp", earnings: 7600, personalTax: 0.30, corporateTax: 0.10 },
 
       },
 
@@ -465,11 +463,27 @@ export default function TaxStairsGamePage() {
 
         title: "Round 3",
 
-        prompt: "Final step: which package pays you more after taxes?",
+        newOffer: { id: "A", label: "Consulting Firm", earnings: 8200, personalTax: 0.26, corporateTax: 0.18 },
 
-        A: { id: "A", label: "Offer A", earnings: 9000, personalTax: 0.33, corporateTax: 0.05 },
+      },
 
-        B: { id: "B", label: "Offer B", earnings: 8600, personalTax: 0.24, corporateTax: 0.14 },
+      {
+
+        id: "r4",
+
+        title: "Round 4",
+
+        newOffer: { id: "B", label: "Remote Agency", earnings: 7800, personalTax: 0.22, corporateTax: 0.08 },
+
+      },
+
+      {
+
+        id: "r5",
+
+        title: "Round 5",
+
+        newOffer: { id: "A", label: "Enterprise Co", earnings: 9000, personalTax: 0.33, corporateTax: 0.05 },
 
       },
 
@@ -479,21 +493,26 @@ export default function TaxStairsGamePage() {
 
   )
 
+  // Initial current offer
+  const initialOffer: PackageOption = { id: "A", label: "Current Job", earnings: 6000, personalTax: 0.2, corporateTax: 0.1 }
+
   const [roundIndex, setRoundIndex] = useState(0)
 
   const round = rounds[roundIndex]
 
-  const [picked, setPicked] = useState<"A" | "B" | null>(null)
+  const [currentOffer, setCurrentOffer] = useState<PackageOption>(initialOffer)
+
+  const [choice, setChoice] = useState<"stay" | "switch" | null>(null)
 
   const [result, setResult] = useState<{
 
     correct: boolean
 
-    bestId: "A" | "B"
+    shouldSwitch: boolean
 
-    afterA: number
+    currentAfterTax: number
 
-    afterB: number
+    newAfterTax: number
 
   } | null>(null)
 
@@ -505,27 +524,33 @@ export default function TaxStairsGamePage() {
 
   const [correctPulse, setCorrectPulse] = useState(0)
 
-  const [showInstructions, setShowInstructions] = useState(true)
+  function evaluate(choice: "stay" | "switch") {
 
-  function evaluate(choice: "A" | "B") {
+    const currentAfterTax = afterTax(currentOffer)
 
-    const afterA = afterTax(round.A)
+    const newAfterTax = afterTax(round.newOffer)
 
-    const afterB = afterTax(round.B)
+    const shouldSwitch = newAfterTax > currentAfterTax
 
-    const bestId: "A" | "B" = afterA >= afterB ? "A" : "B"
+    const correct = (choice === "switch" && shouldSwitch) || (choice === "stay" && !shouldSwitch)
 
-    const correct = choice === bestId
+    setChoice(choice)
 
-    setPicked(choice)
-
-    setResult({ correct, bestId, afterA, afterB })
+    setResult({ correct, shouldSwitch, currentAfterTax, newAfterTax })
 
     if (correct) {
 
       setStepIndex((s) => Math.min(s + 1, 9))
 
       setCorrectPulse((x) => x + 1)
+
+      // Update current offer if switching was correct, or keep current if staying was correct
+
+      if (shouldSwitch) {
+
+        setCurrentOffer(round.newOffer)
+
+      }
 
     } else {
 
@@ -537,7 +562,7 @@ export default function TaxStairsGamePage() {
 
   function nextRound() {
 
-    setPicked(null)
+    setChoice(null)
 
     setResult(null)
 
@@ -549,7 +574,9 @@ export default function TaxStairsGamePage() {
 
     setRoundIndex(0)
 
-    setPicked(null)
+    setCurrentOffer(initialOffer)
+
+    setChoice(null)
 
     setResult(null)
 
@@ -559,103 +586,36 @@ export default function TaxStairsGamePage() {
 
     setCorrectPulse(0)
 
-    setShowInstructions(true)
-
   }
 
   const isLast = roundIndex === rounds.length - 1
 
   return (
 
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-amber-50">
 
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto px-4 py-8">
 
-        <div className="grid lg:grid-cols-2 gap-6 items-stretch">
+        {/* Top: Simple instruction */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold font-vt323 mb-2">Pick the highest after tax offer to climb on the mountain!</h1>
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <Badge variant="secondary" className="font-vt323 text-base">Step {stepIndex}/9</Badge>
+            <Button variant="outline" onClick={restart} className="font-vt323 text-base">
+              Restart
+            </Button>
+          </div>
+        </div>
 
-          {/* LEFT: UI */}
+        {/* Game area */}
+        <div className="grid lg:grid-cols-2 gap-6 items-start">
 
-          <div className="flex flex-col gap-4">
-
-                <div className="flex items-center justify-between">
-
-              <div>
-
-                <div className="text-sm text-muted-foreground font-vt323">Game 1 • After-Tax Choice</div>
-
-                <h1 className="text-3xl font-bold font-vt323">Climb the Tax Stairs</h1>
-
-              </div>
-
-              <div className="flex gap-2">
-
-                <Badge variant="secondary" className="font-vt323">Step {stepIndex}</Badge>
-
-                <Button variant="outline" onClick={restart} className="font-vt323 text-base">
-
-                  Restart
-
-                </Button>
-
-              </div>
-
-            </div>
+          {/* LEFT: Game controls */}
+          <div className="flex flex-col gap-6">
 
             <AnimatePresence mode="wait">
 
-              {showInstructions ? (
-
-                <motion.div
-
-                  key="instructions"
-
-                  initial={{ opacity: 0, y: 10 }}
-
-                  animate={{ opacity: 1, y: 0 }}
-
-                  exit={{ opacity: 0, y: -10 }}
-
-                >
-
-                  <Card className="p-6">
-
-                    <h2 className="text-xl font-bold mb-2 font-vt323">How to play</h2>
-
-                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground font-vt323">
-
-                      <li>You'll see two packages (A vs B).</li>
-
-                      <li>Each has earnings + two tax rates (personal + corporate).</li>
-
-                      <li>Your goal: pick the higher <span className="font-medium text-foreground">after-tax</span> pay.</li>
-
-                      <li>Correct choice = your character steps up one stair.</li>
-
-                    </ol>
-
-                    <div className="mt-4 p-4 rounded-lg bg-muted/40 text-sm font-vt323">
-
-                      <div className="font-semibold mb-1">After-tax (teaching version)</div>
-
-                      <div className="text-muted-foreground">
-
-                        after-tax = earnings × (1 − personal tax) × (1 − corporate tax)
-
-                      </div>
-
-                    </div>
-
-                    <div className="mt-5 flex justify-end">
-
-                      <Button onClick={() => setShowInstructions(false)} className="font-vt323 text-base">Start (Practice First)</Button>
-
-                    </div>
-
-                  </Card>
-
-                </motion.div>
-
-              ) : (
+              {!result ? (
 
                 <motion.div
 
@@ -667,149 +627,141 @@ export default function TaxStairsGamePage() {
 
                   exit={{ opacity: 0, y: -10 }}
 
-                  className="flex flex-col gap-4"
+                  className="flex flex-col gap-6"
 
                 >
 
-                  <Card className="p-6">
+                  <Card className="p-6 bg-white/90 shadow-lg">
 
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="text-center mb-4">
 
-                      <div>
+                      <div className="text-sm text-muted-foreground font-vt323 mb-1">{round.title}</div>
 
-                        <div className="text-sm text-muted-foreground font-vt323">
+                      <h2 className="text-2xl font-bold font-vt323">A new job offer arrives!</h2>
 
-                          {round.isPractice ? "Practice" : `Question ${roundIndex}`}
-
-                        </div>
-
-                        <h2 className="text-xl font-bold font-vt323">{round.title}</h2>
-
-                      </div>
-
-                      {round.isPractice && <Badge variant="secondary">guided</Badge>}
+                      <p className="mt-2 text-sm text-muted-foreground font-vt323">Should you stay with your current job or switch?</p>
 
                     </div>
 
-                    <p className="mt-2 text-sm text-muted-foreground font-vt323">{round.prompt}</p>
-
                   </Card>
 
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid gap-6">
 
-                    <PackageCard p={round.A} onPick={(id) => !result && evaluate(id)} />
+                    <OfferCard 
 
-                    <PackageCard p={round.B} onPick={(id) => !result && evaluate(id)} />
+                      offer={currentOffer} 
+
+                      label="Stay with Current Job"
+
+                      onChoose={() => evaluate("stay")}
+
+                    />
+
+                    <OfferCard 
+
+                      offer={round.newOffer} 
+
+                      label="Switch to New Offer"
+
+                      onChoose={() => evaluate("switch")}
+
+                    />
 
                   </div>
 
-                  <AnimatePresence>
+                </motion.div>
 
-                    {result && (
+              ) : (
 
-                      <motion.div
+                <motion.div
 
-                        initial={{ opacity: 0, y: 10 }}
+                  key="result"
 
-                        animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 10 }}
 
-                        exit={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
 
-                      >
+                  exit={{ opacity: 0, y: -10 }}
 
-                        <Card className="p-6">
+                >
 
-                          <div className="flex items-start justify-between gap-3">
+                  <Card className="p-6 bg-white/90 shadow-lg">
 
-                            <div>
+                    <div className="text-center mb-6">
 
-                              <div className="text-sm text-muted-foreground font-vt323">Result</div>
+                      <div className="text-4xl mb-3">
 
-                              <div className="text-2xl font-bold font-vt323">
+                        {result.correct ? "✅" : "❌"}
 
-                                {result.correct ? "✅ Correct — step up!" : "❌ Not quite — taxes got you!"}
+                      </div>
 
-                              </div>
+                      <div className="text-2xl font-bold font-vt323 mb-2">
 
-                              <div className="mt-1 text-sm text-muted-foreground font-vt323">
+                        {result.correct ? "Correct! Step up!" : "Not quite!"}
 
-                                Best choice was <span className="font-semibold text-foreground">Package {result.bestId}</span>.
+                      </div>
 
-                              </div>
+                      <div className="text-sm text-muted-foreground font-vt323">
 
-                            </div>
+                        {result.shouldSwitch 
 
-                            <Badge variant={result.correct ? "default" : "destructive"} className="font-vt323">
+                          ? "The new offer has higher after-tax pay. You should switch!"
 
-                              You chose {picked}
+                          : "Your current job has higher after-tax pay. You should stay!"
 
-                            </Badge>
+                        }
 
-                          </div>
+                      </div>
 
-                          <div className="mt-4 grid md:grid-cols-2 gap-4 text-sm font-vt323">
+                    </div>
 
-                            <div className="p-4 rounded-lg bg-muted/40">
+                    <div className="grid md:grid-cols-2 gap-4 mb-6">
 
-                              <div className="font-semibold mb-1">Package A after-tax</div>
+                      <div className="p-4 rounded-lg bg-muted/40 border-2 border-dashed">
 
-                              <div className="text-2xl font-bold">${money(result.afterA)}</div>
+                        <div className="font-semibold mb-2 font-vt323">Current Job</div>
 
-                              <div className="text-muted-foreground mt-1">
+                        <div className="text-2xl font-bold font-vt323">${money(result.currentAfterTax)}</div>
 
-                                ${money(round.A.earnings)} × (1 − {pct(round.A.personalTax)}) × (1 − {pct(round.A.corporateTax)})
+                        <div className="text-xs text-muted-foreground mt-1 font-vt323">after-tax</div>
 
-                              </div>
+                      </div>
 
-                            </div>
+                      <div className="p-4 rounded-lg bg-muted/40 border-2 border-dashed">
 
-                            <div className="p-4 rounded-lg bg-muted/40">
+                        <div className="font-semibold mb-2 font-vt323">New Offer</div>
 
-                              <div className="font-semibold mb-1">Package B after-tax</div>
+                        <div className="text-2xl font-bold font-vt323">${money(result.newAfterTax)}</div>
 
-                              <div className="text-2xl font-bold">${money(result.afterB)}</div>
+                        <div className="text-xs text-muted-foreground mt-1 font-vt323">after-tax</div>
 
-                              <div className="text-muted-foreground mt-1">
+                      </div>
 
-                                ${money(round.B.earnings)} × (1 − {pct(round.B.personalTax)}) × (1 − {pct(round.B.corporateTax)})
+                    </div>
 
-                              </div>
+                    <div className="flex justify-center">
 
-                            </div>
+                      {isLast ? (
 
-                          </div>
+                        <Button onClick={restart} className="font-vt323 text-base" size="lg">
 
-                          <div className="mt-5 flex items-center justify-between gap-3">
+                          Play Again
 
-                            <div className="text-sm text-muted-foreground font-vt323">
+                        </Button>
 
-                              Takeaway: judge offers by <span className="font-medium text-foreground">take-home</span>, not gross.
+                      ) : (
 
-                            </div>
+                        <Button onClick={nextRound} className="font-vt323 text-base" size="lg">
 
-                            <div className="flex gap-2">
+                          Next Round
 
-                              {isLast ? (
+                        </Button>
 
-                                <Button onClick={restart} className="font-vt323 text-base">Play Again</Button>
+                      )}
 
-                              ) : (
+                    </div>
 
-                                <Button onClick={nextRound} className="font-vt323 text-base">Next Question</Button>
-
-                              )}
-
-                            </div>
-
-                          </div>
-
-                        </Card>
-
-                      </motion.div>
-
-                    )}
-
-                  </AnimatePresence>
+                  </Card>
 
                 </motion.div>
 
@@ -820,17 +772,30 @@ export default function TaxStairsGamePage() {
           </div>
 
           {/* RIGHT: 3D game scene */}
+          <Card className="overflow-hidden relative min-h-[600px] shadow-xl" style={{ borderRadius: 12 }}>
 
-          <Card className="overflow-hidden relative min-h-[520px]" style={{ borderRadius: 0 }}>
+            <div className="h-[600px] w-full relative">
 
-            <div className="h-[520px] w-full relative">
+              <Simple3DScene stepIndex={stepIndex} wrongPulse={wrongPulse} correctPulse={correctPulse} currentOffer={currentOffer} />
 
-              <Simple3DScene stepIndex={stepIndex} wrongPulse={wrongPulse} correctPulse={correctPulse} />
+              {/* Current offer display - bottom right corner, on top of mountain */}
+              {currentOffer && (
+                <div className="absolute bottom-6 right-6 z-20">
+                  <Card className="p-4 bg-white/95 shadow-xl border-2 border-orange-200 min-w-[200px]">
+                    <div className="text-xs text-muted-foreground font-vt323 mb-1">Current Job</div>
+                    <div className="text-lg font-bold font-vt323 mb-2">{currentOffer.label}</div>
+                    <div className="text-2xl font-bold font-vt323 text-orange-600">
+                      ${money(afterTax(currentOffer))}
+                    </div>
+                    <div className="text-xs text-muted-foreground font-vt323 mt-1">after-tax</div>
+                  </Card>
+                </div>
+              )}
 
-              {/* UI Overlay */}
+              {/* Step indicator - top left */}
               <div className="absolute top-4 left-4 z-20">
-                <Badge variant="secondary" className="font-vt323 text-base bg-white/90">
-                  Step {stepIndex}
+                <Badge variant="secondary" className="font-vt323 text-base bg-white/95 shadow-lg px-4 py-2">
+                  Step {stepIndex}/9
                 </Badge>
               </div>
 
