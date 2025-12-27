@@ -72,7 +72,7 @@ const skyColors = [
 
 function PixelatedGrass() {
   const grassColors = ['#2d5016', '#3a6b1f', '#4a7c2a'] // dark, middle, light green
-  const tileSize = 0.25 // Much smaller pixels
+  const tileSize = 2.5 // Much bigger pixels to reduce loading time
   const width = 40
   const depth = 50
   
@@ -470,12 +470,12 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
     // Step 1: Blue sky with clouds ☁️
     return (
       <group position={[0, 10, -20]}>
-        {/* Clouds positioned across the sky */}
-        {Array.from({ length: 15 }).map((_, i) => {
+        {/* Clouds positioned across the sky - more and larger */}
+        {Array.from({ length: 30 }).map((_, i) => {
           const x = (Math.random() - 0.5) * 45
           const y = (Math.random() - 0.5) * 20 + 5
           const z = -20 + Math.random() * 3
-          const scale = 0.5 + Math.random() * 0.5
+          const scale = 1.5 + Math.random() * 1.5 // Much larger clouds
           return (
             <mesh key={`cloud-${i}`} position={[x, y, z]} scale={[scale, scale, 0.1]}>
               <boxGeometry args={[2, 1, 0.1]} />
@@ -489,9 +489,9 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
     // Step 2: Red-purple sunset with sun ☀️
     return (
       <group position={[0, 10, -20]}>
-        {/* Sun */}
+        {/* Sun - much larger */}
         <mesh position={[8, 8, -20]}>
-          <sphereGeometry args={[1.5, 16, 16]} />
+          <sphereGeometry args={[4.0, 16, 16]} />
           <meshBasicMaterial color="#FFD700" />
         </mesh>
       </group>
@@ -500,12 +500,12 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
     // Step 3: Dark night with stars ⭐️
     return (
       <group position={[0, 10, -20]}>
-        {/* Stars as small bright points */}
+        {/* Stars as much larger bright points */}
         {Array.from({ length: 100 }).map((_, i) => {
           const x = (Math.random() - 0.5) * 45
           const y = (Math.random() - 0.5) * 30 + 5
           const z = -20 + Math.random() * 5
-          const size = 0.1 + Math.random() * 0.15
+          const size = 0.5 + Math.random() * 0.5 // Much larger stars
           return (
             <mesh key={`star-${i}`} position={[x, y, z]}>
               <sphereGeometry args={[size, 8, 8]} />
@@ -1057,7 +1057,7 @@ export default function TaxStairsGamePage() {
                         </div>
                       </div>
                     </button>
-                  </div>
+                            </div>
 
                   {/* Right side - Stay with Current Job button + Arrow (outside right, pointing right away) */}
                   <div className="flex items-center gap-2">
@@ -1076,7 +1076,7 @@ export default function TaxStairsGamePage() {
                             <div className="absolute top-0 left-0 right-0 h-1 bg-orange-300 rounded-t opacity-60"></div>
                             <div className="absolute inset-0 flex items-center justify-center text-white font-vt323 text-sm font-bold">
                               Stay with Current Job
-                            </div>
+                          </div>
                           </div>
                           <div className="absolute left-1 top-1 w-36 h-10 bg-orange-700 rounded opacity-50" style={{ transform: 'translateZ(-4px)' }}></div>
                         </div>
