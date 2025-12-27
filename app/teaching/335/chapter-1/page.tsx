@@ -2,12 +2,6 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react"
 
-import { Canvas, useFrame } from "@react-three/fiber"
-
-import { OrthographicCamera, Environment } from "@react-three/drei"
-
-import * as THREE from "three"
-
 import { motion, AnimatePresence } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
@@ -68,376 +62,341 @@ function pct(x: number) {
 
 }
 
-/** -------- 3D SCENE -------- */
+/** -------- PIXEL ART STYLES -------- */
+const pixelStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+  
+  .pixel-art-container {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    font-family: 'VT323', monospace;
+  }
+  
+  .pixel-field {
+    background: #87CEEB;
+    position: relative;
+    overflow: hidden;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-sky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: #87CEEB;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: #B8E0D2;
+    border-top: 2px solid #98D8E8;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(0,0,0,0.05) 15px, rgba(0,0,0,0.05) 16px),
+      repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(0,0,0,0.05) 15px, rgba(0,0,0,0.05) 16px);
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+  
+  .pixel-stairs {
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    padding-bottom: 20px;
+    gap: 8px;
+  }
+  
+  .pixel-step {
+    width: 40px;
+    height: 30px;
+    background: #d08a6a;
+    border: 2px solid #c77f60;
+    border-radius: 0;
+    box-shadow: 
+      2px 2px 0 #b87256,
+      inset -2px -2px 0 rgba(0,0,0,0.1);
+    image-rendering: pixelated;
+  }
+  
+  .pixel-step:nth-child(even) {
+    background: #c77f60;
+    border-color: #b87256;
+  }
+  
+  .pixel-character {
+    position: absolute;
+    bottom: 20px;
+    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-character.stepping {
+    animation: pixelStep 0.5s ease-out;
+  }
+  
+  .pixel-character.wrong {
+    animation: pixelWrong 0.5s ease-out;
+  }
+  
+  @keyframes pixelStep {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.1); }
+    100% { transform: translateY(0) scale(1); }
+  }
+  
+  @keyframes pixelWrong {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-15px) rotate(-5deg); }
+    75% { transform: translateX(5px) rotate(5deg); }
+  }
+  
+  .pixel-avatar {
+    width: 32px;
+    height: 40px;
+    position: relative;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-head {
+    width: 24px;
+    height: 24px;
+    background: #ffb48a;
+    border: 2px solid #e89f7a;
+    border-radius: 0;
+    margin: 0 auto;
+    position: relative;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-body {
+    width: 20px;
+    height: 20px;
+    background: #4b74ff;
+    border: 2px solid #3a5fd9;
+    border-radius: 0;
+    margin: 2px auto 0;
+    position: relative;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-backpack {
+    width: 8px;
+    height: 12px;
+    background: #2a2a2f;
+    border: 1px solid #1a1a1f;
+    border-radius: 0;
+    position: absolute;
+    left: -4px;
+    top: 8px;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-confetti {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #ffd15a;
+    border: 1px solid #e6ba3d;
+    border-radius: 0;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-ui-text {
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    image-rendering: pixelated;
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .pixel-ui-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 3px solid #333;
+    border-radius: 0;
+    image-rendering: pixelated;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+  }
+  
+  .pixel-ui-button {
+    border-radius: 0;
+    border: 2px solid #333;
+    image-rendering: pixelated;
+    font-family: 'VT323', monospace;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  
+  .pixel-confetti-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  
+  .pixel-button {
+    border-radius: 0;
+    border: 2px solid;
+    image-rendering: pixelated;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  
+  .pixel-button:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  }
+  
+  .pixel-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+`;
 
-function VoxelStairs({
-
-  steps = 8,
-
-  stepW = 1.2,
-
-  stepH = 0.45,
-
-  stepD = 1.0,
-
-}: {
-
-  steps?: number
-
-  stepW?: number
-
-  stepH?: number
-
-  stepD?: number
-
-}) {
-
-  const geo = useMemo(() => new THREE.BoxGeometry(stepW, stepH, stepD), [stepW, stepH, stepD])
-
-  return (
-
-    <group position={[0, 0, 0]}>
-
-      {Array.from({ length: steps }).map((_, i) => {
-
-        const x = i * (stepW * 0.82)
-
-        const y = i * (stepH * 0.95)
-
-        const z = 0
-
-        return (
-
-          <mesh key={i} geometry={geo} position={[x, y, z]} castShadow receiveShadow>
-
-            <meshStandardMaterial color={i % 2 === 0 ? "#d08a6a" : "#c77f60"} roughness={0.9} />
-
-          </mesh>
-
-        )
-
-      })}
-
-      {/* Side wall / platform */}
-
-      <mesh position={[steps * (stepW * 0.82) * 0.3, -0.55, 0]} receiveShadow>
-
-        <boxGeometry args={[steps * (stepW * 0.82) + 2, 0.6, 3]} />
-
-        <meshStandardMaterial color="#2a2a2f" roughness={0.95} />
-
-      </mesh>
-
-    </group>
-
-  )
-
-}
-
-function LittleAvatar({
-
-  stepIndex,
-
-  stepW = 1.2,
-
-  stepH = 0.45,
-
-  onWrongPulse,
-
-}: {
-
-  stepIndex: number
-
-  stepW?: number
-
-  stepH?: number
-
-  onWrongPulse: number // increments to trigger a wrong animation
-
-}) {
-
-  const group = useRef<THREE.Group>(null)
-
-  const tRef = useRef(0)
-
-  // target position based on step
-
-  const target = useMemo(() => {
-
-    const x = stepIndex * (stepW * 0.82)
-
-    const y = stepIndex * (stepH * 0.95) + 0.35
-
-    return new THREE.Vector3(x, y, 0)
-
-  }, [stepIndex, stepW, stepH])
-
-  // wrong animation: hop + tiny knockback
-
-  const wrongAnim = useRef({ active: false, start: 0 })
-
+function usePixelStyles() {
   useEffect(() => {
-
-    if (!group.current) return
-
-    wrongAnim.current = { active: true, start: performance.now() }
-
-  }, [onWrongPulse])
-
-  useFrame((_, dt) => {
-
-    if (!group.current) return
-
-    // smooth follow to target
-
-    group.current.position.lerp(target, 1 - Math.pow(0.0005, dt * 60))
-
-    // idle bob
-
-    tRef.current += dt
-
-    group.current.rotation.y = Math.sin(tRef.current * 1.1) * 0.08
-
-    // wrong hop (short)
-
-    if (wrongAnim.current.active) {
-
-      const elapsed = (performance.now() - wrongAnim.current.start) / 1000
-
-      const dur = 0.45
-
-      if (elapsed <= dur) {
-
-        const p = elapsed / dur
-
-        const hop = Math.sin(p * Math.PI) * 0.35
-
-        const knock = Math.sin(p * Math.PI) * 0.25
-
-        group.current.position.y += hop
-
-        group.current.position.x -= knock * 0.35
-
-        group.current.rotation.z = Math.sin(p * Math.PI) * 0.22
-
-      } else {
-
-        wrongAnim.current.active = false
-
-        group.current.rotation.z = 0
-
-      }
-
+    const styleId = 'pixel-art-styles'
+    if (document.getElementById(styleId)) return
+    
+    const style = document.createElement('style')
+    style.id = styleId
+    style.textContent = pixelStyles
+    document.head.appendChild(style)
+    
+    return () => {
+      const existing = document.getElementById(styleId)
+      if (existing) existing.remove()
     }
-
-  })
-
-  return (
-
-    <group ref={group} castShadow>
-
-      {/* body */}
-
-      <mesh castShadow>
-
-        <boxGeometry args={[0.38, 0.5, 0.3]} />
-
-        <meshStandardMaterial color="#4b74ff" roughness={0.7} />
-
-      </mesh>
-
-      {/* head */}
-
-      <mesh position={[0, 0.38, 0]} castShadow>
-
-        <boxGeometry args={[0.28, 0.28, 0.28]} />
-
-        <meshStandardMaterial color="#ffb48a" roughness={0.65} />
-
-      </mesh>
-
-      {/* tiny backpack */}
-
-      <mesh position={[-0.22, 0.1, -0.02]} castShadow>
-
-        <boxGeometry args={[0.14, 0.22, 0.18]} />
-
-        <meshStandardMaterial color="#2a2a2f" roughness={0.85} />
-
-      </mesh>
-
-    </group>
-
-  )
-
-}
-
-function ConfettiCoins({ trigger }: { trigger: number }) {
-
-  const group = useRef<THREE.Group>(null)
-
-  const coins = useMemo(() => {
-
-    const arr = Array.from({ length: 18 }).map(() => ({
-
-      pos: new THREE.Vector3(0, 0, 0),
-
-      vel: new THREE.Vector3(
-
-        (Math.random() - 0.5) * 2.2,
-
-        2.2 + Math.random() * 1.2,
-
-        (Math.random() - 0.5) * 1.2
-
-      ),
-
-      rot: new THREE.Vector3(Math.random(), Math.random(), Math.random()),
-
-    }))
-
-    return arr
-
   }, [])
-
-  const active = useRef(false)
-
-  const start = useRef(0)
-
-  useEffect(() => {
-
-    if (!group.current) return
-
-    // reset
-
-    coins.forEach((c) => {
-
-      c.pos.set(0, 0, 0)
-
-      c.vel.set((Math.random() - 0.5) * 2.2, 2.2 + Math.random() * 1.2, (Math.random() - 0.5) * 1.2)
-
-      c.rot.set(Math.random(), Math.random(), Math.random())
-
-    })
-
-    active.current = true
-
-    start.current = performance.now()
-
-  }, [trigger, coins])
-
-  useFrame((_, dt) => {
-
-    if (!group.current || !active.current) return
-
-    const elapsed = (performance.now() - start.current) / 1000
-
-    if (elapsed > 0.9) {
-
-      active.current = false
-
-      return
-
-    }
-
-    coins.forEach((c, i) => {
-
-      c.vel.y -= 7.5 * dt
-
-      c.pos.addScaledVector(c.vel, dt)
-
-      c.rot.x += dt * 6
-
-      c.rot.y += dt * 7
-
-      const m = group.current!.children[i] as THREE.Mesh
-
-      m.position.copy(c.pos)
-
-      m.rotation.set(c.rot.x, c.rot.y, c.rot.z)
-
-      m.scale.setScalar(0.9 + Math.sin(elapsed * 10 + i) * 0.05)
-
-    })
-
-  })
-
-  return (
-
-    <group ref={group} position={[0.3, 1.2, 0.2]}>
-
-      {coins.map((_, i) => (
-
-        <mesh key={i} castShadow>
-
-          <boxGeometry args={[0.12, 0.08, 0.02]} />
-
-          <meshStandardMaterial color="#ffd15a" roughness={0.35} metalness={0.4} />
-
-        </mesh>
-
-      ))}
-
-    </group>
-
-  )
-
 }
 
-function VoxelScene({
+/** -------- PIXEL ART SCENE -------- */
 
+function PixelField({
   stepIndex,
-
   wrongPulse,
-
   correctPulse,
-
 }: {
-
   stepIndex: number
-
   wrongPulse: number
-
   correctPulse: number
-
 }) {
-
+  usePixelStyles()
+  const [animating, setAnimating] = useState(false)
+  const [wrongAnimating, setWrongAnimating] = useState(false)
+  const confettiRef = useRef<HTMLDivElement>(null)
+  const prevStepIndex = useRef(stepIndex)
+  
+  useEffect(() => {
+    if (stepIndex > prevStepIndex.current) {
+      setAnimating(true)
+      setTimeout(() => setAnimating(false), 500)
+    }
+    prevStepIndex.current = stepIndex
+  }, [stepIndex])
+  
+  useEffect(() => {
+    if (wrongPulse > 0) {
+      setWrongAnimating(true)
+      setTimeout(() => setWrongAnimating(false), 500)
+    }
+  }, [wrongPulse])
+  
+  useEffect(() => {
+    if (correctPulse > 0 && confettiRef.current) {
+      // Create confetti particles
+      for (let i = 0; i < 12; i++) {
+        const confetti = document.createElement('div')
+        confetti.className = 'pixel-confetti'
+        const startX = 50 + (Math.random() - 0.5) * 30
+        const startY = 30
+        confetti.style.left = `${startX}%`
+        confetti.style.top = `${startY}%`
+        confetti.style.setProperty('--dx', `${(Math.random() - 0.5) * 200}px`)
+        confetti.style.setProperty('--dy', `${-100 - Math.random() * 100}px`)
+        confetti.style.animation = `pixelConfetti 0.8s ease-out forwards`
+        confettiRef.current.appendChild(confetti)
+        
+        setTimeout(() => confetti.remove(), 800)
+      }
+    }
+  }, [correctPulse])
+  
+  // Calculate character position (left percentage based on step)
+  const characterLeft = 15 + (stepIndex * 8.5)
+  
   return (
-
-    <Canvas shadows dpr={[1, 2]} style={{ width: "100%", height: "100%" }}>
-
-      {/* Camera */}
-
-      <OrthographicCamera makeDefault position={[6, 5, 8]} zoom={85} near={-50} far={50} />
-
-      <ambientLight intensity={0.6} />
-
-      <directionalLight position={[8, 10, 6]} intensity={1.1} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
-
-      {/* floor fog-ish vibe */}
-
-      <fog attach="fog" args={["#e48a7d", 8, 20]} />
-
-      {/* Scene objects */}
-
-      <group position={[-2.5, -0.5, 0]}>
-
-        <VoxelStairs steps={10} />
-
-        <LittleAvatar stepIndex={stepIndex} onWrongPulse={wrongPulse} />
-
-        <ConfettiCoins trigger={correctPulse} />
-
-      </group>
-
-      {/* background env */}
-
-      <Environment preset="sunset" />
-
-    </Canvas>
-
+    <div className="pixel-art-container pixel-field" style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <style>{`
+        @keyframes pixelConfetti {
+          to {
+            transform: translate(var(--dx), var(--dy)) rotate(360deg);
+            opacity: 0;
+          }
+        }
+      `}</style>
+      
+      {/* Sky layer */}
+      <div className="pixel-sky" />
+      
+      {/* Ground layer */}
+      <div className="pixel-ground" />
+      
+      {/* Pixel grid overlay */}
+      <div className="pixel-grid" />
+      
+      {/* Stairs */}
+      <div className="pixel-stairs" style={{ paddingLeft: '10%', position: 'relative', zIndex: 2 }}>
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} className="pixel-step" />
+        ))}
+      </div>
+      
+      {/* Character */}
+      <div 
+        className={`pixel-character ${animating ? 'stepping' : ''} ${wrongAnimating ? 'wrong' : ''}`}
+        style={{ left: `${characterLeft}%`, zIndex: 3 }}
+      >
+        <div className="pixel-avatar">
+          <div className="pixel-head">
+            {/* Eyes */}
+            <div style={{
+              position: 'absolute',
+              width: '3px',
+              height: '3px',
+              background: '#000',
+              left: '6px',
+              top: '8px',
+              boxShadow: '6px 0 0 #000',
+              imageRendering: 'pixelated'
+            }} />
+          </div>
+          <div className="pixel-body">
+            <div className="pixel-backpack" />
+          </div>
+        </div>
+      </div>
+      
+      {/* Confetti container */}
+      <div ref={confettiRef} className="pixel-confetti-container" style={{ zIndex: 4 }} />
+    </div>
   )
-
 }
 
 /** -------- UI + GAME LOGIC -------- */
@@ -464,17 +423,17 @@ function PackageCard({
 
         <div>
 
-          <div className="text-sm text-muted-foreground">Package {p.id}</div>
+          <div className="text-sm text-muted-foreground font-vt323">Package {p.id}</div>
 
-          <div className="text-xl font-bold">{p.label}</div>
+          <div className="text-xl font-bold font-vt323">{p.label}</div>
 
         </div>
 
-        <Badge variant="secondary">Choose</Badge>
+        <Badge variant="secondary" className="font-vt323">Choose</Badge>
 
       </div>
 
-      <div className="mt-4 space-y-2 text-sm">
+      <div className="mt-4 space-y-2 text-sm font-vt323">
 
         <div className="flex justify-between">
 
@@ -502,7 +461,7 @@ function PackageCard({
 
       </div>
 
-      <Button className="w-full mt-4" onClick={() => onPick(p.id)}>
+      <Button className="w-full mt-4 font-vt323 text-base" onClick={() => onPick(p.id)}>
 
         Pick Package {p.id}
 
@@ -684,21 +643,21 @@ export default function TaxStairsGamePage() {
 
           <div className="flex flex-col gap-4">
 
-            <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
 
               <div>
 
-                <div className="text-sm text-muted-foreground">Game 1 • After-Tax Choice</div>
+                <div className="text-sm text-muted-foreground font-vt323">Game 1 • After-Tax Choice</div>
 
-                <h1 className="text-3xl font-bold">Climb the Tax Stairs</h1>
+                <h1 className="text-3xl font-bold font-vt323">Climb the Tax Stairs</h1>
 
               </div>
 
               <div className="flex gap-2">
 
-                <Badge variant="secondary">Step {stepIndex}</Badge>
+                <Badge variant="secondary" className="font-vt323">Step {stepIndex}</Badge>
 
-                <Button variant="outline" onClick={restart}>
+                <Button variant="outline" onClick={restart} className="font-vt323 text-base">
 
                   Restart
 
@@ -724,11 +683,11 @@ export default function TaxStairsGamePage() {
 
                 >
 
-                  <Card className="p-6">
+                  <Card className="p-6 pixel-ui-card" style={{ borderRadius: 0, border: '3px solid #333' }}>
 
-                    <h2 className="text-xl font-bold mb-2">How to play</h2>
+                    <h2 className="text-xl font-bold mb-2 pixel-ui-text" style={{ fontSize: '20px' }}>How to play</h2>
 
-                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground pixel-ui-text" style={{ fontSize: '16px' }}>
 
                       <li>You'll see two packages (A vs B).</li>
 
@@ -740,7 +699,7 @@ export default function TaxStairsGamePage() {
 
                     </ol>
 
-                    <div className="mt-4 p-4 rounded-lg bg-muted/40 text-sm">
+                    <div className="mt-4 p-4 bg-muted/40 text-sm pixel-ui-text" style={{ borderRadius: 0, border: '2px solid #666', fontSize: '14px' }}>
 
                       <div className="font-semibold mb-1">After-tax (teaching version)</div>
 
@@ -754,7 +713,7 @@ export default function TaxStairsGamePage() {
 
                     <div className="mt-5 flex justify-end">
 
-                      <Button onClick={() => setShowInstructions(false)}>Start (Practice First)</Button>
+                      <Button onClick={() => setShowInstructions(false)} className="pixel-ui-button font-vt323 text-base" style={{ borderRadius: 0, border: '2px solid #333' }}>Start (Practice First)</Button>
 
                     </div>
 
@@ -784,13 +743,13 @@ export default function TaxStairsGamePage() {
 
                       <div>
 
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-muted-foreground font-vt323">
 
                           {round.isPractice ? "Practice" : `Question ${roundIndex}`}
 
                         </div>
 
-                        <h2 className="text-xl font-bold">{round.title}</h2>
+                        <h2 className="text-xl font-bold font-vt323">{round.title}</h2>
 
                       </div>
 
@@ -798,7 +757,7 @@ export default function TaxStairsGamePage() {
 
                     </div>
 
-                    <p className="mt-2 text-sm text-muted-foreground">{round.prompt}</p>
+                    <p className="mt-2 text-sm text-muted-foreground font-vt323">{round.prompt}</p>
 
                   </Card>
 
@@ -830,15 +789,15 @@ export default function TaxStairsGamePage() {
 
                             <div>
 
-                              <div className="text-sm text-muted-foreground">Result</div>
+                              <div className="text-sm text-muted-foreground font-vt323">Result</div>
 
-                              <div className="text-2xl font-bold">
+                              <div className="text-2xl font-bold font-vt323">
 
                                 {result.correct ? "✅ Correct — step up!" : "❌ Not quite — taxes got you!"}
 
                               </div>
 
-                              <div className="mt-1 text-sm text-muted-foreground">
+                              <div className="mt-1 text-sm text-muted-foreground font-vt323">
 
                                 Best choice was <span className="font-semibold text-foreground">Package {result.bestId}</span>.
 
@@ -846,7 +805,7 @@ export default function TaxStairsGamePage() {
 
                             </div>
 
-                            <Badge variant={result.correct ? "default" : "destructive"}>
+                            <Badge variant={result.correct ? "default" : "destructive"} className="font-vt323">
 
                               You chose {picked}
 
@@ -854,7 +813,7 @@ export default function TaxStairsGamePage() {
 
                           </div>
 
-                          <div className="mt-4 grid md:grid-cols-2 gap-4 text-sm">
+                          <div className="mt-4 grid md:grid-cols-2 gap-4 text-sm font-vt323">
 
                             <div className="p-4 rounded-lg bg-muted/40">
 
@@ -888,7 +847,7 @@ export default function TaxStairsGamePage() {
 
                           <div className="mt-5 flex items-center justify-between gap-3">
 
-                            <div className="text-sm text-muted-foreground">
+                            <div className="text-sm text-muted-foreground font-vt323">
 
                               Takeaway: judge offers by <span className="font-medium text-foreground">take-home</span>, not gross.
 
@@ -898,11 +857,11 @@ export default function TaxStairsGamePage() {
 
                               {isLast ? (
 
-                                <Button onClick={restart}>Play Again</Button>
+                                <Button onClick={restart} className="font-vt323 text-base">Play Again</Button>
 
                               ) : (
 
-                                <Button onClick={nextRound}>Next Question</Button>
+                                <Button onClick={nextRound} className="font-vt323 text-base">Next Question</Button>
 
                               )}
 
@@ -926,34 +885,19 @@ export default function TaxStairsGamePage() {
 
           </div>
 
-          {/* RIGHT: voxel diorama */}
+          {/* RIGHT: pixel art game scene */}
 
-          <Card className="overflow-hidden relative min-h-[520px] bg-gradient-to-b from-[#ff8d7d] to-[#2b2b33]">
+          <Card className="overflow-hidden relative min-h-[520px] border-0" style={{ background: '#87CEEB', borderRadius: 0, border: '3px solid #333' }}>
 
-            <div className="absolute top-4 left-4 z-10">
+            <div className="h-[520px] w-full relative">
 
-              <Badge variant="secondary">Voxel Preview</Badge>
+              <PixelField stepIndex={stepIndex} wrongPulse={wrongPulse} correctPulse={correctPulse} />
 
-            </div>
-
-            <div className="absolute top-4 right-4 z-10">
-
-              <Badge variant="secondary">Correct → step up</Badge>
-
-            </div>
-
-            <div className="h-[520px] w-full">
-
-              <VoxelScene stepIndex={stepIndex} wrongPulse={wrongPulse} correctPulse={correctPulse} />
-
-            </div>
-
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/30 backdrop-blur-sm">
-
-              <div className="text-white text-sm">
-
-                <span className="font-semibold">Goal:</span> reach the top by consistently choosing higher after-tax pay.
-
+              {/* Pixel UI Overlay */}
+              <div className="absolute top-4 left-4 z-20">
+                <div className="pixel-ui-card px-3 py-1 pixel-ui-text" style={{ fontSize: '14px', background: 'rgba(255,255,255,0.9)' }}>
+                  STEP {stepIndex}
+                </div>
               </div>
 
             </div>
