@@ -438,11 +438,11 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
     // Step 0: Single color
     return null
   } else if (stepIndex === 1) {
-    // Step 1: Blue sky with clouds ☁️ - distributed on both sides
+    // Step 1: Blue sky with clouds ☁️ - distributed on both sides, smaller and fewer
     return (
       <group position={[0, 10, -20]}>
-        {/* Clouds as large emoji text - distributed across entire sky */}
-        {Array.from({ length: 30 }).map((_, i) => {
+        {/* Clouds as emoji text - half the size and count */}
+        {Array.from({ length: 15 }).map((_, i) => {
           // Distribute clouds across entire sky width (-25 to +25)
           const x = (Math.random() - 0.5) * 50
           const y = (Math.random() - 0.5) * 20 + 5
@@ -455,7 +455,7 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
               style={{ pointerEvents: 'none' }}
             >
               <div style={{ 
-                fontSize: '120px', 
+                fontSize: '60px', 
                 lineHeight: '1',
                 userSelect: 'none',
                 filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
@@ -468,17 +468,17 @@ function EmojiSky({ stepIndex }: { stepIndex: number }) {
       </group>
     )
   } else if (stepIndex === 2) {
-    // Step 2: Sunset with sun ☀️
+    // Step 2: Sunset with sun ☀️ - smaller and positioned just above mountains
     return (
       <group position={[0, 10, -20]}>
-        {/* Sun as large emoji text - much larger since we only have one */}
+        {/* Sun as emoji text - smaller and lower, just above mountains */}
         <Html
-          position={[5, 6, -20]}
+          position={[5, -2, -20]}
           center
           style={{ pointerEvents: 'none' }}
         >
           <div style={{ 
-            fontSize: '400px', 
+            fontSize: '200px', 
             lineHeight: '1',
             userSelect: 'none',
             filter: 'drop-shadow(4px 4px 8px rgba(0,0,0,0.4))'
