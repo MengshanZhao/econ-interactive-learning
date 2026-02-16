@@ -21,7 +21,7 @@ What is finance/income statement and how do you calculate 10+ different ratios i
 ### Present and Future Ratios — [Play here](https://www.mengshanzhao.com/teaching/335/chapter-3)
 How to calculate the present or future value with a rocket.
 
-### TVM Rocket — Cash Flow PV — [Play here](https://www.mengshanzhao.com/teaching/335/chapter-4)
+### Rocket and Cash Flow PV — [Play here](https://www.mengshanzhao.com/teaching/335/chapter-4)
 Present value of cash-flow streams, perpetuities, and annuities with visual timelines and a 6-question quiz; randomized each run.
 
 ### Bank Boss — Animal Borrowers — [Play here](https://www.mengshanzhao.com/teaching/335/chapter-5)
@@ -48,7 +48,8 @@ Portfolio risk and return with five stocks; explore covariance, correlation, and
 ### Weighted Average Cost of Capital: A Card Game — [Play here](https://www.mengshanzhao.com/teaching/335/chapter-13)
 Reveal cost of equity, cost of debt, and equity share; bet on whose WACC is lower in a card-game format.
 
-**Preview (Selected):**
+
+## Preview (Selected):
 ![ Quiz 1 Screenshot 1](public/screenshots/game1_1.png)
 ![ Quiz 3 Screenshot 1](public/screenshots/game_3.png)
 ![ Quiz 5 Screenshot 1](public/screenshots/game5_1.png)
