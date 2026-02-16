@@ -20,7 +20,6 @@ What is finance/income statement and how do you calculate 10+ different ratios c
 How to calculate the present or future value with a rocket.
 
 **Preview:**
-![Tax Quiz Screenshot 3](public/screenshots/game_1_3.JPG)
 ![ Quiz 2 Screenshot 1](public/screenshots/game_2.PNG)
 ![ Quiz 3 Screenshot 1](public/screenshots/game_3.png)
 
