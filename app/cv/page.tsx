@@ -116,99 +116,7 @@ export default function CVPage() {
               </div>
             </div>
 
-            {/* Working Papers */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Working Papers</h3>
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      Competing for Clean Air: Dynamic Incentives in China's Environmental Protection Interviews
-                    </h4>
-                    <span className="text-gray-600">03.2024 – Current</span>
-                  </div>
-                  <p className="text-gray-600">
-                    Examines the Environmental Protection Interview (EPI) campaign-style environmental policy in China using near real-time air quality data and Difference-in-Differences approach. Finds that cities at risk of being interviewed achieve PM2.5 reductions of 15.7 μg/m³—nearly four times larger than previous estimates, with effects most pronounced at year-end coinciding with annual evaluations.
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      Assessing the Economic Impacts of Technological Intervention on Organic Vegetable Farm Profitability and Gender Roles in Organic Farming
-                    </h4>
-                    <span className="text-gray-600">Jun 2024 – Current</span>
-                  </div>
-                  <p className="text-gray-600 mb-1">with Prof. Galinato</p>
-                  <p className="text-gray-600">
-                    Determines whether agricultural labor productivity across genders changes after introduction of organic vegetable technologies through a randomized controlled trial in the Philippines. Finds significant increases in female labor during fertilizer and pesticide application stages for low-income households and reductions in labor productivity gaps across all income groups.
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      Birth Timing Decisions, China's Two-Child Allowance, and Women's Human Capital
-                    </h4>
-                    <span className="text-gray-600">Jan 2023 – Current</span>
-                  </div>
-                  <p className="text-gray-600 mb-1">with Ben Cowan</p>
-                  <p className="text-gray-600">
-                    Critically examines the decline in fertility rates in China using a two-stage, discrete-choice model that enables individuals to make fertility decisions based on utility maximization. Empirically validates the model using Chinese Family Panel Survey data from 2010 to 2020, elucidating the roles of human-capital accumulation returns, child value, time costs, and compliance penalties.
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      The Effects of a Psychological Support Intervention for Mothers on Children's Nutrition and Maternal Psychosocial Well-being
-                    </h4>
-                    <span className="text-gray-600">Jan 2023 – Current</span>
-                  </div>
-                  <p className="text-gray-600 mb-1">with Seollee Park and Jennifer Ostrowski</p>
-                  <p className="text-gray-600">
-                    Examines the impacts of psychological support interventions on maternal mental health outcomes and child nutritional status through randomized controlled trial methodology with 800 caregivers.
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      The Impacts of COVID-19 on U.S. Containerized Agricultural Exports
-                    </h4>
-                    <span className="text-gray-600">Jan 2022</span>
-                  </div>
-                  <p className="text-gray-600 mb-1">with Jake Wagner, Eric Jessup, and Bart Kenner</p>
-                  <p className="text-gray-600">
-                    Measures impacts of COVID-19 on monthly U.S. containerized agricultural export volumes using near-saturated fixed effects panel data model. Results show heterogeneous reductions through time: 4.6% reduction from March 2020-May 2021, 11.1% from May 2021-January 2022, with effects most pronounced across origin ports, commodities, and destination countries.
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">Optimal Pricing Policies for Campus Parking</h4>
-                    <span className="text-gray-600">Jan 2022</span>
-                  </div>
-                  <p className="text-gray-600 mb-1">with Jake Wagner and D. Moore</p>
-                  <p className="text-gray-600">
-                    Develops economic models for optimizing campus parking pricing strategies to improve efficiency and accessibility.
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      Role of Public Sentiment in Evaluating Lockdown Effects on Mobility: An Application of Natural Language Processing Method
-                    </h4>
-                    <span className="text-gray-600">Sep 2020 – Current</span>
-                  </div>
-                  <p className="text-gray-600 mb-1">with Xiaorui Qu, Qinan Lu, Liufang Su and Gunning Shi</p>
-                  <p className="text-gray-600">
-                    Investigates the influence of public sentiment and health policies on behavioral changes using daily COVID-related tweets and sentiment analysis through natural language processing. Employs Regression Discontinuity in Time Series (RDiT) method with county-level data from March to April 2020, finding that neutral-tone sentiment has the most pronounced negative impact on mobility.
-                  </p>
-                </div>
-              </div>
-            </div>
+        
 
             {/* Teaching Experience */}
             <div className="mb-12">
@@ -231,6 +139,15 @@ export default function CVPage() {
                     <li>ECONS 101: Fundamentals of Microeconomics</li>
                   </ul>
                 </div>
+              </div>
+            </div>
+
+            {/* Grant */}
+              <div className="mb-12">
+              <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Grant</h3>
+              <div className="space-y-2">
+                <h4 className="text-lg font-semibold text-gray-800">Addressing Maternal Mental Health and Child Undernutrition in Nigeria through Psychological Support <span className="text-gray-600 italic font-normal">2023–2025</span></h4>
+                <p className="text-gray-600">CEGA, UC Berkeley, $75,000. Lead PI: Seollee Park; Role: <span className="italic">Additional Investigator</span>.</p>
               </div>
             </div>
 
@@ -266,9 +183,12 @@ export default function CVPage() {
             <div className="mb-12">
               <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Professional Service</h3>
               <div className="space-y-2">
-                <p className="text-gray-800">Volunteer, Social Platform Team — Committee on Women in Agricultural Economics (CWAE)</p>
+                <p className="text-gray-800">Section Chair - AERE, WEAI <span className="text-gray-600 italic">2025</span></p>
+                <p className="text-gray-800"><span className="font-semibold">Volunteer, Social Platform Team</span> — Committee on Women in Agricultural Economics (CWAE)</p>
               </div>
             </div>
+
+    
 
             {/* Research */}
             <div className="mb-12">
