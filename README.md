@@ -48,16 +48,17 @@ Portfolio risk and return with five stocks; explore covariance, correlation, and
 ### Weighted Average Cost of Capital: A Card Game — [Play here](https://www.mengshanzhao.com/teaching/335/chapter-13)
 Reveal cost of equity, cost of debt, and equity share; bet on whose WACC is lower in a card-game format.
 
+---
 
-## Preview (Selected):
-![ Quiz 1 Screenshot 1](public/screenshots/game1_1.png)
+**Preview:**
+![ Quiz 1 Screenshot 1](public/screenshots/game1_1.jpeg)
+![ Quiz 2 Screenshot 1](public/screenshots/game_2.PNG)
 ![ Quiz 3 Screenshot 1](public/screenshots/game_3.png)
 ![ Quiz 5 Screenshot 1](public/screenshots/game5_1.png)
 ![ Quiz 5 Screenshot 2](public/screenshots/game5_2.png)
 ![ Quiz 6 Screenshot 1](public/screenshots/game6.png)
 ![ Quiz 12 Screenshot 1](public/screenshots/game12.png)
 ![ Quiz 13 Screenshot 1](public/screenshots/game13_1.jpeg)
-
 
 ---
 

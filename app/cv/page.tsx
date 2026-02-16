@@ -183,7 +183,7 @@ export default function CVPage() {
             <div className="mb-12">
               <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 text-gray-800">Professional Service</h3>
               <div className="space-y-2">
-                <p className="text-gray-800"><span className="font-semibold">Section Chair - AERE, WEAI </span> <span className="text-gray-600 italic">2025</span></p>
+                <p className="text-gray-800"><span className="font-semibold">Section Chair </span> - AERE, WEAI <span className="text-gray-600 italic">2025</span></p>
                 <p className="text-gray-800"><span className="font-semibold">Volunteer, Social Platform Team</span> — Committee on Women in Agricultural Economics (CWAE)</p>
               </div>
             </div>
